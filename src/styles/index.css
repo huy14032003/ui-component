@@ -37,6 +37,5 @@
         --destructive-foreground: var(--color-destructive-foreground);
         --success: var(--color-success);
         --success-foreground: var(--color-success-foreground);
-        --radius-xl: var(--radius-xl);
     }
 }

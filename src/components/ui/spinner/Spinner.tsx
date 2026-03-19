@@ -1,4 +1,3 @@
-import React from 'react'
 import * as Icons from '@components/icons'
 import { cn } from '@lib/utils/cn';
 type SpinnerVariant = 'circle' | 'dots' | 'pulse' | 'bars';
@@ -10,8 +9,8 @@ interface SpinnerProps {
 }
 const Spinner = ({ variant = 'circle', size = 'md', className }: SpinnerProps) => {
     const sizeClasses = {
-        xs: "w-1 h-1",
-        sm: "w-2 h-2",
+        xs: "w-2 h-2",
+        sm: "w-3 h-3",
         md: "w-4 h-4",
         lg: "w-6 h-6",
     };

@@ -19,5 +19,14 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      'react-refresh/only-export-components': 'error',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/consistent-type-imports': 'error',
+    },
+    plugins: {
+      'react-refresh': reactRefresh,
+    },
+
   },
 ])
