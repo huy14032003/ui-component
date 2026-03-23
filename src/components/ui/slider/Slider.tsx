@@ -1,4 +1,3 @@
-import React from 'react';
 import { Slider as AriaSlider, SliderOutput, SliderThumb, SliderTrack, Label, type SliderProps } from 'react-aria-components';
 import { cn } from '@lib/utils/cn';
 

@@ -11,12 +11,10 @@ import { ProgressRing } from './components/ui/progress/ProgressRing';
 import { Tabs, TabList, Tab, TabPanel } from './components/ui/tabs/Tabs';
 import { Popover, PopoverDialog } from './components/ui/popover/Popover';
 import { Tooltip, TooltipTrigger } from './components/ui/tooltip/Tooltip';
-import { DialogTrigger, Button as AriaButton, Heading } from 'react-aria-components';
+import { DialogTrigger, Button as AriaButton } from 'react-aria-components';
 import { Switch } from './components/ui/switch/Switch';
 import { Radio, RadioGroup } from './components/ui/radio/Radio';
 import { Example } from './components/ui/modal/Example';
-import { Modal } from './components/ui/modal/Modal';
-import { Dialog } from './components/ui/dialog/Dialog';
 import InputDate from './components/ui/datepicker/InputDate';
 import Tag from './components/ui/tag/Tag';
 
