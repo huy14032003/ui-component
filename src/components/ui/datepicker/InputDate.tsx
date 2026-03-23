@@ -65,7 +65,7 @@ const segmentStyles = tv({
 });
 
 const popoverStyles = tv({
-    base: "bg-white border border-gray-200 rounded-xl shadow-lg entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 origin-top z-50 outline-none max-h-[calc(var(--visual-viewport-height)-20px)] overflow-y-auto scrollbar-hide",
+    base: "bg-white border border-gray-200 rounded-xl shadow-lg entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 origin-top z-50 outline-none max-h-[85vh] sm:max-h-[calc(var(--visual-viewport-height)-20px)] overflow-y-auto",
 });
 
 const calendarCellStyles = tv({
@@ -185,7 +185,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                     )}
                 </DateInput>
             )}
-            <AriaButton className="p-1 rounded-md text-gray-400 hover:text-gray-600 outline-none transition-colors">
+            <AriaButton type="button" className="p-1 rounded-md text-gray-400 hover:text-gray-600 outline-none transition-colors">
                 <Icons.Calendar className={cn(
                     size === "xs" ? "w-3 h-3" :
                         size === "sm" ? "w-4 h-4" :
@@ -334,7 +334,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                     granularity={showTime ? "second" : "day"}
                 >
                     {renderField(true)}
-                    <Popover className={popoverStyles} offset={8}>
+                    <Popover className={popoverStyles} offset={8} containerPadding={12}>
                         <Dialog className="outline-none">
                             <div className="flex flex-col">
                                 {renderRangeCalendar()}
@@ -361,7 +361,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                 granularity={showTime ? "second" : "day"}
             >
                 {renderField(false)}
-                <Popover className={popoverStyles} offset={8}>
+                <Popover className={popoverStyles} offset={8} containerPadding={12}>
                     <Dialog className="outline-none">
                         <div className="flex flex-col">
                             {renderCalendar()}
