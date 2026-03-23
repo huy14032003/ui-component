@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ModalOverlay, type ModalOverlayProps, Modal as RACModal, Heading } from 'react-aria-components';
 import { tv } from 'tailwind-variants';
 import * as Icons from '@components/icons';
-import Button from '../button/Buton';
+import Button from '../button/Button';
 
 export interface ResponsiveWidth {
   xs?: string | number;

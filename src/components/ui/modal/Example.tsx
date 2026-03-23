@@ -1,7 +1,7 @@
 import { DialogTrigger, Heading } from 'react-aria-components';
 import { Modal } from './Modal';
 import { Dialog } from '../dialog/Dialog';
-import Button from '../button/Buton';
+import Button from '../button/Button';
 import { useState } from 'react';
 
 export function Example(props: any) {
@@ -14,16 +14,16 @@ export function Example(props: any) {
         setOpen(true)
       }}>Menu</Button>
 
-      <Modal 
-        isDismissable 
-        isOpen={isOpen} 
+      <Modal
+        isDismissable
+        isOpen={isOpen}
         handleClose={() => setOpen(false)}
         onOpenChange={(open) => setOpen(open)}
         width={{ xs: '95%', sm: '80%', md: '50%', default: '450px' }}
         title="Thông báo hệ thống"
-        // footer={null}
+      // footer={null}
       >
-          <div className="">
+        <div className="">
 
           <p>Click outside or press Escape to close this dialog sâssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss.</p>
           <p>Click outside or press Escape to close this dialog sâssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss.</p>
@@ -62,7 +62,7 @@ export function Example(props: any) {
           <p>Click outside or press Escape to close this dialog sâssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss.</p>
           <p>Click outside or press Escape to close this dialog sâssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss.</p>
           <p>Click outside or press Escape to close this dialog sâssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss.</p>
-          </div>
+        </div>
       </Modal>
     </>
   );

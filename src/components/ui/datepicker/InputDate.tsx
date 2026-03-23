@@ -27,7 +27,7 @@ import * as Icons from "@components/icons";
 // --- Styles ---
 
 const fieldStyles = tv({
-    base: "flex items-center gap-2 bg-white border border-gray-300 rounded-lg shadow-sm outline-none transition-all group focus-within:ring-2",
+    base: "flex items-center gap-2 bg-white border border-gray-300 rounded-lg shadow-sm outline-none transition-all group focus-within:ring-2 w-full max-w-full",
     variants: {
         variant: {
             primary: "focus-within:border-primary focus-within:ring-primary/20",
@@ -37,10 +37,10 @@ const fieldStyles = tv({
             warning: "focus-within:border-warning focus-within:ring-warning/20",
         },
         size: {
-            xs: "px-2 py-1 text-xs",
-            sm: "px-3 py-1.5 text-sm",
-            md: "px-4 py-2 text-sm",
-            lg: "px-5 py-2.5 text-base",
+            xs: "px-1.5 py-0.5 text-[10px]",
+            sm: "px-2 py-1 text-xs",
+            md: "px-3 py-1.5 text-sm",
+            lg: "px-4 py-2 text-base",
         },
         isDisabled: {
             true: "opacity-50 cursor-not-allowed bg-gray-50",
@@ -53,13 +53,13 @@ const fieldStyles = tv({
 });
 
 const segmentStyles = tv({
-    base: "px-0.5 rounded-sm outline-none focus:bg-primary focus:text-white tabular-nums",
+    base: "px-0.5 rounded-sm outline-none focus:bg-primary focus:text-white tabular-nums transition-colors caret-transparent",
     variants: {
         isPlaceholder: {
-            true: "important:text-gray-400 font-normal",
+            true: "text-gray-400 font-normal",
         },
         type: {
-            literal: "px-0",
+            literal: "px-0 opacity-50",
         }
     }
 });
@@ -105,7 +105,7 @@ interface CustomInputDateProps<T extends DateValue> extends Omit<DatePickerProps
     label?: string;
     variant?: "primary" | "secondary" | "danger" | "success" | "warning";
     size?: "xs" | "sm" | "md" | "lg";
-    showTime?: boolean;
+    showTime?: "second" | "minute" | "hour" | "day";
     isRange?: boolean;
     className?: string;
 }
@@ -114,7 +114,7 @@ interface CustomInputDateRangeProps<T extends DateValue> extends Omit<DateRangeP
     label?: string;
     variant?: "primary" | "secondary" | "danger" | "success" | "warning";
     size?: "xs" | "sm" | "md" | "lg";
-    showTime?: boolean;
+    showTime?: "second" | "minute" | "hour" | "day";
     isRange?: boolean;
     className?: string;
 }
@@ -122,7 +122,7 @@ interface CustomInputDateRangeProps<T extends DateValue> extends Omit<DateRangeP
 type InputDateProps<T extends DateValue> = CustomInputDateProps<T> | CustomInputDateRangeProps<T>;
 
 export default function InputDate<T extends DateValue>(props: InputDateProps<T>) {
-    const { label, variant = "primary", size = "md", showTime = false, isRange = false, className, ...rest } = props;
+    const { label, variant = "primary", size = "md", showTime = "day", isRange = false, className, ...rest } = props;
 
     // Sử dụng state để đồng bộ hóa giữa các thành phần
     const [value, setValue] = useState<any>(props.value || props.defaultValue || null);
@@ -131,8 +131,9 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
     const handleValueChange = (newVal: any) => {
         let finalVal = newVal;
 
-        // Chuyển đổi CalendarDate sang CalendarDateTime nếu showTime=true để tránh lỗi granularity
-        if (showTime && newVal) {
+        const isTimeEnabled = showTime && showTime !== "day";
+        // Chuyển đổi CalendarDate sang CalendarDateTime nếu showTime có thời gian để tránh lỗi granularity
+        if (isTimeEnabled && newVal) {
             if (isRange) {
                 const start = newVal.start && !('hour' in newVal.start) ? toCalendarDateTime(newVal.start) : newVal.start;
                 const end = newVal.end && !('hour' in newVal.end) ? toCalendarDateTime(newVal.end) : newVal.end;
@@ -150,10 +151,11 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
     };
 
     const handleNow = () => {
-        let current: any = showTime ? now(getLocalTimeZone()) : today(getLocalTimeZone());
+        const isTimeEnabled = showTime && showTime !== "day";
+        let current: any = isTimeEnabled ? now(getLocalTimeZone()) : today(getLocalTimeZone());
 
         // Chuyển sang CalendarDateTime để không hiện GMT+7
-        if (showTime && 'timeZone' in current) {
+        if (isTimeEnabled && 'timeZone' in current) {
             current = toCalendarDateTime(current);
         }
 
@@ -166,26 +168,32 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
 
     const renderField = (isRangeField: boolean) => (
         <Group className={fieldStyles({ variant, size, isDisabled: props.isDisabled })}>
-            <DateInput slot={isRangeField ? "start" : undefined} className="flex flex-1 items-center">
-                {(segment) => (
-                    <DateSegment
-                        segment={segment}
-                        className={segmentStyles({ isPlaceholder: segment.isPlaceholder, type: segment.type === "literal" ? "literal" : undefined })}
-                    />
-                )}
-            </DateInput>
-            {isRangeField && <span className="text-gray-400 px-1">—</span>}
-            {isRangeField && (
-                <DateInput slot="end" className="flex flex-1 items-center">
+            <div className="flex-1 flex items-center min-w-0 overflow-hidden">
+                <DateInput slot={isRangeField ? "start" : undefined} className="flex-1 flex items-center min-w-0 overflow-x-auto no-scrollbar">
                     {(segment) => (
                         <DateSegment
                             segment={segment}
-                            className={segmentStyles({ isPlaceholder: segment.isPlaceholder, type: segment.type === "literal" ? "literal" : undefined })}
+                            className={cn(segmentStyles({ isPlaceholder: segment.isPlaceholder, type: segment.type === "literal" ? "literal" : undefined }), segment.type && 'pl-1')}
                         />
                     )}
                 </DateInput>
-            )}
-            <AriaButton type="button" className="p-1 rounded-md text-gray-400 hover:text-gray-600 outline-none transition-colors">
+                {isRangeField && (
+                    <>
+                        <span className="text-gray-300 flex-none mx-1">
+                            <Icons.MoveHorizontal size={size === 'xs' ? 12 : 14} strokeWidth={2.5} />
+                        </span>
+                        <DateInput slot="end" className="flex-1 flex items-center min-w-0 overflow-x-auto no-scrollbar">
+                            {(segment) => (
+                                <DateSegment
+                                    segment={segment}
+                                    className={cn(segmentStyles({ isPlaceholder: segment.isPlaceholder, type: segment.type === "literal" ? "literal" : undefined }), segment.type && 'pl-1')}
+                                />
+                            )}
+                        </DateInput>
+                    </>
+                )}
+            </div>
+            <AriaButton type="button" className="flex-none p-1 rounded-md text-gray-400 hover:text-gray-600 outline-none transition-colors border-l border-gray-100 ml-1">
                 <Icons.Calendar className={cn(
                     size === "xs" ? "w-3 h-3" :
                         size === "sm" ? "w-4 h-4" :
@@ -252,7 +260,8 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
     );
 
     const renderTimeSection = () => {
-        if (!showTime) return null;
+        const isTimeEnabled = showTime && showTime !== "day";
+        if (!isTimeEnabled) return null;
 
         return (
             <div className="p-4 border-t border-gray-100 flex flex-col gap-3">
@@ -273,7 +282,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                         <>
                             <TimeField
                                 slot="start"
-                                granularity="second"
+                                granularity={showTime}
                                 value={value?.start}
                                 onChange={(val) => handleValueChange({ ...value, start: val })}
                                 className="flex-1"
@@ -287,7 +296,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                             <span className="text-gray-400 text-xs">—</span>
                             <TimeField
                                 slot="end"
-                                granularity="second"
+                                granularity={showTime}
                                 value={value?.end}
                                 onChange={(val) => handleValueChange({ ...value, end: val })}
                                 className="flex-1"
@@ -301,7 +310,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                         </>
                     ) : (
                         <TimeField
-                            granularity="second"
+                            granularity={showTime}
                             value={value}
                             onChange={handleValueChange}
                             className="w-full"
@@ -331,7 +340,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                     isOpen={isOpen}
                     onOpenChange={setIsOpen}
                     shouldCloseOnSelect={false}
-                    granularity={showTime ? "second" : "day"}
+                    granularity={showTime}
                 >
                     {renderField(true)}
                     <Popover className={popoverStyles} offset={8} containerPadding={12}>
@@ -358,7 +367,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                 isOpen={isOpen}
                 onOpenChange={setIsOpen}
                 shouldCloseOnSelect={false}
-                granularity={showTime ? "second" : "day"}
+                granularity={showTime}
             >
                 {renderField(false)}
                 <Popover className={popoverStyles} offset={8} containerPadding={12}>

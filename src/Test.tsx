@@ -1,22 +1,22 @@
 import * as Icons from '@components/icons'
 import Spinner from '@components/ui/spinner/Spinner'
-import Button from '@components/ui/button/Buton'
+import Button from '@components/ui/button/Button'
 import { AutocompleteSelect, CustomSelect, MultiSelect } from '@components/ui/select/Select';
-import { Disclosure } from './components/ui/disclosure/Disclosure';
-import { Input, InputPassword } from './components/ui/input/Input';
-import { Checkbox, CheckboxGroup } from './components/ui/checkbox/Checkbox';
-import { Slider } from './components/ui/slider/Slider';
-import { ProgressBar } from './components/ui/progress/ProgressBar';
-import { ProgressRing } from './components/ui/progress/ProgressRing';
-import { Tabs, TabList, Tab, TabPanel } from './components/ui/tabs/Tabs';
-import { Popover, PopoverDialog } from './components/ui/popover/Popover';
-import { Tooltip, TooltipTrigger } from './components/ui/tooltip/Tooltip';
+import { Disclosure } from '@components/ui/disclosure/Disclosure';
+import { Input, InputPassword } from '@components/ui/input/Input';
+import { Checkbox, CheckboxGroup } from '@components/ui/checkbox/Checkbox';
+import { Slider } from '@components/ui/slider/Slider';
+import { ProgressBar } from '@components/ui/progress/ProgressBar';
+import { ProgressRing } from '@components/ui/progress/ProgressRing';
+import { Tabs, TabList, Tab, TabPanel } from '@components/ui/tabs/Tabs';
+import { Popover, PopoverDialog } from '@components/ui/popover/Popover';
+import { Tooltip, TooltipTrigger } from '@components/ui/tooltip/Tooltip';
 import { DialogTrigger, Button as AriaButton } from 'react-aria-components';
-import { Switch } from './components/ui/switch/Switch';
-import { Radio, RadioGroup } from './components/ui/radio/Radio';
-import { Example } from './components/ui/modal/Example';
-import InputDate from './components/ui/datepicker/InputDate';
-import Tag from './components/ui/tag/Tag';
+import { Switch } from '@components/ui/switch/Switch';
+import { Radio, RadioGroup } from '@components/ui/radio/Radio';
+import { Example } from '@components/ui/modal/Example';
+import InputDate from '@components/ui/datepicker/InputDate';
+import Tag from '@components/ui/tag/Tag';
 
 const Test = () => {
 
@@ -468,49 +468,49 @@ const Test = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
         <div className="space-y-6">
           <InputDate label="Chọn ngày (Default)" variant="primary" />
-          <InputDate label="Chọn ngày (Success)" variant="success" />
+          <InputDate label="Chọn ngày & giờ" showTime="hour" variant="warning" />
         </div>
         <div className="space-y-6">
-          <InputDate label="Chọn ngày & giờ" showTime variant="warning" />
-          <InputDate label="Chọn ngày & giờ (Danger)" showTime variant="danger" />
+          <InputDate label="Chọn ngày (Success)" showTime="minute" variant="success" />
+          <InputDate label="Chọn ngày & giờ (Danger)" showTime="second" variant="danger" />
         </div>
         <div className="space-y-6">
           <InputDate label="Chọn khoảng ngày" isRange variant="primary" />
-          <InputDate label="Chọn khoảng ngày & giờ" isRange showTime variant="success" />
+          <InputDate label="Chọn khoảng ngày & giờ" isRange showTime="minute" variant="success" />
         </div>
       </div>
       <div className="p-4 mt-4 bg-gray-50 rounded-xl space-y-6">
-          <h4 className="font-semibold text-gray-700">Kích thước (Sizes)</h4>
-          <div className="flex flex-col gap-4">
-              <InputDate size="xs" label="Size XS" variant="primary" />
-              <InputDate size="sm" label="Size SM" variant="success" />
-              <InputDate size="md" label="Size MD (Default)" variant="warning" />
-              <InputDate size="lg" label="Size LG" variant="danger" />
-          </div>
+        <h4 className="font-semibold text-gray-700">Kích thước (Sizes)</h4>
+        <div className="flex flex-col gap-4">
+          <InputDate size="xs" label="Size XS" variant="primary" />
+          <InputDate size="sm" label="Size SM" variant="success" />
+          <InputDate size="md" label="Size MD (Default)" variant="warning" />
+          <InputDate size="lg" label="Size LG" variant="danger" />
+        </div>
       </div>
       <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>10. Tag</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4">
-          <Tag variant="primary">Primary</Tag>
-          <Tag variant="secondary">Secondary</Tag>
-          <Tag variant="danger">Danger</Tag>
-          <Tag variant="success">Success</Tag>
-          <Tag variant="warning">Warning</Tag>
-          <Tag variant="outlinePrimary">Outline Primary</Tag>
-          <Tag variant="outlineSecondary">Outline Secondary</Tag>
-          <Tag variant="outlineDanger">Outline Danger</Tag>
-          <Tag variant="outlineSuccess">Outline Success</Tag>
-          <Tag variant="outlineWarning">Outline Warning</Tag>
-          <Tag variant="ghostPrimary">Ghost Primary</Tag>
-          <Tag variant="ghostSecondary">Ghost Secondary</Tag>
-          <Tag variant="ghostDanger">Ghost Danger</Tag>
-          <Tag variant="ghostSuccess">Ghost Success</Tag>
-          <Tag variant="ghostWarning">Ghost Warning</Tag>
-          <Tag variant="outlineGhostPrimary">Outline Ghost Primary</Tag>
-          <Tag variant="outlineGhostSecondary">Outline Ghost Secondary</Tag>
-          <Tag variant="outlineGhostDanger">Outline Ghost Danger</Tag>
-          <Tag variant="outlineGhostSuccess">Outline Ghost Success</Tag>
-          <Tag variant="outlineGhostWarning">Outline Ghost Warning</Tag>
-        </div>
+        <Tag variant="primary">Primary</Tag>
+        <Tag variant="secondary">Secondary</Tag>
+        <Tag variant="danger">Danger</Tag>
+        <Tag variant="success">Success</Tag>
+        <Tag variant="warning">Warning</Tag>
+        <Tag variant="outlinePrimary">Outline Primary</Tag>
+        <Tag variant="outlineSecondary">Outline Secondary</Tag>
+        <Tag variant="outlineDanger">Outline Danger</Tag>
+        <Tag variant="outlineSuccess">Outline Success</Tag>
+        <Tag variant="outlineWarning">Outline Warning</Tag>
+        <Tag variant="ghostPrimary">Ghost Primary</Tag>
+        <Tag variant="ghostSecondary">Ghost Secondary</Tag>
+        <Tag variant="ghostDanger">Ghost Danger</Tag>
+        <Tag variant="ghostSuccess">Ghost Success</Tag>
+        <Tag variant="ghostWarning">Ghost Warning</Tag>
+        <Tag variant="outlineGhostPrimary">Outline Ghost Primary</Tag>
+        <Tag variant="outlineGhostSecondary">Outline Ghost Secondary</Tag>
+        <Tag variant="outlineGhostDanger">Outline Ghost Danger</Tag>
+        <Tag variant="outlineGhostSuccess">Outline Ghost Success</Tag>
+        <Tag variant="outlineGhostWarning">Outline Ghost Warning</Tag>
+      </div>
     </div>
   )
 }

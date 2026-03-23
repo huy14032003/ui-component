@@ -10,6 +10,7 @@ import {
   type TabPanelProps
 } from 'react-aria-components';
 import { cn } from '@lib/utils/cn';
+import { tv } from 'tailwind-variants';
 
 export interface CustomTabsProps extends TabsProps {
   variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning';
@@ -17,21 +18,29 @@ export interface CustomTabsProps extends TabsProps {
 
 const TabsContext = React.createContext<{ variant: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' }>({ variant: 'primary' });
 
-const tabVariantClasses = {
-  primary: 'data-[selected]:bg-primary data-[selected]:text-white',
-  secondary: 'data-[selected]:bg-secondary data-[selected]:text-white',
-  danger: 'data-[selected]:bg-danger data-[selected]:text-white',
-  success: 'data-[selected]:bg-success data-[selected]:text-white',
-  warning: 'data-[selected]:bg-warning data-[selected]:text-white',
-};
+const tabVariantClasses = tv({
+  variants: {
+    variant: {
+      primary: 'data-[selected]:bg-primary data-[selected]:text-white',
+      secondary: 'data-[selected]:bg-secondary data-[selected]:text-white',
+      danger: 'data-[selected]:bg-danger data-[selected]:text-white',
+      success: 'data-[selected]:bg-success data-[selected]:text-white',
+      warning: 'data-[selected]:bg-warning data-[selected]:text-white',
+    },
+  },
+});
 
-const underlineVariantClasses = {
-  primary: 'data-[selected]:border-b-2 data-[selected]:border-primary data-[selected]:text-primary',
-  secondary: 'data-[selected]:border-b-2 data-[selected]:border-secondary data-[selected]:text-secondary',
-  danger: 'data-[selected]:border-b-2 data-[selected]:border-danger data-[selected]:text-danger',
-  success: 'data-[selected]:border-b-2 data-[selected]:border-success data-[selected]:text-success',
-  warning: 'data-[selected]:border-b-2 data-[selected]:border-warning data-[selected]:text-warning',
-};
+const underlineVariantClasses = tv({
+  variants: {
+    variant: {
+      primary: 'data-[selected]:border-b-2 data-[selected]:border-primary data-[selected]:text-primary',
+      secondary: 'data-[selected]:border-b-2 data-[selected]:border-secondary data-[selected]:text-secondary',
+      danger: 'data-[selected]:border-b-2 data-[selected]:border-danger data-[selected]:text-danger',
+      success: 'data-[selected]:border-b-2 data-[selected]:border-success data-[selected]:text-success',
+      warning: 'data-[selected]:border-b-2 data-[selected]:border-warning data-[selected]:text-warning',
+    },
+  },
+});
 
 export function Tabs({ variant = 'primary', className, ...props }: CustomTabsProps) {
   return (
@@ -76,8 +85,8 @@ export function Tab({ styleType = 'underline', className, ...props }: CustomTabP
         "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded-sm",
         "text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed",
         styleType === 'pill' 
-          ? cn("rounded-md px-4 py-1.5", tabVariantClasses[variant])
-          : cn("rounded-none border-b-2 border-transparent", underlineVariantClasses[variant]),
+          ? cn("rounded-md px-4 py-1.5", tabVariantClasses({ variant }))
+          : cn("rounded-none border-b-2 border-transparent", underlineVariantClasses({ variant })),
         className as string
       )} 
     />

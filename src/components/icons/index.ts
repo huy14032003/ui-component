@@ -10,5 +10,7 @@ export {
     Calendar,
     Clock,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    CalendarRange,
+    MoveHorizontal
 } from 'lucide-react'
