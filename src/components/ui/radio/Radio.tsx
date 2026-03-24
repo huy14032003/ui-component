@@ -69,6 +69,7 @@ export function Radio({ variant = 'primary', size = 'md', label, description, cl
   return (
     <AriaRadio
       {...props}
+      aria-label={props['aria-label'] || label || "Radio"}
       className={cn(
         "group flex items-start gap-2.5 text-sm transition-colors outline-none",
         props.isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90",
@@ -124,7 +125,7 @@ export interface CustomRadioGroupProps extends Omit<RadioGroupProps, 'children'>
 
 export function RadioGroup({ label, description, errorMessage, children, orientation = 'vertical', className, ...props }: CustomRadioGroupProps) {
   return (
-    <AriaRadioGroup {...props} className={cn("flex flex-col gap-2", className)}>
+    <AriaRadioGroup {...props} aria-label={props['aria-label'] || label || "Radio Group"} className={cn("flex flex-col gap-2", className)}>
       {label && <Label className="text-sm font-semibold text-gray-800">{label}</Label>}
       <div className={cn("flex", orientation === 'horizontal' ? "flex-row gap-5 flex-wrap" : "flex-col gap-3")}>
         {children}

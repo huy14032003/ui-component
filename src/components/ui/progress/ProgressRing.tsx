@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProgressBar as AriaProgressBar, type ProgressBarProps } from 'react-aria-components';
 import { cn } from '@lib/utils/cn';
+import { tv } from 'tailwind-variants';
 
 export interface CustomProgressRingProps extends ProgressBarProps {
   variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning';
@@ -8,18 +9,31 @@ export interface CustomProgressRingProps extends ProgressBarProps {
   showValueLabel?: boolean;
 }
 
-const ringVariantClasses = {
-  primary: 'stroke-primary',
-  secondary: 'stroke-secondary',
-  danger: 'stroke-danger',
-  success: 'stroke-success',
-  warning: 'stroke-warning',
-};
+const ringVariantClasses = tv({
+  base: 'fill-none transition-all duration-300 ease-in-out',
+  variants: {
+    variant: {
+      primary: 'stroke-primary',
+      secondary: 'stroke-secondary',
+      danger: 'stroke-danger',
+      success: 'stroke-success',
+      warning: 'stroke-warning',
+    },
+    isIndeterminate: {
+      true: 'animate-[progress-ring-indeterminate_1.5s_ease-in-out_infinite]',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    variant: 'primary',
+    isIndeterminate: false,
+  },
+});
 
 const ringSizeMap = {
-  sm: { size: 32, strokeWidth: 3 },
-  md: { size: 48, strokeWidth: 4 },
-  lg: { size: 64, strokeWidth: 5 },
+  sm: { size: 32, strokeWidth: 3, textSize: 'text-[10px]' },
+  md: { size: 48, strokeWidth: 4, textSize: 'text-xs' },
+  lg: { size: 64, strokeWidth: 5, textSize: 'text-sm' },
 };
 
 export function ProgressRing({
@@ -29,13 +43,13 @@ export function ProgressRing({
   className,
   ...props
 }: CustomProgressRingProps) {
-  const { size: svgSize, strokeWidth } = ringSizeMap[size];
+  const { size: svgSize, strokeWidth, textSize } = ringSizeMap[size];
   const center = svgSize / 2;
   const radius = center - strokeWidth;
   const circumference = 2 * Math.PI * radius;
 
   return (
-    <AriaProgressBar {...props} className={cn("relative flex items-center justify-center", className)}>
+    <AriaProgressBar {...props} aria-label={props['aria-label'] || "Progress Ring"} className={cn("relative flex items-center justify-center", className)}>
       {({ percentage, isIndeterminate }) => {
         const offset = isIndeterminate ? 0 : circumference - ((percentage || 0) / 100) * circumference;
         
@@ -60,7 +74,7 @@ export function ProgressRing({
                 r={radius}
                 className={cn(
                   "fill-none transition-all duration-300 ease-in-out",
-                  ringVariantClasses[variant],
+                  ringVariantClasses({ variant, isIndeterminate }),
                   isIndeterminate ? "animate-[progress-ring-indeterminate_1.5s_ease-in-out_infinite]" : ""
                 )}
                 strokeWidth={strokeWidth}
@@ -70,7 +84,7 @@ export function ProgressRing({
               />
             </svg>
             {showValueLabel && !isIndeterminate && (
-              <span className="absolute text-xs font-semibold text-gray-700 select-none">
+              <span className={cn("absolute font-semibold text-gray-700 select-none", textSize)}>
                 {Math.round(percentage || 0)}%
               </span>
             )}

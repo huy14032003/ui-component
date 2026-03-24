@@ -23,17 +23,18 @@ const textClasses = {
 
 function Input({ className, label, size = 'md', placeholder, type = 'text', ...props }: Props) {
   return (
-    <div className={cn('flex flex-col gap-1', className)}>
+    <div className={cn('flex flex-col gap-1 ', className)}>
       {label && (
         <label className={cn("font-medium text-gray-700", textClasses[size])}>
           {label}
         </label>
       )}
       <AriaInput
+        aria-label={label || placeholder || "Input"}
         type={type}
         placeholder={placeholder}
         className={cn(
-          'border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary ', 
+          'bg-white border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary ', 
           sizeClasses[size] 
         )}
         {...props}
@@ -53,9 +54,10 @@ function InputPassword({ className, label, size = 'md', placeholder, ...props }:
             )}
             <div className="relative w-full group">
                 <AriaInput
+                    aria-label={label || placeholder || "Password input"}
                     type={showPassword ? 'text' : 'password'}
                     className={cn(
-                        'w-full border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary pr-10',
+                        'bg-white w-full border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary pr-10',
                         sizeClasses[size]
                     )}
                     placeholder={placeholder || 'Nhập...'}

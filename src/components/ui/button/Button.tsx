@@ -37,31 +37,30 @@ const buttonStyles = tv({
   },
   // Đây là phần "ảo thuật" để xử lý các case ghostPrimary, outlineDanger...
   compoundVariants: [
-    // Ghost variants
-    { intent: 'ghost', color: 'primary', class: 'text-blue-700 hover:bg-blue-100' },
-    { intent: 'ghost', color: 'danger', class: 'text-red-700 hover:bg-red-100' },
-    { intent: 'ghost', color: 'success', class: 'text-green-700 hover:bg-green-100' },
-    { intent: 'ghost', color: 'warning', class: 'text-yellow-700 hover:bg-yellow-100' },
-    { intent: 'ghost', color: 'secondary', class: 'text-gray-700 hover:bg-gray-100' },
+    // Ghost variants — dùng CSS variable
+    { intent: 'ghost', color: 'primary',   class: 'text-primary   hover:bg-primary/10' },
+    { intent: 'ghost', color: 'danger',    class: 'text-danger    hover:bg-danger/10' },
+    { intent: 'ghost', color: 'success',   class: 'text-success   hover:bg-success/10' },
+    { intent: 'ghost', color: 'warning',   class: 'text-warning   hover:bg-warning/10' },
+    { intent: 'ghost', color: 'secondary', class: 'text-secondary hover:bg-secondary/10' },
     // Outline variants
-    { intent: 'outline', color: 'primary', class: 'border-blue-300 text-blue-700 hover:bg-blue-50' },
-    { intent: 'outline', color: 'danger', class: 'border-red-300 text-red-700 hover:bg-red-50' },
-    { intent: 'outline', color: 'success', class: 'border-green-300 text-green-700 hover:bg-green-50' },
-    { intent: 'outline', color: 'warning', class: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
-    { intent: 'outline', color: 'secondary', class: 'border-gray-300 text-gray-700 hover:bg-gray-50' },
-    // Bạn có thể thêm các case còn lại tương tự vào đây
-    { intent: 'dashed', color: 'primary', class: 'border-blue-300 text-blue-700 hover:bg-blue-50' },
-    { intent: 'dashed', color: 'danger', class: 'border-red-300 text-red-700 hover:bg-red-50' },
-    { intent: 'dashed', color: 'success', class: 'border-green-300 text-green-700 hover:bg-green-50' },
-    { intent: 'dashed', color: 'warning', class: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
-    { intent: 'dashed', color: 'secondary', class: 'border-gray-300 text-gray-700 hover:bg-gray-50' },
-    
-    { intent: 'solid', color: 'primary', class: 'bg-primary text-primary-foreground border-primary' },
-    { intent: 'solid', color: 'primary', class: 'bg-primary text-primary-foreground border-primary' },
-    { intent: 'solid', color: 'danger', class: 'bg-danger text-danger-foreground border-danger' },
-    { intent: 'solid', color: 'success', class: 'bg-success text-success-foreground border-success' },
-    { intent: 'solid', color: 'warning', class: 'bg-warning text-warning-foreground border-warning' },
-    { intent: 'solid', color: 'secondary', class: 'bg-secondary text-secondary-foreground border-secondary' },
+    { intent: 'outline', color: 'primary',   class: 'border-primary/40   text-primary   hover:bg-primary/5' },
+    { intent: 'outline', color: 'danger',    class: 'border-danger/40    text-danger    hover:bg-danger/5' },
+    { intent: 'outline', color: 'success',   class: 'border-success/40   text-success   hover:bg-success/5' },
+    { intent: 'outline', color: 'warning',   class: 'border-warning/40   text-warning   hover:bg-warning/5' },
+    { intent: 'outline', color: 'secondary', class: 'border-secondary/40 text-secondary hover:bg-secondary/5' },
+    // Dashed variants
+    { intent: 'dashed', color: 'primary',   class: 'border-primary/40   text-primary   hover:bg-primary/5' },
+    { intent: 'dashed', color: 'danger',    class: 'border-danger/40    text-danger    hover:bg-danger/5' },
+    { intent: 'dashed', color: 'success',   class: 'border-success/40   text-success   hover:bg-success/5' },
+    { intent: 'dashed', color: 'warning',   class: 'border-warning/40   text-warning   hover:bg-warning/5' },
+    { intent: 'dashed', color: 'secondary', class: 'border-secondary/40 text-secondary hover:bg-secondary/5' },
+    // Solid variants
+    { intent: 'solid', color: 'primary',   class: 'bg-primary   text-primary-foreground' },
+    { intent: 'solid', color: 'danger',    class: 'bg-danger    text-danger-foreground' },
+    { intent: 'solid', color: 'success',   class: 'bg-success   text-success-foreground' },
+    { intent: 'solid', color: 'warning',   class: 'bg-warning   text-warning-foreground' },
+    { intent: 'solid', color: 'secondary', class: 'bg-secondary text-secondary-foreground' },
   ],
   defaultVariants: {
     intent: 'solid',
@@ -101,6 +100,7 @@ const Button = ({
 
   return (
     <AriaButton
+      aria-label={props['aria-label'] || (typeof children === 'string' ? children : undefined) || "Button"}
       isDisabled={isDisabled || isLoading}
       className={(values) =>
         buttonStyles({

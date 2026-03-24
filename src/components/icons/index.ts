@@ -12,5 +12,7 @@ export {
     ChevronLeft,
     ChevronRight,
     CalendarRange,
-    MoveHorizontal
+    MoveHorizontal,
+    Bell,
+    TriangleAlert
 } from 'lucide-react'

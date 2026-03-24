@@ -17,8 +17,63 @@ import { Radio, RadioGroup } from '@components/ui/radio/Radio';
 import { Example } from '@components/ui/modal/Example';
 import InputDate from '@components/ui/datepicker/InputDate';
 import Tag from '@components/ui/tag/Tag';
+import Avatar from '@components/ui/avatar/Avatar';
+import AvatarGroup from '@components/ui/avatar/AvatarGroup';
+import Skeleton from '@components/ui/skeleton/Skeleton';
+import Timeline from '@components/ui/timeline/Timeline';
+import TimelineItem from '@components/ui/timeline/TimelineItem';
+import Upload from '@components/ui/upload/Upload';
+import { Table } from '@components/ui/table/Table';
+import Tour from '@components/ui/tour/Tour';
+import { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { FormInput } from '@components/ui/form/FormInput';
+import { FormSelect } from '@components/ui/form/FormSelect';
+import { FormCheckbox, FormCheckboxGroup } from '@components/ui/form/FormCheckbox';
+import { FormRadioGroup } from '@components/ui/form/FormRadio';
+import { FormInputDate } from '@components/ui/form/FormInputDate';
+import { FormUpload } from './components/ui/form/FormUpload';
+import ExampleToast from './components/ui/toast/ExampleToast';
+import { toast } from './components/ui/toast/Toast';
+import { ExampleCard } from './components/ui/card/ExampleCard';
+
+const formSchema = z.object({
+  username: z.string().min(3, 'Tên đăng nhập phải chứa ít nhất 3 ký tự'),
+  password: z.string().min(6, 'Mật khẩu phải chứa ít nhất 6 ký tự'),
+  language: z.array(z.string()).min(1, 'Vui lòng chọn ít nhất 1 ngôn ngữ'),
+  avatar: z.array(z.any()).min(1, 'Ảnh đại diện là bắt buộc'),
+  role: z.string().min(1, 'Vui lòng chọn vai trò'),
+  skills: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất 1 kỹ năng'),
+  gender: z.string().min(1, 'Vui lòng chọn giới tính'),
+  birthDate: z.any().refine(val => val !== null && val !== undefined, 'Ngày sinh là bắt buộc'),
+  acceptTerms: z.boolean().refine(val => val === true, 'Bạn phải đồng ý với điều khoản')
+});
 
 const Test = () => {
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+
+  const formMethods = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+      role: '',
+      skills: [],
+      avatar: [],
+      language: [],
+      gender: '',
+      birthDate: null,
+      acceptTerms: false
+    }
+  });
+
+  const onFormSubmit = (data: z.infer<typeof formSchema>) => {
+    alert("đã gửi data lên console log")
+    console.log(data);
+  };
 
   const options = [
     { label: 'Option 1', value: '1' },
@@ -347,8 +402,8 @@ const Test = () => {
           <Slider label="Âm lượng (Primary)" defaultValue={50} variant="primary" />
           <Slider label="Độ sáng (Success)" defaultValue={75} variant="success" />
           <Slider label="Quá tải (Danger)" defaultValue={90} variant="danger" />
-          <Slider label="Nhiệt độ (Warning)" defaultValue={60} variant="warning" />
-          <Slider label="Chế độ (Secondary)" defaultValue={30} variant="secondary" />
+          <Slider label="Nhiệt độ (Warning)" typeSlider='point' defaultValue={60} variant="warning" />
+          <Slider label="Chế độ (Secondary)" typeSlider='point' defaultValue={30} variant="secondary" />
           <Slider label="Disabled Slider" defaultValue={50} isDisabled />
         </div>
 
@@ -457,11 +512,10 @@ const Test = () => {
           </div>
         </div>
       </div>
-      <div className="">
-        <h3 className="font-semibold text-lg text-gray-700">Modal</h3>
-        <div className="">
-          <Example />
-        </div>
+      <div className="p-4 space-y-3">
+        <h3 className="font-semibold text-lg text-gray-700">Modal — các biến thể</h3>
+        <p className="text-sm text-gray-500">Click vào từng button để xem ví dụ tương ứng.</p>
+        <Example />
       </div>
 
       <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>9. Date & Time Pickers</p>
@@ -511,6 +565,616 @@ const Test = () => {
         <Tag variant="outlineGhostSuccess">Outline Ghost Success</Tag>
         <Tag variant="outlineGhostWarning">Outline Ghost Warning</Tag>
       </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>11. Avatar & AvatarGroup</p>
+      <div className="space-y-6 p-4">
+        <div className="flex flex-wrap items-center gap-6">
+          <Avatar size="sm" src="https://i.pravatar.cc/150?u=1" alt="Avatar SM" />
+          <Avatar size="md" src="https://i.pravatar.cc/150?u=2" alt="Avatar MD" />
+          <Avatar size="lg" src="https://i.pravatar.cc/150?u=3" alt="Avatar LG" />
+          <Avatar size="xl" src="https://i.pravatar.cc/150?u=4" alt="Avatar XL" />
+        </div>
+        <div className="flex flex-wrap items-center gap-6">
+          <Avatar size="lg" shape="square" src="https://i.pravatar.cc/150?u=5" />
+          <Avatar size="lg" shape="circle" bordered src="https://i.pravatar.cc/150?u=6" />
+          <Avatar size="lg" fallback="JD" />
+          <Avatar size="lg" />
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-gray-500">Avatar Group</p>
+          <AvatarGroup max={4} size="md">
+            <Avatar src="https://i.pravatar.cc/150?u=a" />
+            <Avatar src="https://i.pravatar.cc/150?u=b" />
+            <Avatar src="https://i.pravatar.cc/150?u=c" />
+            <Avatar src="https://i.pravatar.cc/150?u=d" />
+            <Avatar src="https://i.pravatar.cc/150?u=e" />
+          </AvatarGroup>
+        </div>
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-avatar',
+              title: 'Xem mã nguồn (Avatar)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`<Avatar size="lg" src="..." alt="..." />
+<AvatarGroup max={4}>...</AvatarGroup>`}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>12. Skeleton</p>
+      <div className="space-y-6 p-4 max-w-md">
+        <div className="flex items-center gap-4">
+          <Skeleton variant="circle" width={48} height={48} />
+          <div className="flex-1 space-y-2">
+            <Skeleton variant="text" width="60%" />
+            <Skeleton variant="text" />
+          </div>
+        </div>
+        <Skeleton variant="rect" height={150} />
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-skeleton',
+              title: 'Xem mã nguồn (Skeleton)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`<Skeleton variant="circle" width={48} height={48} />
+<Skeleton variant="text" width="60%" />
+<Skeleton variant="rect" height={150} />`}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>13. Timeline</p>
+      <div className="p-4 space-y-10">
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-4">Vertical Timeline</h3>
+          <Timeline direction="vertical">
+            <TimelineItem color="primary">
+              <p className="font-semibold">Bắt đầu dự án</p>
+              <p className="text-sm text-gray-500">20/03/2024 - Khởi tạo repository</p>
+            </TimelineItem>
+            <TimelineItem color="success">
+              <p className="font-semibold">Hoàn thành thiết kế</p>
+              <p className="text-sm text-gray-500">22/03/2024 - Approved bởi client</p>
+            </TimelineItem>
+            <TimelineItem color="warning" dot={<Icons.Wifi className="w-3 h-3 text-warning" />}>
+              <p className="font-semibold">Đang triển khai UI</p>
+              <p className="text-sm text-gray-500">24/03/2024 - Bổ sung các component cơ bản</p>
+            </TimelineItem>
+            <TimelineItem color="gray">
+              <p className="font-semibold">Kiểm thử (Sắp tới)</p>
+              <p className="text-sm text-gray-500">26/03/2024 - Chạy unit test và integration test</p>
+            </TimelineItem>
+          </Timeline>
+        </div>
+
+        <div className="overflow-x-auto">
+          <h3 className="font-semibold text-gray-700 mb-4">Horizontal Timeline</h3>
+          <Timeline direction="horizontal">
+            <TimelineItem color="primary">
+              <p className="font-semibold">Bắt đầu dự án</p>
+              <p className="text-sm text-gray-500">20/03/2024</p>
+            </TimelineItem>
+            <TimelineItem color="success">
+              <p className="font-semibold">Thiết kế</p>
+              <p className="text-sm text-gray-500">22/03/2024</p>
+            </TimelineItem>
+            <TimelineItem color="warning" dot={<Icons.Wifi className="w-3 h-3 text-warning" />}>
+              <p className="font-semibold">Phát triển</p>
+              <p className="text-sm text-gray-500">24/03/2024</p>
+            </TimelineItem>
+            <TimelineItem color="gray">
+              <p className="font-semibold">Kiểm thử</p>
+              <p className="text-sm text-gray-500">26/03/2024</p>
+            </TimelineItem>
+          </Timeline>
+        </div>
+
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-timeline',
+              title: 'Xem mã nguồn (Timeline)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`<Timeline direction="horizontal">
+  <TimelineItem color="primary">...</TimelineItem>
+  <TimelineItem color="success">...</TimelineItem>
+</Timeline>`}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>14. Table</p>
+      <div className="p-4 space-y-8">
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-2">Bảng dữ liệu trọn bộ tính năng (Sort, Select, Pagination, Expand)</h3>
+          <Table
+            data={[
+              { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', details: 'Quản trị viên hệ thống với quyền hạn cao nhất. Quản lý toàn bộ nhân viên và tài nguyên.' },
+              { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Inactive', details: 'Người dùng thường, tài khoản đang tạm khoá.' },
+              { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor', status: 'Active', details: 'Trình soạn thảo nội dung website.' },
+              { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'User', status: 'Active', details: 'Người dùng thường, hoạt động tích cực mỗi ngày.' },
+              { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Pending', details: 'Quản trị viên đa bộ phận đang chờ phê duyệt.' },
+            ]}
+            columns={[
+              { header: 'ID', accessorKey: 'id' },
+              { header: 'Tên', accessorKey: 'name' },
+              { header: 'Email', accessorKey: 'email' },
+              { header: 'Vai trò', accessorKey: 'role' },
+              {
+                header: 'Trạng thái',
+                meta: { align: 'center' },
+                accessorKey: 'status',
+                cell: ({ getValue }) => (
+                  <Tag variant={getValue() === 'Active' ? 'ghostSuccess' : getValue() === 'Inactive' ? 'ghostDanger' : 'ghostWarning'}>
+                    {getValue() as string}
+                  </Tag>
+                )
+              },
+            ]}
+            enableRowSelection
+            enablePagination
+            enableSorting
+            renderPageSizeText={(size) => `${size} dòng`}
+            goToPageText="Đến trang"
+            renderPaginationText={(from, to, total) => (
+              <>
+                Hiển thị <span className="font-medium text-gray-900">{from}</span> đến <span className="font-medium text-gray-900">{to}</span> của <span className="font-medium text-gray-900">{total}</span> kết quả
+              </>
+            )}
+            enableExpanding
+            renderSubComponent={({ row }) => (
+              <div className="py-2 px-4 space-y-2 text-sm text-gray-600">
+                <p><strong className="text-gray-900">Thông tin chi tiết:</strong> {row.details}</p>
+              </div>
+            )}
+          />
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-2">Bảng dữ liệu trọn bộ tính năng (Sort, Select, Pagination, Expand)</h3>
+          <Table
+            data={[
+              { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', details: 'Quản trị viên hệ thống với quyền hạn cao nhất. Quản lý toàn bộ nhân viên và tài nguyên.' },
+              { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Inactive', details: 'Người dùng thường, tài khoản đang tạm khoá.' },
+              { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor', status: 'Active', details: 'Trình soạn thảo nội dung website.' },
+              { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'User', status: 'Active', details: 'Người dùng thường, hoạt động tích cực mỗi ngày.' },
+              { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Pending', details: 'Quản trị viên đa bộ phận đang chờ phê duyệt.' },
+            ]}
+            columns={[
+              { header: 'ID', accessorKey: 'id', meta: { align: 'center' } },
+              { header: 'Tên', accessorKey: 'name' },
+              { header: 'Email', accessorKey: 'email' },
+              { header: 'Vai trò', accessorKey: 'role' },
+              {
+                header: 'Trạng thái',
+                accessorKey: 'status',
+                cell: ({ getValue }) => (
+                  <Tag variant={getValue() === 'Active' ? 'success' : getValue() === 'Inactive' ? 'danger' : 'warning'}>
+                    {getValue() as string}
+                  </Tag>
+                )
+              },
+            ]}
+            enableRowSelection
+            enablePagination
+            enableSorting
+
+          />
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-2">Bảng dữ liệu không có dữ liệu, không phân trang, không sắp xếp, không chọn hàng</h3>
+          <Table
+            data={[]}
+            columns={[
+              { header: 'ID', accessorKey: 'id', meta: { align: 'center' } },
+              { header: 'Tên', accessorKey: 'name' },
+              { header: 'Email', accessorKey: 'email' },
+              { header: 'Vai trò', accessorKey: 'role' },
+              {
+                header: 'Trạng thái',
+                accessorKey: 'status',
+                cell: ({ getValue }) => (
+                  <Tag variant={getValue() === 'Active' ? 'success' : getValue() === 'Inactive' ? 'danger' : 'warning'}>
+                    {getValue() as string}
+                  </Tag>
+                )
+              },
+            ]}
+            enablePagination
+            enableSorting={false}
+
+          />
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-2">Bảng dữ liệu trọn bộ tính năng (Sort, Select, Pagination, Expand)</h3>
+          <Table
+            data={[
+              { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', details: 'Quản trị viên hệ thống với quyền hạn cao nhất. Quản lý toàn bộ nhân viên và tài nguyên.' },
+              { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Inactive', details: 'Người dùng thường, tài khoản đang tạm khoá.' },
+              { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor', status: 'Active', details: 'Trình soạn thảo nội dung website.' },
+              { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'User', status: 'Active', details: 'Người dùng thường, hoạt động tích cực mỗi ngày.' },
+              { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Pending', details: 'Quản trị viên đa bộ phận đang chờ phê duyệt.' },
+            ]}
+            columns={[
+              { header: 'ID', accessorKey: 'id' },
+              { header: 'Tên', accessorKey: 'name' },
+              { header: 'Email', accessorKey: 'email' },
+              { header: 'Vai trò', accessorKey: 'role' },
+              {
+                header: 'Trạng thái',
+                accessorKey: 'status',
+                cell: ({ getValue }) => (
+                  <Tag variant={getValue() === 'Active' ? 'success' : getValue() === 'Inactive' ? 'danger' : 'warning'}>
+                    {getValue() as string}
+                  </Tag>
+                )
+              },
+            ]}
+            enablePagination
+            enableSorting
+            enableExpanding
+            renderSubComponent={({ row }) => (
+              <div className="py-2 px-4 space-y-2 text-sm text-gray-600">
+                <p><strong className="text-gray-900">Thông tin chi tiết:</strong> {row.details}</p>
+              </div>
+            )}
+          />
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-2">Bảng đang tải (Loading)</h3>
+          <Table
+            data={[
+              { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', details: 'Quản trị viên hệ thống với quyền hạn cao nhất. Quản lý toàn bộ nhân viên và tài nguyên.' },
+              { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Inactive', details: 'Người dùng thường, tài khoản đang tạm khoá.' },
+              { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor', status: 'Active', details: 'Trình soạn thảo nội dung website.' },
+              { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'User', status: 'Active', details: 'Người dùng thường, hoạt động tích cực mỗi ngày.' },
+              { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Pending', details: 'Quản trị viên đa bộ phận đang chờ phê duyệt.' },
+            ]}
+            columns={[
+              { header: 'ID', accessorKey: 'id', meta: { align: 'center' } },
+              { header: 'Tên', accessorKey: 'name' },
+              { header: 'Email', accessorKey: 'email' },
+              { header: 'Vai trò', accessorKey: 'role' },
+            ]}
+            isLoading={true}
+          />
+        </div>
+
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-table',
+              title: 'Xem mã nguồn (Table)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`
+<Table
+  data={[
+    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', details: 'Quản trị viên hệ thống với quyền hạn cao nhất. Quản lý toàn bộ nhân viên và tài nguyên.' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Inactive', details: 'Người dùng thường, tài khoản đang tạm khoá.' },
+    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor', status: 'Active', details: 'Trình soạn thảo nội dung website.' },
+    { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'User', status: 'Active', details: 'Người dùng thường, hoạt động tích cực mỗi ngày.' },
+    { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Pending', details: 'Quản trị viên đa bộ phận đang chờ phê duyệt.' },
+  ]}
+  columns={[
+    { header: 'ID', accessorKey: 'id' },
+    { header: 'Tên', accessorKey: 'name' },
+    { header: 'Email', accessorKey: 'email' },
+    { header: 'Vai trò', accessorKey: 'role' },
+    {
+      header: 'Trạng thái',
+      meta: { align: 'center' },
+      accessorKey: 'status',
+      cell: ({ getValue }) => (
+        <Tag variant={getValue() === 'Active' ? 'ghostSuccess' : getValue() === 'Inactive' ? 'ghostDanger' : 'ghostWarning'}>
+          {getValue() as string}
+        </Tag>
+      )
+    },
+  ]}
+  enableRowSelection
+  enablePagination
+  enableSorting
+
+  //đặt renderPageSizeText={null} để ẩn ô chọn số dòng
+  renderPageSizeText={(size) => \`\${size} dòng\`}
+
+  //đặt goToPageText={null} để ẩn ô nhạp số trang
+  goToPageText="Đến trang"
+
+  //đặt renderPaginationText={null} để ẩn ô hiển thị số dòng
+  renderPaginationText={(from, to, total) => (
+    <>
+      Hiển thị <span className="font-medium text-gray-900">{from}</span> đến <span className="font-medium text-gray-900">{to}</span> của <span className="font-medium text-gray-900">{total}</span> kết quả
+    </>
+  )}
+  enableExpanding
+  renderSubComponent={({ row }) => (
+    <div className="py-2 px-4 space-y-2 text-sm text-gray-600">
+      <p><strong className="text-gray-900">Thông tin chi tiết:</strong> {row.details}</p>
+    </div>
+  )}
+/>
+
+`}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>15. Upload</p>
+      <div className="p-4 max-w-xl">
+        <Upload
+          value={uploadedFiles}
+          onChange={setUploadedFiles}
+          multiple
+          maxFiles={3}
+          accept="image/*,.pdf"
+        />
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-upload',
+              title: 'Xem mã nguồn (Upload)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`<Upload 
+  value={files} 
+  onChange={setFiles} 
+  multiple 
+  maxFiles={3}
+/>`}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2' id="tour-section">16. Tour</p>
+      <div className="p-4">
+        <Button variant="primary" onClick={() => setIsTourOpen(true)} id="start-tour-btn">
+          Bắt đầu hướng dẫn (Start Tour)
+        </Button>
+        <Tour
+          open={isTourOpen}
+          onClose={() => setIsTourOpen(false)}
+          steps={[
+            {
+              target: '#start-tour-btn',
+              title: 'Bắt đầu',
+              description: 'Nhấn vào đây bất cứ khi nào bạn muốn xem lại hướng dẫn sử dụng thư viện.',
+              placement: 'bottom'
+            },
+            {
+              target: '#tour-section',
+              title: 'Danh sách Component',
+              description: 'Đây là nơi trưng bày tất cả các component mà chúng tôi đã xây dựng.',
+              placement: 'top'
+            },
+          ]}
+        />
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-tour',
+              title: 'Xem mã nguồn (Tour)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`
+const [isTourOpen, setIsTourOpen] = useState(false);
+
+<Button variant="primary" onClick={() => setIsTourOpen(true)} id="start-tour-btn">
+  Bắt đầu hướng dẫn (Start Tour)
+</Button>
+
+<Tour
+  open={isTourOpen}
+  onClose={() => setIsTourOpen(false)}
+  steps={[
+    {
+      target: '#start-tour-btn',
+      title: 'Bắt đầu',
+      description: 'Nhấn vào đây bất cứ khi nào bạn muốn xem lại hướng dẫn sử dụng thư viện.',
+      placement: 'bottom'
+    },
+    {
+      target: '#tour-section',
+      title: 'Danh sách Component',
+      description: 'Đây là nơi trưng bày tất cả các component mà chúng tôi đã xây dựng.',
+      placement: 'top'
+    },
+  ]}
+/>`}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2' id="form-section">17. Form</p>
+      <div className="p-4">
+        <FormProvider {...formMethods}>
+          <form onSubmit={formMethods.handleSubmit(onFormSubmit)} className="space-y-4 max-w-xl p-6 border rounded-xl bg-white shadow-sm">
+            <h3 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Đăng ký tài khoản</h3>
+
+            <FormInput name="username" label="Tên đăng nhập" placeholder="Nhập tên đăng nhập..." />
+            <FormInput name="password" label="Mật khẩu" placeholder="Nhập mật khẩu..." isPassword />
+
+            <FormSelect
+              name="role"
+              label="Vai trò"
+              options={[{ label: 'Quản trị viên', value: 'admin' }, { label: 'Người dùng', value: 'user' }]}
+            />
+
+            <FormSelect
+              name="language"
+              label="Ngôn ngữ"
+              selectType='multi'
+              options={[{ label: 'Tiếng Việt', value: 'vi' }, { label: 'Tiếng Anh', value: 'en' }]}
+            />
+
+            <FormInputDate name="birthDate" label="Ngày sinh" valueFormat='DD/MM/YYYY' />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormCheckboxGroup name="skills" label="Kỹ năng">
+                <Checkbox value="react" label="ReactJS" />
+                <Checkbox value="vue" label="VueJS" />
+                <Checkbox value="angular" label="Angular" />
+              </FormCheckboxGroup>
+
+              <FormRadioGroup name="gender" label="Giới tính" orientation="vertical">
+                <Radio value="male" label="Nam" />
+                <Radio value="female" label="Nữ" />
+                <Radio value="other" label="Khác" />
+              </FormRadioGroup>
+            </div>
+            <div className="">
+              <FormUpload name="avatar" label="Ảnh đại diện" />
+            </div>
+            <FormCheckbox name="acceptTerms" label="Tôi đồng ý với các điều khoản dịch vụ" />
+
+            <div className="pt-4 border-t mt-4 flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => formMethods.reset()}>Làm mới</Button>
+              <Button type="submit" variant="primary">Đăng ký</Button>
+            </div>
+          </form>
+        </FormProvider>
+
+          <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-tour',
+              title: 'Xem mã nguồn (Tour)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`<FormProvider {...formMethods}>
+          <form onSubmit={formMethods.handleSubmit(onFormSubmit)} className="space-y-4 max-w-xl p-6 border rounded-xl bg-white shadow-sm">
+            <h3 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Đăng ký tài khoản</h3>
+
+            <FormInput name="username" label="Tên đăng nhập" placeholder="Nhập tên đăng nhập..." />
+            <FormInput name="password" label="Mật khẩu" placeholder="Nhập mật khẩu..." isPassword />
+
+            <FormSelect
+              name="role"
+              label="Vai trò"
+              options={[{ label: 'Quản trị viên', value: 'admin' }, { label: 'Người dùng', value: 'user' }]}
+            />
+
+            <FormSelect
+              name="language"
+              label="Ngôn ngữ"
+              selectType='multi'
+              options={[{ label: 'Tiếng Việt', value: 'vi' }, { label: 'Tiếng Anh', value: 'en' }]}
+            />
+
+            <FormInputDate name="birthDate" label="Ngày sinh" valueFormat='DD/MM/YYYY' />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormCheckboxGroup name="skills" label="Kỹ năng">
+                <Checkbox value="react" label="ReactJS" />
+                <Checkbox value="vue" label="VueJS" />
+                <Checkbox value="angular" label="Angular" />
+              </FormCheckboxGroup>
+
+              <FormRadioGroup name="gender" label="Giới tính" orientation="vertical">
+                <Radio value="male" label="Nam" />
+                <Radio value="female" label="Nữ" />
+                <Radio value="other" label="Khác" />
+              </FormRadioGroup>
+            </div>
+            <div className="">
+              <FormUpload name="avatar" label="Ảnh đại diện" />
+            </div>
+            <FormCheckbox name="acceptTerms" label="Tôi đồng ý với các điều khoản dịch vụ" />
+
+            <div className="pt-4 border-t mt-4 flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => formMethods.reset()}>Làm mới</Button>
+              <Button type="submit" variant="primary">Đăng ký</Button>
+            </div>
+          </form>
+        </FormProvider>`}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2' id="toast-section">18. Toast</p>
+      <div className="p-4">
+        <ExampleToast />
+        {/* <Button onPress={() => toast.success('Lưu thành công!', 'Dữ liệu đã được cập nhật.', 3000)}>Show Toast</Button> */}
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-toast',
+              title: 'Xem mã nguồn (Toast)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`
+<MyToastRegion placement="bottom-right" />
+// Gọi ở bất kỳ đâu
+toast.success('Lưu thành công!', 'Dữ liệu đã được cập nhật.', 3000);
+toast.error('Có lỗi!', undefined, 5000);
+                  
+                  
+                  `}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div> 
+
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2' id="card-section">19. Card</p>
+      <div className="p-4">
+        <ExampleCard />
+        <Disclosure
+          className="w-full max-w-none shadow-none border border-gray-200 mt-2"
+          items={[
+            {
+              id: 'code-card',
+              title: 'Xem mã nguồn (Card)',
+              content: (
+                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                  <code>{`
+<Card>
+  <CardHeader>
+    <CardTitle>Card Title</CardTitle>
+    <CardDescription>Card Description</CardDescription>
+  </CardHeader>
+  <CardContent>
+    Content goes here...
+  </CardContent>
+  <CardFooter>
+    <Button>Footer Action</Button>
+  </CardFooter>
+</Card>
+                  `}</code>
+                </pre>
+              )
+            }
+          ]} />
+      </div>
+
     </div>
   )
 }

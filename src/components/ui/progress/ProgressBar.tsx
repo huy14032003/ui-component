@@ -26,6 +26,7 @@ export function ProgressBar({
   return (
     <AriaProgressBar
       {...props}
+      aria-label={props['aria-label'] || label || "Progress"}
       className={cn('flex flex-col gap-2 w-full', className)}
     >
       {({ percentage, valueText }) => (
@@ -36,7 +37,7 @@ export function ProgressBar({
               {showValueLabel && <span className="text-gray-600">{valueText}</span>}
             </div>
           )}
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden relative">
+          <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden relative">
             <div
               className={cn(
                 "absolute top-0 bottom-0 left-0 rounded-full transition-all duration-300 ease-in-out",

@@ -3,24 +3,20 @@
 
 @theme {
     --color-primary: #3b82f6;
-    /* Blue - Cho sự tin cậy (Wallet) */
     --color-primary-foreground: #ffffff;
-
-    --color-secondary: #64748b;
-    /* Slate - Cho các thành phần phụ */
-    --color-secondary-foreground: #f8fafc;
-
+    --color-secondary: #2e2e2e;
+    --color-secondary-foreground: #ffffff;
     --color-accent: #f59e0b;
-    /* Amber - Cho các nút hành động/Highlight phim */
     --color-background: #ffffff;
     --color-foreground: #0f172a;
-
-    /* Bạn cũng có thể định nghĩa các màu trạng thái */
     --color-success: #10b981;
+    --color-success-foreground: #ffffff;
     --color-destructive: #ef4444;
+    --color-destructive-foreground: #ffffff;
     --color-warning: #f59e0b;
-    --color-danger: #ef4444;
     --color-warning-foreground: #ffffff;
+    --color-danger: #ef4444;
+    --color-danger-foreground: #ffffff;
 
     /* Custom Border Radius */
     --radius-xl: 1rem;
@@ -40,5 +36,10 @@
         --destructive-foreground: var(--color-destructive-foreground);
         --success: var(--color-success);
         --success-foreground: var(--color-success-foreground);
+        --warning: var(--color-warning);
+        --warning-foreground: var(--color-warning-foreground);
+        --danger: var(--color-danger);
+        --danger-foreground: var(--color-danger-foreground);
+
     }
 }

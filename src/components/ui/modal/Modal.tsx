@@ -15,6 +15,8 @@ export interface ResponsiveWidth {
 
 export interface CustomModalProps extends ModalOverlayProps {
   width?: string | number | ResponsiveWidth;
+  /** Chiều cao modal. Truyền số (px), string (vd: '80vh'), hoặc 'auto' để co theo nội dung. Mặc định: 90vh */
+  height?: string | number | 'auto';
   title?: React.ReactNode;
   footer?: React.ReactNode;
   showCloseButton?: boolean;
@@ -35,7 +37,7 @@ const overlayStyles = tv({
 });
 
 const modalStyles = tv({
-  base: 'font-sans w-full flex flex-col overflow-hidden rounded-2xl h-[calc(var(--visual-viewport-height)*.9)] bg-white dark:bg-neutral-800/70 dark:backdrop-blur-2xl dark:backdrop-saturate-200 forced-colors:bg-[Canvas] text-left align-middle text-neutral-700 dark:text-neutral-300 shadow-2xl bg-clip-padding border border-black/10 dark:border-white/10 max-w-[var(--modal-w,min(90vw,450px))] sm:max-w-[var(--modal-w-sm,var(--modal-w,min(90vw,450px)))] md:max-w-[var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px))))] lg:max-w-[var(--modal-w-lg,var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px)))))] xl:max-w-[var(--modal-w-xl,var(--modal-w-lg,var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px))))))]',
+  base: 'font-sans w-full flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-neutral-800/70 dark:backdrop-blur-2xl dark:backdrop-saturate-200 forced-colors:bg-[Canvas] text-left align-middle text-neutral-700 dark:text-neutral-300 shadow-2xl bg-clip-padding border border-black/10 dark:border-white/10 max-w-[var(--modal-w,min(90vw,450px))] sm:max-w-[var(--modal-w-sm,var(--modal-w,min(90vw,450px)))] md:max-w-[var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px))))] lg:max-w-[var(--modal-w-lg,var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px)))))] xl:max-w-[var(--modal-w-xl,var(--modal-w-lg,var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px))))))]',
   variants: {
     isEntering: {
       true: 'animate-in zoom-in-105 ease-out duration-200'
@@ -47,7 +49,7 @@ const modalStyles = tv({
 });
 
 export function Modal(props: CustomModalProps) {
-  const { handleClose, isOpen, width, title, footer, showCloseButton = true, handleConfirm, ...rest } = props;
+  const { handleClose, isOpen, width, height, title, footer, showCloseButton = true, handleConfirm, ...rest } = props;
 
   useEffect(() => {
     if (isOpen) {
@@ -62,21 +64,28 @@ export function Modal(props: CustomModalProps) {
     };
   }, [isOpen]);
 
+  const toSize = (val: string | number) => typeof val === 'number' ? `${val}px` : val;
+
   const widthStyles = {
-    ...(typeof width === 'string' || typeof width === 'number' ? { '--modal-w': typeof width === 'number' ? `${width}px` : width } : {}),
+    ...(typeof width === 'string' || typeof width === 'number' ? { '--modal-w': toSize(width) } : {}),
     ...(typeof width === 'object' ? {
-      ...(width.default && { '--modal-w': typeof width.default === 'number' ? `${width.default}px` : width.default }),
-      ...(width.xs && { '--modal-w': typeof width.xs === 'number' ? `${width.xs}px` : width.xs }),
-      ...(width.sm && { '--modal-w-sm': typeof width.sm === 'number' ? `${width.sm}px` : width.sm }),
-      ...(width.md && { '--modal-w-md': typeof width.md === 'number' ? `${width.md}px` : width.md }),
-      ...(width.lg && { '--modal-w-lg': typeof width.lg === 'number' ? `${width.lg}px` : width.lg }),
-      ...(width.xl && { '--modal-w-xl': typeof width.xl === 'number' ? `${width.xl}px` : width.xl }),
+      ...(width.default && { '--modal-w': toSize(width.default) }),
+      ...(width.xs && { '--modal-w': toSize(width.xs) }),
+      ...(width.sm && { '--modal-w-sm': toSize(width.sm) }),
+      ...(width.md && { '--modal-w-md': toSize(width.md) }),
+      ...(width.lg && { '--modal-w-lg': toSize(width.lg) }),
+      ...(width.xl && { '--modal-w-xl': toSize(width.xl) }),
     } : {})
   } as React.CSSProperties;
+
+  const isAutoHeight = height === 'auto' || height === undefined;
+  const heightStyles = isAutoHeight
+    ? { maxHeight: 'calc(var(--visual-viewport-height, 100vh) * 0.9)' }
+    : { height: toSize(height as string | number), maxHeight: 'calc(var(--visual-viewport-height, 100vh) * 0.9)' };
   const getFooter = () => {
     if (footer) {
       return (
-        <div className="px-6 py-4 border-t border-black/5 dark:border-white/10 shrink-0 bg-neutral-50/50 dark:bg-neutral-900/20">
+        <div className="p-3 border-t border-black/5 dark:border-white/10 shrink-0 bg-neutral-50/50 dark:bg-neutral-900/20">
           {footer}
         </div>
       )
@@ -103,11 +112,12 @@ export function Modal(props: CustomModalProps) {
         className={modalStyles}
         style={(renderProps) => ({
           ...widthStyles,
+          ...heightStyles,
           ...(typeof rest.style === 'function' ? rest.style(renderProps) : rest.style)
         })}
       >
         {(renderProps) => (
-          <div className="flex flex-col h-full max-h-full overflow-hidden px-4">
+          <div className={`flex flex-col overflow-hidden px-4 ${isAutoHeight ? 'max-h-full' : 'h-full'}`}>
             {(title || showCloseButton) && (
               <div className="flex items-center justify-between py-4 border-b border-black/5 dark:border-white/10 shrink-0 min-h-[64px]">
                 <Heading slot="title" className="text-xl font-bold text-neutral-800 dark:text-white truncate pr-4">
@@ -115,10 +125,11 @@ export function Modal(props: CustomModalProps) {
                 </Heading>
                 {showCloseButton && (
                   <Button
-                    variant="ghost"
-                    size="xs"
-                    onPress={() => props.onOpenChange?.(false)}
-                    className="rounded-md w-8 h-8 p-0"
+                    aria-label="Đóng"
+                    variant='ghost'
+                    size="sm"
+                    className="shrink-0 p-1 rounded-full hover:bg-black/5 outline-none transition-colors"
+                    onPress={handleClose || (() => props.onOpenChange?.(false))}
                   >
                     <Icons.X className="w-5 h-5 text-neutral-500 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-white" />
                   </Button>

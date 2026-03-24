@@ -21,12 +21,167 @@ import {
     Dialog,
     Input
 } from "react-aria-components";
+import { tv } from "tailwind-variants";
 
 // Định nghĩa cấu trúc của một Option
 export interface SelectOption {
     label: string | number;
     value: string | number;
 }
+
+// Cấu hình tailwind-variants chung cho Select
+const selectStyles = {
+    trigger: tv({
+        base: "flex items-center justify-between w-full bg-white border border-gray-300 rounded-lg  outline-none transition-all group",
+        variants: {
+            variant: {
+                primary: "focus:border-primary focus:ring-2 focus:ring-primary/20",
+                secondary: "focus:border-secondary focus:ring-2 focus:ring-secondary/20",
+                danger: "focus:border-danger focus:ring-2 focus:ring-danger/20",
+                success: "focus:border-success focus:ring-2 focus:ring-success/20",
+                warning: "focus:border-warning focus:ring-2 focus:ring-warning/20"
+            },
+            type: {
+                custom: "px-4 py-2.5 text-sm hover:bg-gray-50 data-pressed:bg-gray-100 data-disabled:opacity-50 data-disabled:cursor-not-allowed",
+                autocomplete: "px-3 py-2.5 hover:border-gray-400 text-sm",
+            }
+        },
+        defaultVariants: {
+            variant: "primary",
+            type: "custom"
+        }
+    }),
+    groupTrigger: tv({
+         base: "group relative flex flex-wrap items-center gap-2 p-1.5 bg-white border border-gray-300 rounded-lg  transition-all focus-within:ring-2",
+         variants: {
+             variant: {
+                 primary: "focus-within:border-primary focus-within:ring-primary/20",
+                 secondary: "focus-within:border-secondary focus-within:ring-secondary/20",
+                 danger: "focus-within:border-danger focus-within:ring-danger/20",
+                 success: "focus-within:border-success focus-within:ring-success/20",
+                 warning: "focus-within:border-warning focus-within:ring-warning/20",
+             }
+         },
+         defaultVariants: {
+            variant: "primary"
+         }
+    }),
+    listBoxItem: tv({
+        base: "group flex items-center justify-between px-3 py-2 text-sm rounded-md outline-none cursor-pointer",
+        variants: {
+            variant: {
+                primary: "data-focused:bg-primary/10 data-focused:text-primary data-selected:bg-primary/10 data-selected:text-primary",
+                secondary: "data-focused:bg-secondary/10 data-focused:text-secondary data-selected:bg-secondary/10 data-selected:text-secondary",
+                danger: "data-focused:bg-danger/10 data-focused:text-danger data-selected:bg-danger/10 data-selected:text-danger",
+                success: "data-focused:bg-success/10 data-focused:text-success data-selected:bg-success/10 data-selected:text-success",
+                warning: "data-focused:bg-warning/10 data-focused:text-warning data-selected:bg-warning/10 data-selected:text-warning"
+            },
+            type: {
+                custom: "text-gray-500 transition-colors hover:bg-gray-100 data-selected:font-semibold",
+                multi: "text-gray-700",
+                autocomplete: "text-gray-700 transition-colors hover:bg-gray-100 data-focused:bg-gray-100 data-selected:font-semibold rounded-lg"
+            }
+        },
+        defaultVariants: {
+            variant: "primary",
+            type: "custom"
+        }
+    }),
+    icon: tv({
+        base: "shrink-0",
+        variants: {
+            variant: {
+                primary: "text-primary",
+                secondary: "text-secondary",
+                danger: "text-danger",
+                success: "text-success",
+                warning: "text-warning"
+            }
+        },
+         defaultVariants: {
+             variant: "primary"
+         }
+    }),
+    tag: tv({
+        base: "flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md border outline-none",
+        variants: {
+             variant: {
+                primary: "bg-primary/10 text-primary border-primary/20",
+                secondary: "bg-secondary/10 text-secondary border-secondary/20",
+                danger: "bg-danger/10 text-danger border-danger/20",
+                success: "bg-success/10 text-success border-success/20",
+                warning: "bg-warning/10 text-warning border-warning/20",
+             }
+        },
+         defaultVariants: {
+             variant: "primary"
+         }
+    }),
+    tagButton: tv({
+        base: "p-0.5 rounded-full transition-colors outline-none",
+        variants: {
+            variant: {
+               primary: "hover:bg-primary/20",
+               secondary: "hover:bg-secondary/20",
+               danger: "hover:bg-danger/20",
+               success: "hover:bg-success/20",
+               warning: "hover:bg-warning/20",
+            }
+       },
+        defaultVariants: {
+            variant: "primary"
+        }
+    }),
+    textAction: tv({
+        base: "text-xs font-semibold cursor-pointer transition-colors",
+        variants: {
+            variant: {
+               primary: "text-primary hover:opacity-80",
+               secondary: "text-secondary hover:opacity-80",
+               danger: "text-danger hover:opacity-80",
+               success: "text-success hover:opacity-80",
+               warning: "text-warning hover:opacity-80",
+            }
+        },
+        defaultVariants: {
+             variant: "primary"
+        }
+    }),
+    checkbox: tv({
+        base: "w-4 h-4 border rounded flex items-center justify-center transition-colors shrink-0 ml-2",
+         variants: {
+             variant: {
+                primary: "bg-primary border-primary",
+                secondary: "bg-secondary border-secondary",
+                danger: "bg-danger border-danger",
+                success: "bg-success border-success",
+                warning: "bg-warning border-warning",
+             },
+             isSelected: {
+                 false: "border-gray-300 bg-white"
+             }
+         },
+         defaultVariants: {
+             variant: "primary",
+             isSelected: false
+         }
+    }),
+    searchContainer: tv({
+        base: "flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full focus-within:ring-2 transition-all focus-within:bg-white",
+        variants: {
+            variant: {
+                 primary: "focus-within:border-primary focus-within:ring-primary/10",
+                 secondary: "focus-within:border-secondary focus-within:ring-secondary/10",
+                 danger: "focus-within:border-danger focus-within:ring-danger/10",
+                 success: "focus-within:border-success focus-within:ring-success/10",
+                 warning: "focus-within:border-warning focus-within:ring-warning/10",
+            }
+        },
+        defaultVariants: {
+             variant: "primary"
+        }
+    })
+};
 
 // Mở rộng các props mặc định của Select để nhận thêm cấu hình riêng
 interface CustomSelectProps<T extends object> extends Omit<SelectProps<T>, "children"> {
@@ -46,6 +201,7 @@ interface MultiSelectProps {
     className?: string;
     variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning';
 }
+
 function CustomSelect<T extends object>({
     label,
     options,
@@ -85,14 +241,7 @@ function CustomSelect<T extends object>({
                     </Label>
                 )}
 
-                <Button className={cn(
-                    "flex items-center justify-between w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg shadow-sm outline-none transition-all hover:bg-gray-50 data-pressed:bg-gray-100 data-disabled:opacity-50 data-disabled:cursor-not-allowed group",
-                    variant === 'primary' && "focus:border-primary focus:ring-2 focus:ring-primary/20",
-                    variant === 'secondary' && "focus:border-secondary focus:ring-2 focus:ring-secondary/20",
-                    variant === 'danger' && "focus:border-danger focus:ring-2 focus:ring-danger/20",
-                    variant === 'success' && "focus:border-success focus:ring-2 focus:ring-success/20",
-                    variant === 'warning' && "focus:border-warning focus:ring-2 focus:ring-warning/20"
-                )}>
+                <Button className={selectStyles.trigger({ variant, type: 'custom' })}>
                     <SelectValue className="text-gray-900 truncate data-placeholder:text-gray-500" />
                     <div className="flex items-center gap-1">
                         {selectedKey ? (
@@ -126,27 +275,13 @@ function CustomSelect<T extends object>({
                                 key={option.value}
                                 id={option.value}
                                 textValue={String(option.label)}
-                                className={cn(
-                                    "group flex items-center justify-between px-3 py-2 text-sm text-gray-500 rounded-md outline-none cursor-pointer transition-colors hover:bg-gray-100",
-                                    variant === 'primary' && "data-focused:bg-primary/10 data-focused:text-primary data-selected:bg-primary/10 data-selected:text-primary data-selected:font-semibold",
-                                    variant === 'secondary' && "data-focused:bg-secondary/10 data-focused:text-secondary data-selected:bg-secondary/10 data-selected:text-secondary data-selected:font-semibold",
-                                    variant === 'danger' && "data-focused:bg-danger/10 data-focused:text-danger data-selected:bg-danger/10 data-selected:text-danger data-selected:font-semibold",
-                                    variant === 'success' && "data-focused:bg-success/10 data-focused:text-success data-selected:bg-success/10 data-selected:text-success data-selected:font-semibold",
-                                    variant === 'warning' && "data-focused:bg-warning/10 data-focused:text-warning data-selected:bg-warning/10 data-selected:text-warning data-selected:font-semibold"
-                                )}
+                                className={selectStyles.listBoxItem({ variant, type: 'custom' })}
                             >
                                 {({ isSelected }) => (
                                     <>
                                         <span className="truncate">{option.label}</span>
                                         {isSelected && (
-                                            <svg className={cn(
-                                                "w-4 h-4",
-                                                variant === 'primary' && "text-primary",
-                                                variant === 'secondary' && "text-secondary",
-                                                variant === 'danger' && "text-danger",
-                                                variant === 'success' && "text-success",
-                                                variant === 'warning' && "text-warning"
-                                            )} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className={cn("w-4 h-4", selectStyles.icon({ variant }))} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                             </svg>
                                         )}
@@ -228,45 +363,25 @@ function MultiSelect({
                 </Label>
             )}
 
-            {/* 👈 Sửa ở đây: Thay <div className="group..."> thành <Group> */}
-            <Group ref={triggerRef} className={cn(
-                "group relative flex flex-wrap items-center gap-2 p-1.5 bg-white border border-gray-300 rounded-lg shadow-sm transition-all focus-within:ring-2",
-                variant === 'primary' && "focus-within:border-primary focus-within:ring-primary/20",
-                variant === 'secondary' && "focus-within:border-secondary focus-within:ring-secondary/20",
-                variant === 'danger' && "focus-within:border-danger focus-within:ring-danger/20",
-                variant === 'success' && "focus-within:border-success focus-within:ring-success/20",
-                variant === 'warning' && "focus-within:border-warning focus-within:ring-warning/20"
-            )}>
+            {/* 👈 Thay <div className="group..."> thành <Group> */}
+            <Group aria-label={label || placeholder || "MultiSelect"} ref={triggerRef} className={selectStyles.groupTrigger({ variant })}>
 
                 {selectedArray.length > 0 && (
-                    /* 👈 Sửa ở đây: Thêm className="contents" để TagGroup không phá layout flex */
+                    /* 👈 Thêm className="contents" để TagGroup không phá layout flex */
                     <TagGroup aria-label="Selected items" className="contents">
                         <TagList className="flex flex-wrap gap-1.5">
                             {selectedArray.map((item) => (
                                 <Tag
                                     key={item.value}
                                     id={item.value}
-                                    className={cn(
-                                        "flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md border outline-none",
-                                        variant === 'primary' && "bg-primary/10 text-primary border-primary/20",
-                                        variant === 'secondary' && "bg-secondary/10 text-secondary border-secondary/20",
-                                        variant === 'danger' && "bg-danger/10 text-danger border-danger/20",
-                                        variant === 'success' && "bg-success/10 text-success border-success/20",
-                                        variant === 'warning' && "bg-warning/10 text-warning border-warning/20"
-                                    )}
+                                    className={selectStyles.tag({ variant })}
                                 >
                                     {item.label}
                                     <Button
+                                        aria-label="Xóa"
                                         slot="remove"
                                         onPress={() => removeKey(item.value)}
-                                        className={cn(
-                                            "p-0.5 rounded-full transition-colors outline-none",
-                                            variant === 'primary' && "hover:bg-primary/20",
-                                            variant === 'secondary' && "hover:bg-secondary/20",
-                                            variant === 'danger' && "hover:bg-danger/20",
-                                            variant === 'success' && "hover:bg-success/20",
-                                            variant === 'warning' && "hover:bg-warning/20"
-                                        )}
+                                        className={selectStyles.tagButton({ variant })}
                                     >
                                         <X className="w-3 h-3" />
                                     </Button>
@@ -276,8 +391,8 @@ function MultiSelect({
                     </TagGroup>
                 )}
 
-                {/* 👈 Sửa ở đây: Điều chỉnh class của Button để nó là Trigger bao phủ phần còn lại */}
-                <Button onPress={() => setOpen(!isOpen)} className="flex-1 min-w-[40px]  flex items-center justify-between outline-none text-sm min-h-[28px] cursor-pointer">
+                {/* 👈 Điều chỉnh class của Button để nó là Trigger bao phủ phần còn lại */}
+                <Button onPress={() => setOpen(!isOpen)} className="flex-1 min-w-[40px] flex items-center justify-between outline-none text-sm min-h-[28px] cursor-pointer">
                     {({ }) => (
                         <>
                             <span className={cn(
@@ -294,18 +409,11 @@ function MultiSelect({
                 </Button>
 
                 {/* Popover phải nằm TRONG thẻ Group */}
-                <Popover  isOpen={isOpen} onOpenChange={setOpen} triggerRef={triggerRef} style={{ width: triggerWidth ? `${triggerWidth}px` : undefined }} className="bg-white border border-gray-200 rounded-xl shadow-lg entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 origin-top z-50 overflow-hidden flex flex-col">
+                <Popover isOpen={isOpen} onOpenChange={setOpen} triggerRef={triggerRef} style={{ width: triggerWidth ? `${triggerWidth}px` : undefined }} className="bg-white border border-gray-200 rounded-xl shadow-lg entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 origin-top z-50 overflow-hidden flex flex-col">
                     <div className="flex items-center justify-between p-2.5 border-b border-gray-100 bg-gray-50/50 shrink-0">
                         <span
                             onClick={handleSelectAll}
-                            className={cn(
-                                "text-xs font-semibold cursor-pointer transition-colors",
-                                variant === 'primary' && "text-primary hover:opacity-80",
-                                variant === 'secondary' && "text-secondary hover:opacity-80",
-                                variant === 'danger' && "text-danger hover:opacity-80",
-                                variant === 'success' && "text-success hover:opacity-80",
-                                variant === 'warning' && "text-warning hover:opacity-80"
-                            )}
+                            className={selectStyles.textAction({ variant })}
                         >
                             Chọn tất cả
                         </span>
@@ -328,38 +436,18 @@ function MultiSelect({
                                 key={option.value}
                                 id={option.value}
                                 textValue={String(option.label)}
-                                className={cn(
-                                    "group flex items-center justify-between px-3 py-2 text-sm text-gray-700 rounded-md outline-none cursor-pointer",
-                                    variant === 'primary' && "data-focused:bg-primary/10 data-focused:text-primary data-selected:bg-primary/10",
-                                    variant === 'secondary' && "data-focused:bg-secondary/10 data-focused:text-secondary data-selected:bg-secondary/10",
-                                    variant === 'danger' && "data-focused:bg-danger/10 data-focused:text-danger data-selected:bg-danger/10",
-                                    variant === 'success' && "data-focused:bg-success/10 data-focused:text-success data-selected:bg-success/10",
-                                    variant === 'warning' && "data-focused:bg-warning/10 data-focused:text-warning data-selected:bg-warning/10"
-                                )}
+                                className={selectStyles.listBoxItem({ variant, type: 'multi' })}
                             >
                                 {({ isSelected }) => (
                                     <>
                                         <span className={cn(
                                             "truncate",
                                             isSelected && "font-semibold",
-                                            isSelected && variant === 'primary' && "text-primary",
-                                            isSelected && variant === 'secondary' && "text-secondary",
-                                            isSelected && variant === 'danger' && "text-danger",
-                                            isSelected && variant === 'success' && "text-success",
-                                            isSelected && variant === 'warning' && "text-warning"
+                                            isSelected && selectStyles.icon({ variant })
                                         )}>
                                             {option.label}
                                         </span>
-                                        <div className={cn(
-                                            "w-4 h-4 border rounded flex items-center justify-center transition-colors shrink-0 ml-2",
-                                            isSelected ? (
-                                                variant === 'primary' ? "bg-primary border-primary" :
-                                                variant === 'secondary' ? "bg-secondary border-secondary" :
-                                                variant === 'danger' ? "bg-danger border-danger" :
-                                                variant === 'success' ? "bg-success border-success" :
-                                                "bg-warning border-warning"
-                                            ) : "border-gray-300 bg-white"
-                                        )}>
+                                        <div className={selectStyles.checkbox({ variant, isSelected: isSelected || false })}>
                                             {isSelected && (
                                                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -438,7 +526,7 @@ function AutocompleteSelect({
     };
 
     return (
-        <div className={cn( className||"w-full ")}>
+        <div className={cn(className || "w-full ")}>
             {label && (
                 <Label className="text-sm font-medium text-gray-700 cursor-default">
                     {label}
@@ -448,15 +536,8 @@ function AutocompleteSelect({
             {/* Dùng DialogTrigger để kiểm soát Popover */}
             <DialogTrigger isOpen={isOpen} onOpenChange={setIsOpen}>
 
-                {/* 1. Nút Trigger TÔNG MÀU DÙNG THEO THEME CHUNG GIỐNG CÁC SELECT KIA */}
-                <Button className={cn(
-                    "flex items-center justify-between w-full px-3 py-2.5 bg-white border border-gray-300 hover:border-gray-400 rounded-lg shadow-sm outline-none transition-all group",
-                    variant === 'primary' && "focus:border-primary focus:ring-2 focus:ring-primary/20",
-                    variant === 'secondary' && "focus:border-secondary focus:ring-2 focus:ring-secondary/20",
-                    variant === 'danger' && "focus:border-danger focus:ring-2 focus:ring-danger/20",
-                    variant === 'success' && "focus:border-success focus:ring-2 focus:ring-success/20",
-                    variant === 'warning' && "focus:border-warning focus:ring-2 focus:ring-warning/20"
-                )}>
+                {/* 1. Nút Trigger */}
+                <Button className={selectStyles.trigger({ variant, type: 'autocomplete' })}>
                     <span className={cn(
                         "truncate text-sm",
                         selectedItem ? "text-gray-900" : "text-gray-500"
@@ -486,7 +567,7 @@ function AutocompleteSelect({
                 </Button>
 
                 {/* 2. Popover tông màu SÁNG, shadow lớn */}
-                <Popover  className="w-(--trigger-width) bg-white border border-gray-200 rounded-xl shadow-lg entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 origin-top overflow-hidden z-50">
+                <Popover className="w-(--trigger-width) bg-white border border-gray-200 rounded-xl shadow-lg entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 origin-top overflow-hidden z-50">
 
                     {/* Bọc bằng Dialog để tùy biến nội dung bên trong */}
                     <Dialog className="outline-none flex flex-col pt-2 pb-1 ">
@@ -500,14 +581,7 @@ function AutocompleteSelect({
                                 autoFocus // Tự động focus ô search khi mở menu
                                 className="w-full"
                             >
-                                <div className={cn(
-                                    "flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full focus-within:ring-2 transition-all focus-within:bg-white",
-                                    variant === 'primary' && "focus-within:border-primary focus-within:ring-primary/10",
-                                    variant === 'secondary' && "focus-within:border-secondary focus-within:ring-secondary/10",
-                                    variant === 'danger' && "focus-within:border-danger focus-within:ring-danger/10",
-                                    variant === 'success' && "focus-within:border-success focus-within:ring-success/10",
-                                    variant === 'warning' && "focus-within:border-warning focus-within:ring-warning/10"
-                                )}>
+                                <div className={selectStyles.searchContainer({ variant })}>
                                     <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
@@ -537,27 +611,13 @@ function AutocompleteSelect({
                                     key={option.value}
                                     id={option.value}
                                     textValue={String(option.label)}
-                                    className={cn(
-                                        "group flex items-center justify-between px-3 py-2 text-sm text-gray-700 rounded-lg outline-none cursor-pointer transition-colors hover:bg-gray-100 data-focused:bg-gray-100",
-                                        variant === 'primary' && "data-selected:bg-primary/10 data-selected:text-primary data-selected:font-semibold",
-                                        variant === 'secondary' && "data-selected:bg-secondary/10 data-selected:text-secondary data-selected:font-semibold",
-                                        variant === 'danger' && "data-selected:bg-danger/10 data-selected:text-danger data-selected:font-semibold",
-                                        variant === 'success' && "data-selected:bg-success/10 data-selected:text-success data-selected:font-semibold",
-                                        variant === 'warning' && "data-selected:bg-warning/10 data-selected:text-warning data-selected:font-semibold"
-                                    )}
+                                    className={selectStyles.listBoxItem({ variant, type: 'autocomplete' })}
                                 >
                                     {({ isSelected }) => (
                                         <>
                                             <span className="truncate">{option.label}</span>
                                             {isSelected && (
-                                                <svg className={cn(
-                                                    "w-4 h-4 shrink-0",
-                                                    variant === 'primary' && "text-primary",
-                                                    variant === 'secondary' && "text-secondary",
-                                                    variant === 'danger' && "text-danger",
-                                                    variant === 'success' && "text-success",
-                                                    variant === 'warning' && "text-warning"
-                                                )} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg className={cn("w-4 h-4 shrink-0", selectStyles.icon({ variant }))} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                                 </svg>
                                             )}
@@ -572,6 +632,7 @@ function AutocompleteSelect({
         </div>
     );
 }
+
 export {
     CustomSelect,
     MultiSelect,

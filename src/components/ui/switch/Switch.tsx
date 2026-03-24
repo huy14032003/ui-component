@@ -53,6 +53,7 @@ export function Switch({ variant = 'primary', size = 'md', label, className, ...
   return (
     <AriaSwitch
       {...props}
+      aria-label={props['aria-label'] || label || "Switch"}
       className={cn(
         "group flex items-center gap-3 text-sm transition-opacity outline-none",
         props.isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90",
