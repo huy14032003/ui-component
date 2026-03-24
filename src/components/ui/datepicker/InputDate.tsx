@@ -27,7 +27,7 @@ import * as Icons from "@components/icons";
 // --- Styles ---
 
 const fieldStyles = tv({
-    base: "flex items-center gap-2 bg-white border border-gray-300 rounded-lg outline-none transition-all group focus-within:ring-2 w-full max-w-full",
+    base: "flex items-center gap-2 bg-white border border-gray-300 rounded-lg shadow-sm outline-none transition-all group focus-within:ring-2 w-full max-w-full",
     variants: {
         variant: {
             primary: "focus-within:border-primary focus-within:ring-primary/20",
@@ -65,14 +65,7 @@ const segmentStyles = tv({
 });
 
 const popoverStyles = tv({
-    base: [
-        "bg-white border border-gray-200 rounded-xl shadow-lg",
-        "entering:animate-in entering:fade-in entering:zoom-in-95",
-        "exiting:animate-out exiting:fade-out exiting:zoom-out-95",
-        "origin-top z-50 outline-none",
-        "max-h-[min(85dvh,480px)] overflow-y-auto",
-        "[-webkit-overflow-scrolling:touch] overscroll-contain"
-    ].join(' '),
+    base: "bg-white border border-gray-200 rounded-xl shadow-lg entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 origin-top z-50 outline-none max-h-[85vh] sm:max-h-[calc(var(--visual-viewport-height)-20px)] overflow-y-auto",
 });
 
 const calendarCellStyles = tv({
@@ -200,7 +193,7 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                     </>
                 )}
             </div>
-            <AriaButton aria-label="Mở lịch" type="button" className="flex-none p-1 rounded-md text-gray-400 hover:text-gray-600 outline-none transition-colors border-l border-gray-100 ml-1">
+            <AriaButton type="button" className="flex-none p-1 rounded-md text-gray-400 hover:text-gray-600 outline-none transition-colors border-l border-gray-100 ml-1">
                 <Icons.Calendar className={cn(
                     size === "xs" ? "w-3 h-3" :
                         size === "sm" ? "w-4 h-4" :
@@ -217,11 +210,11 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
             className="p-4 outline-none"
         >
             <header className="flex items-center justify-between mb-2">
-                <AriaButton aria-label="Tháng trước" slot="previous" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
+                <AriaButton slot="previous" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
                     <Icons.ChevronLeft className="w-5 h-5" />
                 </AriaButton>
                 <Heading className="font-semibold text-sm" />
-                <AriaButton aria-label="Tháng sau" slot="next" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
+                <AriaButton slot="next" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
                     <Icons.ChevronRight className="w-5 h-5" />
                 </AriaButton>
             </header>
@@ -245,11 +238,11 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
             className="p-4 outline-none"
         >
             <header className="flex items-center justify-between mb-2">
-                <AriaButton aria-label="Tháng trước" slot="previous" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
+                <AriaButton slot="previous" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
                     <Icons.ChevronLeft className="w-5 h-5" />
                 </AriaButton>
                 <Heading className="font-semibold text-sm" />
-                <AriaButton aria-label="Tháng sau" slot="next" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
+                <AriaButton slot="next" className="p-1.5 rounded-md hover:bg-gray-100 outline-none">
                     <Icons.ChevronRight className="w-5 h-5" />
                 </AriaButton>
             </header>
@@ -288,7 +281,6 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                     {isRange ? (
                         <>
                             <TimeField
-                                aria-label="Thời gian bắt đầu"
                                 slot="start"
                                 granularity={showTime}
                                 value={value?.start}
@@ -303,7 +295,6 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                             </TimeField>
                             <span className="text-gray-400 text-xs">—</span>
                             <TimeField
-                                aria-label="Thời gian kết thúc"
                                 slot="end"
                                 granularity={showTime}
                                 value={value?.end}
@@ -319,7 +310,6 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                         </>
                     ) : (
                         <TimeField
-                            aria-label="Thời gian"
                             granularity={showTime}
                             value={value}
                             onChange={handleValueChange}
@@ -341,10 +331,37 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
     if (isRange) {
         const rangeProps = rest as DateRangePickerProps<T>;
         return (
-            <DateRangePicker
-                {...rangeProps}
-                aria-label={rangeProps['aria-label'] || (!label ? 'Chọn từ ngày đến ngày' : undefined)}
-                className={cn("flex flex-col gap-1.5", className)}
+            <div className={cn("flex flex-col gap-1.5", className)}>
+                {label && <Label className="text-sm font-medium text-gray-700 cursor-default">{label}</Label>}
+                <DateRangePicker
+                    {...rangeProps}
+                    value={value}
+                    onChange={handleValueChange}
+                    isOpen={isOpen}
+                    onOpenChange={setIsOpen}
+                    shouldCloseOnSelect={false}
+                    granularity={showTime}
+                >
+                    {renderField(true)}
+                    <Popover className={popoverStyles} offset={8} containerPadding={12}>
+                        <Dialog className="outline-none">
+                            <div className="flex flex-col">
+                                {renderRangeCalendar()}
+                                {renderTimeSection()}
+                            </div>
+                        </Dialog>
+                    </Popover>
+                </DateRangePicker>
+            </div>
+        );
+    }
+
+    const singleProps = rest as DatePickerProps<T>;
+    return (
+        <div className={cn("flex flex-col gap-1.5", className)}>
+            {label && <Label className="text-sm font-medium text-gray-700 cursor-default">{label}</Label>}
+            <DatePicker
+                {...singleProps}
                 value={value}
                 onChange={handleValueChange}
                 isOpen={isOpen}
@@ -352,43 +369,16 @@ export default function InputDate<T extends DateValue>(props: InputDateProps<T>)
                 shouldCloseOnSelect={false}
                 granularity={showTime}
             >
-                {label && <Label className="text-sm font-medium text-gray-700 cursor-default">{label}</Label>}
-                {renderField(true)}
-                <Popover className={popoverStyles} offset={8} containerPadding={8}>
+                {renderField(false)}
+                <Popover className={popoverStyles} offset={8} containerPadding={12}>
                     <Dialog className="outline-none">
                         <div className="flex flex-col">
-                            {renderRangeCalendar()}
+                            {renderCalendar()}
                             {renderTimeSection()}
                         </div>
                     </Dialog>
                 </Popover>
-            </DateRangePicker>
-        );
-    }
-
-    const singleProps = rest as DatePickerProps<T>;
-    return (
-        <DatePicker
-            {...singleProps}
-            aria-label={singleProps['aria-label'] || (!label ? 'Chọn ngày' : undefined)}
-            className={cn("flex flex-col gap-1.5", className)}
-            value={value}
-            onChange={handleValueChange}
-            isOpen={isOpen}
-            onOpenChange={setIsOpen}
-            shouldCloseOnSelect={false}
-            granularity={showTime}
-        >
-            {label && <Label className="text-sm font-medium text-gray-700 cursor-default">{label}</Label>}
-            {renderField(false)}
-            <Popover className={popoverStyles} offset={8} containerPadding={8}>
-                <Dialog className="outline-none">
-                    <div className="flex flex-col">
-                        {renderCalendar()}
-                        {renderTimeSection()}
-                    </div>
-                </Dialog>
-            </Popover>
-        </DatePicker>
+            </DatePicker>
+        </div>
     );
 }
