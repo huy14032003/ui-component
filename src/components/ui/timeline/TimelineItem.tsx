@@ -34,7 +34,7 @@ const lineStyles = tv({
     base: 'absolute bg-gray-200',
     variants: {
         direction: {
-            vertical: 'left-[5px] top-3 bottom-0 w-[2px]',
+            vertical: 'left-[5px] top-4.5 bottom-0 w-[2px] h-full',
             horizontal: 'top-[11px] left-3 w-full h-[2px]'
         }
     },

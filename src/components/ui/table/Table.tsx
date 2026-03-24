@@ -12,6 +12,7 @@ import {
     type PaginationState,
     type RowSelectionState,
     type RowData,
+    type ColumnResizeMode,
 } from '@tanstack/react-table';
 
 declare module '@tanstack/react-table' {
@@ -23,6 +24,7 @@ import { cn } from '@lib/utils/cn';
 import { Checkbox } from '../checkbox/Checkbox';
 import Spinner from '../spinner/Spinner';
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import Button from '../button/Button';
 
 export interface TableProps<TData> {
     data: TData[];
@@ -40,6 +42,8 @@ export interface TableProps<TData> {
     renderPageSizeText?: (pageSize: number) => React.ReactNode;
     goToPageText?: string | boolean;
     alignType?: 'left' | 'center' | 'right';
+    enableColumnResizing?: boolean;
+    columnResizeMode?: ColumnResizeMode;
 }
 
 export function Table<TData>({
@@ -60,7 +64,9 @@ export function Table<TData>({
         </>
     ),
     renderPageSizeText = (size) => `${size} / page`,
-    goToPageText = "Go to page"
+    goToPageText = "Go to page",
+    enableColumnResizing = false,
+    columnResizeMode = 'onChange'
 }: TableProps<TData>) {
 
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -71,8 +77,14 @@ export function Table<TData>({
         if (enableRowSelection) {
             cols.unshift({
                 id: 'select',
+                size: 10,
+                minSize: 5,
+                maxSize: 10,
+                meta: {
+                    align: 'center'
+                },
                 header: ({ table }) => (
-                    <div className="flex items-center justify-center w-8">
+                    <div className="flex items-center justify-center">
                         <Checkbox
                             size="sm"
                             isSelected={table.getIsAllRowsSelected()}
@@ -82,7 +94,7 @@ export function Table<TData>({
                     </div>
                 ),
                 cell: ({ row }) => (
-                    <div className="flex items-center justify-center w-8">
+                    <div className="flex items-center justify-center">
                         <Checkbox
                             size="sm"
                             isSelected={row.getIsSelected()}
@@ -98,15 +110,23 @@ export function Table<TData>({
             cols.unshift({
                 id: 'expander',
                 header: () => null,
+                size: 10,
+                minSize: 10,
+                maxSize: 10,
+                meta: {
+                    align: 'center'
+                },
                 cell: ({ row }) => {
                     return row.getCanExpand() ? (
-                        <div className="flex items-center justify-center w-8">
-                            <button
-                                onClick={row.getToggleExpandedHandler()}
-                                className="p-1 rounded-md hover:bg-gray-200 text-gray-500 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-primary/50"
+                        <div className="flex items-center justify-center">
+                            <Button
+                                variant="outlineSecondary"
+                                size="xs"
+                                onPress={row.getToggleExpandedHandler()}
+                                className="p-0.5 hover:bg-gray-200 text-gray-500 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-primary/50"
                             >
-                                {row.getIsExpanded() ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                            </button>
+                                {row.getIsExpanded() ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                            </Button>
                         </div>
                     ) : null;
                 },
@@ -129,6 +149,8 @@ export function Table<TData>({
         getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
         getFilteredRowModel: getFilteredRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
+        columnResizeMode,
+        enableColumnResizing,
         enableRowSelection,
         getRowCanExpand: getRowCanExpand ? (row) => getRowCanExpand(row.original) : () => !!renderSubComponent,
     });
@@ -144,20 +166,26 @@ export function Table<TData>({
     }, [rowSelection, onSelectionChange, table]);
 
     return (
-        <div className={cn("relative w-full rounded-xl border border-gray-200 bg-white flex flex-col", className)}>
+        <div className={cn("relative w-full rounded-md border border-gray-200 bg-white flex flex-col overflow-hidden", className)}>
 
             {/* Loading Overlay */}
             {isLoading && (
-                <div className="absolute inset-0  bg-black/30 z-10 flex items-center justify-center   rounded-xl overflow-hidden">
+                <div className="absolute inset-0  bg-black/30 z-10 flex items-center justify-center   ">
                     <Spinner size="lg" variant="circle" className='text-blue-700' />
                 </div>
             )}
 
             <div className="overflow-x-auto w-full">
-                <table className="w-full text-sm text-left text-gray-700 whitespace-nowrap">
+                <table
+                    className="w-full text-sm text-left text-gray-700 whitespace-nowrap"
+                    style={{
+                        width: enableColumnResizing ? table.getCenterTotalSize() : undefined,
+                        tableLayout: enableColumnResizing ? 'fixed' : 'auto'
+                    }}
+                >
                     <thead className="text-xs text-gray-600 bg-gray-50/80 border-b border-gray-200">
                         {table.getHeaderGroups().map(headerGroup => (
-                            <tr key={headerGroup.id}>
+                            <tr key={headerGroup.id} >
                                 {headerGroup.headers.map(header => {
                                     const meta = header.column.columnDef.meta;
                                     const align = meta?.align || 'left';
@@ -167,33 +195,56 @@ export function Table<TData>({
                                         <th
                                             key={header.id}
                                             colSpan={header.colSpan}
+                                            style={{
+                                                width: enableColumnResizing ? header.getSize() : header.column.columnDef.size,
+                                                position: 'relative'
+                                            }}
                                             className={cn(
-                                                "px-4 py-3 font-semibold tracking-wide border-b border-gray-200 transition-colors",
+                                                header.column.id === 'select' || header.column.id === 'expander' ? "px-1" : "px-2",
+                                                "py-3 font-semibold tracking-wide border border-gray-200 transition-colors group/header",
                                                 canSort ? "cursor-pointer select-none hover:bg-gray-100" : "",
                                                 align === 'center' ? "text-center" : align === 'right' ? "text-right" : "text-left"
                                             )}
-                                            onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                                         >
-                                            {header.isPlaceholder ? null : (
-                                                <div className={cn(
-                                                    "flex items-center gap-2",
-                                                    align === 'center' ? "justify-center" : align === 'right' ? "justify-end" : "justify-between"
-                                                )}>
-                                                    <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
-                                                    {canSort && (
-                                                        <span className="shrink-0">
-                                                            {{
-                                                                asc: <ChevronUp className="w-4 h-4 text-primary" />,
-                                                                desc: <ChevronDown className="w-4 h-4 text-primary" />,
-                                                            }[header.column.getIsSorted() as string] ?? (
-                                                                    <div className="flex flex-col opacity-30 -space-y-1 hover:opacity-100 transition-opacity">
-                                                                        <ChevronUp className="w-3 h-3" />
-                                                                        <ChevronDown className="w-3 h-3" />
-                                                                    </div>
-                                                                )}
-                                                        </span>
-                                                    )}
-                                                </div>
+                                            <div
+                                                className={cn("flex flex-col h-full")}
+                                                onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                                            >
+                                                {header.isPlaceholder ? null : (
+                                                    <div className={cn(
+                                                        "flex items-center gap-2",
+                                                        align === 'center' ? "justify-center" : align === 'right' ? "justify-end" : "justify-between"
+                                                    )}>
+                                                        <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
+                                                        {canSort && (
+                                                            <span className="shrink-0">
+                                                                {{
+                                                                    asc: <ChevronUp className="w-4 h-4 text-primary" />,
+                                                                    desc: <ChevronDown className="w-4 h-4 text-primary" />,
+                                                                }[header.column.getIsSorted() as string] ?? (
+                                                                        <div className="flex flex-col opacity-30 -space-y-1 hover:opacity-100 transition-opacity">
+                                                                            <ChevronUp className="w-3 h-3" />
+                                                                            <ChevronDown className="w-3 h-3" />
+                                                                        </div>
+                                                                    )}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Resize Handle */}
+                                            {enableColumnResizing && header.column.getCanResize() && (
+                                                <div
+                                                    {...{
+                                                        onMouseDown: header.getResizeHandler(),
+                                                        onTouchStart: header.getResizeHandler(),
+                                                        className: cn(
+                                                            "absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none hover:bg-primary/50 transition-colors",
+                                                            header.column.getIsResizing() ? "bg-primary w-1.5 z-10" : "bg-transparent"
+                                                        ),
+                                                    }}
+                                                />
                                             )}
                                         </th>
                                     );
@@ -201,10 +252,10 @@ export function Table<TData>({
                             </tr>
                         ))}
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="">
                         {!isLoading && data.length === 0 ? (
                             <tr>
-                                <td colSpan={finalColumns.length} className="px-4 py-16 text-center text-gray-500">
+                                <td colSpan={finalColumns.length} className=" px-4 py-16 text-center text-gray-500">
                                     <div className="flex flex-col items-center justify-center space-y-2">
                                         <span className="text-gray-400">
                                             <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,8 +282,10 @@ export function Table<TData>({
                                             return (
                                                 <td
                                                     key={cell.id}
+                                                    style={{ width: enableColumnResizing ? cell.column.getSize() : cell.column.columnDef.size }}
                                                     className={cn(
-                                                        "px-4 py-3 border-b border-gray-100 align-middle",
+                                                        cell.column.id === 'select' || cell.column.id === 'expander' ? "px-1" : "px-2",
+                                                        "py-3 border border-gray-200 align-middle",
                                                         align === 'center' ? "text-center" : align === 'right' ? "text-right" : "text-left"
                                                     )}
                                                 >
@@ -264,14 +317,14 @@ export function Table<TData>({
 
             {/* Pagination Controls */}
             {enablePagination && table.getPageCount() > 0 && (
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50/50 rounded-b-xl gap-4">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-2 py-3 border-t border-gray-200 bg-gray-50/50 gap-4">
                     <div className="text-sm text-gray-500 w-full sm:w-auto text-center sm:text-left">
-                        {renderPaginationText!==false &&(
-                           typeof  renderPaginationText === 'function' ? renderPaginationText(
-                            table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1,
-                            Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, data.length),
-                            data.length
-                        ) : renderPaginationText
+                        {renderPaginationText !== false && (
+                            typeof renderPaginationText === 'function' ? renderPaginationText(
+                                table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1,
+                                Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, data.length),
+                                data.length
+                            ) : renderPaginationText
                         )}
                     </div>
 
@@ -331,27 +384,27 @@ export function Table<TData>({
                         </div>
                         {goToPageText !== false && (
                             <div className="flex items-center gap-2 text-sm text-gray-600 border-l border-gray-300 pl-3 ml-1">
-                                {typeof goToPageText === 'string'  && <span>{goToPageText}</span>}
+                                {typeof goToPageText === 'string' && <span>{goToPageText}</span>}
                                 <input
                                     type="number"
                                     min={1}
-                                max={table.getPageCount() || 1}
-                                value={inputValue}
-                                onChange={e => {
-                                    const val = e.target.value;
-                                    setInputValue(val as any);
+                                    max={table.getPageCount() || 1}
+                                    value={inputValue}
+                                    onChange={e => {
+                                        const val = e.target.value;
+                                        setInputValue(val as any);
 
-                                    const page = val ? Number(val) - 1 : 0;
-                                    if (val && page >= 0 && page < table.getPageCount()) {
-                                        table.setPageIndex(page);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    setInputValue(table.getState().pagination.pageIndex + 1);
-                                }}
-                                className="w-12 px-1 py-1 text-sm border border-gray-300 rounded-md bg-white text-gray-700 text-center outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                            />
-                        </div>
+                                        const page = val ? Number(val) - 1 : 0;
+                                        if (val && page >= 0 && page < table.getPageCount()) {
+                                            table.setPageIndex(page);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        setInputValue(table.getState().pagination.pageIndex + 1);
+                                    }}
+                                    className="w-12 px-1 py-1 text-sm border border-gray-300 rounded-md bg-white text-gray-700 text-center outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                                />
+                            </div>
                         )}
                     </div>
                 </div>

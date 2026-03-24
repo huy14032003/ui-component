@@ -240,32 +240,76 @@ const Test = () => {
         </div>
 
       </div>
-      <p className='text-xl font-bold'>2. select</p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-        <div className="flex flex-col gap-4">
-          <CustomSelect options={options} label='Select Primary' variant='primary' />
-          <CustomSelect options={options} label='Select Success' variant='success' />
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>2. Select Components (Single, Multi, Autocomplete)</p>
+      <div className="space-y-8 p-4 bg-gray-50/30 rounded-2xl border border-gray-100">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 px-2">Single Select Variants</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
+            <CustomSelect options={options} label='Primary Select' variant='primary' placeholder="Chọn một mục..." />
+            <CustomSelect options={options} label='Success Select' variant='success' defaultSelectedKey="3" />
+            <CustomSelect options={options} label='Warning Select' variant='warning' />
+            <CustomSelect options={options} label='Danger Select' variant='danger' />
+          </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <MultiSelect options={options} label='Multi Primary' variant='primary' />
-          <MultiSelect options={options} label='Multi Danger' variant='danger' />
+
+        <div className="border-t border-gray-100 pt-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 px-2">Multi-Select (Select All / Clear All)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
+            <MultiSelect 
+              options={options} 
+              label='Multi-Select Primary' 
+              variant='primary' 
+              placeholder="Chọn nhiều ngôn ngữ hoặc sở thích..."
+              selectedKeys={["1", "2"]} 
+            />
+            <MultiSelect 
+              options={options} 
+              label='Multi-Select Success' 
+              variant='success' 
+              placeholder="Thêm thành viên vào nhóm..."
+            />
+          </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <AutocompleteSelect options={options} label='Autocomplete Primary' variant='primary' />
-          <AutocompleteSelect options={options} label='Autocomplete Warning' variant='warning' />
+
+        <div className="border-t border-gray-100 pt-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 px-2">Autocomplete & Snap to Value</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
+            <AutocompleteSelect 
+                options={[...options, {label: "Last Option", value: "999"}]} 
+                label='Autocomplete Search' 
+                variant='primary' 
+                placeholder="Tìm kiếm quốc gia..."
+            />
+            <AutocompleteSelect 
+                options={options} 
+                label='Autocomplete Warning' 
+                variant='warning' 
+                placeholder="Chọn trạng thái..."
+            />
+          </div>
         </div>
+
         <Disclosure
-          className="w-full col-span-1 md:col-span-3 max-w-none shadow-none border border-gray-200 mt-2"
+          className="w-full max-w-none shadow-none border border-gray-200 mt-4"
           items={[
             {
-              id: 'code-select',
-              title: 'Xem mã nguồn (Select Variants)',
+              id: 'code-select-all',
+              title: 'Xem mã nguồn (Select Full Suite)',
               content: (
-                <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
-                  <code>{`<CustomSelect options={options} label='Select Success' variant='success' />
-<MultiSelect options={options} label='Multi Danger' variant='danger' />
-<AutocompleteSelect options={options} label='Autocomplete Warning' variant='warning' />`}</code>
-                </pre>
+                <div className="space-y-4">
+                  <p className="text-sm font-medium text-gray-600">Single Select:</p>
+                  <pre className="p-4 bg-gray-900 text-blue-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                    <code>{`<CustomSelect options={options} label='Primary' variant='primary' />`}</code>
+                  </pre>
+                  <p className="text-sm font-medium text-gray-600">Multi-Select (All/Clear):</p>
+                  <pre className="p-4 bg-gray-900 text-green-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                    <code>{`<MultiSelect options={options} label='Multi' variant='success' />`}</code>
+                  </pre>
+                  <p className="text-sm font-medium text-gray-600">Autocomplete:</p>
+                  <pre className="p-4 bg-gray-900 text-yellow-300 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed">
+                    <code>{`<AutocompleteSelect options={options} label='Search' variant='warning' />`}</code>
+                  </pre>
+                </div>
               )
             }
           ]} />
@@ -518,28 +562,53 @@ const Test = () => {
         <Example />
       </div>
 
-      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>9. Date & Time Pickers</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
-        <div className="space-y-6">
-          <InputDate label="Chọn ngày (Default)" variant="primary" />
-          <InputDate label="Chọn ngày & giờ" showTime="hour" variant="warning" />
+      <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>9. Date &amp; Time Pickers</p>
+
+      <div className="p-4 space-y-8">
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-4">Mode: single (mặc định)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <InputDate label="Ngày đơn (Primary)" variant="primary" />
+            <InputDate label="Ngày + Giờ (Warning)" variant="warning" showTime="hour" />
+            <InputDate label="Ngày + Phút (Success)" variant="success" showTime="minute" />
+            <InputDate label="Ngày + Giây (Danger)" variant="danger" showTime="second" />
+            <InputDate label="outputFormat: ISO" variant="primary" outputFormat="ISO" onChange={(v) => console.log('ISO:', v)} />
+            <InputDate label="outputFormat: Date object" variant="secondary" outputFormat="Date" onChange={(v) => console.log('Date:', v)} />
+          </div>
         </div>
-        <div className="space-y-6">
-          <InputDate label="Chọn ngày (Success)" showTime="minute" variant="success" />
-          <InputDate label="Chọn ngày & giờ (Danger)" showTime="second" variant="danger" />
+
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-4">Mode: range</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputDate mode="range" label="Khoảng ngày (Primary)" variant="primary" />
+            <InputDate mode="range" label="Khoảng ngày + giờ (Success)" variant="success" showTime="minute" />
+          </div>
         </div>
-        <div className="space-y-6">
-          <InputDate label="Chọn khoảng ngày" isRange variant="primary" />
-          <InputDate label="Chọn khoảng ngày & giờ" isRange showTime="minute" variant="success" />
+
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-4">Mode: multi (chọn nhiều ngày)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputDate mode="multi" label="Chọn nhiều ngày" variant="primary" onChange={(v) => console.log('multi:', v)} />
+            <InputDate mode="multi" label="Tối đa 3 ngày" variant="warning" maxCount={3} onChange={(v) => console.log('multi max:', v)} />
+          </div>
         </div>
-      </div>
-      <div className="p-4 mt-4 bg-gray-50 rounded-xl space-y-6">
-        <h4 className="font-semibold text-gray-700">Kích thước (Sizes)</h4>
-        <div className="flex flex-col gap-4">
-          <InputDate size="xs" label="Size XS" variant="primary" />
-          <InputDate size="sm" label="Size SM" variant="success" />
-          <InputDate size="md" label="Size MD (Default)" variant="warning" />
-          <InputDate size="lg" label="Size LG" variant="danger" />
+
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-4">Mode: autocomplete (gõ hoặc chọn)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputDate mode="autocomplete" label="Gõ ngày (yyyy-mm-dd)" variant="primary" onChange={(v) => console.log('auto:', v)} />
+            <InputDate mode="autocomplete" label="Autocomplete + Giờ (Success)" variant="success" showTime="minute" onChange={(v) => console.log('auto+time:', v)} />
+          </div>
+        </div>
+
+        <div className="bg-gray-50 rounded-xl p-4 space-y-4">
+          <h4 className="font-semibold text-gray-700">Kích thước (Sizes)</h4>
+          <div className="flex flex-col gap-4">
+            <InputDate size="xs" label="Size XS" variant="primary" />
+            <InputDate size="sm" label="Size SM" variant="success" />
+            <InputDate size="md" label="Size MD (Default)" variant="warning" />
+            <InputDate size="lg" label="Size LG" variant="danger" />
+          </div>
         </div>
       </div>
       <p className='text-xl font-bold mt-8 mb-4 border-b pb-2'>10. Tag</p>
@@ -710,7 +779,7 @@ const Test = () => {
               { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Pending', details: 'Quản trị viên đa bộ phận đang chờ phê duyệt.' },
             ]}
             columns={[
-              { header: 'ID', accessorKey: 'id' },
+              { header: 'ID', accessorKey: 'id', size: 50 },
               { header: 'Tên', accessorKey: 'name' },
               { header: 'Email', accessorKey: 'email' },
               { header: 'Vai trò', accessorKey: 'role' },
@@ -845,7 +914,7 @@ const Test = () => {
               { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Pending', details: 'Quản trị viên đa bộ phận đang chờ phê duyệt.' },
             ]}
             columns={[
-              { header: 'ID', accessorKey: 'id', meta: { align: 'center' } },
+              { header: 'ID', accessorKey: 'id', meta: { align: 'center' }, size: 50 },
               { header: 'Tên', accessorKey: 'name' },
               { header: 'Email', accessorKey: 'email' },
               { header: 'Vai trò', accessorKey: 'role' },

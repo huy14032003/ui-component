@@ -101,9 +101,8 @@ export function FormInputDate({ name, valueFormat, ...props }: FormInputDateProp
 
                 return (
                     <div className="flex flex-col gap-1 w-full">
-                        {/* @ts-ignore */}
                         <InputDate
-                            {...props}
+                            {...(props as any)}
                             value={displayValue}
                             onChange={handleChange}
                             onBlur={onBlur}
