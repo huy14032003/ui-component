@@ -1,57 +1,57 @@
-import React from 'react';
-import { 
-  Popover as AriaPopover, 
-  Dialog as AriaDialog,
-  DialogTrigger,
-  type PopoverProps,
-  type DialogProps
-} from 'react-aria-components';
-import { cn } from '@lib/utils/cn';
+import React from 'react'
+import * as PopoverPrimitive from '@radix-ui/react-popover'
+import { tv, type VariantProps } from 'tailwind-variants'
+import { cn } from '../../../lib/utils/cn'
 
-export interface CustomPopoverProps extends Omit<PopoverProps, 'children'> {
-  children: React.ReactNode;
-  showArrow?: boolean;
+/**
+ * Popover Variants using tailwind-variants
+ */
+const popoverContentVariants = tv({
+    base: 'relative z-50 min-w-[8rem] overflow-hidden rounded-lg bg-popover p-4 text-popover-foreground shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+    variants: {
+        variant: {
+            solid: 'border border-secondary/20 bg-background',
+            glass: 'backdrop-blur-2xl bg-gradient-to-b from-neutral-950/40 to-white-900/20 border  border-white/10 text-white shadow-2xl',
+        }
+    },
+    defaultVariants: {
+        variant: 'solid'
+    }
+})
+
+const Popover = PopoverPrimitive.Root
+const PopoverTrigger = PopoverPrimitive.Trigger
+const PopoverAnchor = PopoverPrimitive.Anchor
+const PopoverClose = PopoverPrimitive.Close
+
+interface PopoverContentProps
+    extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>,
+    VariantProps<typeof popoverContentVariants> { }
+
+const PopoverContent = React.forwardRef<
+    React.ElementRef<typeof PopoverPrimitive.Content>,
+    PopoverContentProps
+>(({ className, variant, align = 'center', sideOffset = 4, ...props }, ref) => (
+    <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+            ref={ref}
+            align={align}
+            sideOffset={sideOffset}
+            className={cn(popoverContentVariants({ variant }), className)}
+            {...props}
+        />
+    </PopoverPrimitive.Portal>
+))
+
+PopoverContent.displayName = PopoverPrimitive.Content.displayName
+
+export {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverAnchor,
+    PopoverClose,
+    popoverContentVariants
 }
 
-export function Popover({ children, showArrow = false, className, ...props }: CustomPopoverProps) {
-  return (
-    <AriaPopover
-      {...props}
-      className={(renderProps) => cn(
-        "bg-white border border-gray-200 rounded-lg shadow-xl outline-none p-4 z-50",
-        renderProps.isEntering ? "animate-in fade-in zoom-in-95 duration-200 ease-out" : "",
-        renderProps.isExiting ? "animate-out fade-out zoom-out-95 duration-150 ease-in" : "",
-        typeof className === 'function' ? className(renderProps) : className
-      )}
-    >
-      {showArrow && (
-        <svg 
-          viewBox="0 0 12 12" 
-          className="absolute w-3 h-3 fill-white stroke-gray-200 stroke-[1px] -z-10 group-placement-bottom:-top-1.5 group-placement-bottom:rotate-180 group-placement-top:-bottom-1.5 group-placement-left:-right-1.5 group-placement-left:-rotate-90 group-placement-right:-left-1.5 group-placement-right:rotate-90"
-        >
-          <path d="M0 0 L6 6 L12 0" />
-        </svg>
-      )}
-      {children}
-    </AriaPopover>
-  );
-}
-
-export interface CustomDialogProps extends DialogProps {
-  title?: string;
-}
-
-export function PopoverDialog({ title, children, className, ...props }: CustomDialogProps) {
-  return (
-    <AriaDialog {...props} className={cn("outline-none relative", className as string)}>
-      {({ close }) => (
-        <>
-          {title && <h3 className="font-semibold text-gray-900 mb-2 text-lg">{title}</h3>}
-          {typeof children === 'function' ? children({ close }) : children}
-        </>
-      )}
-    </AriaDialog>
-  );
-}
-
-export { DialogTrigger };
+export default Popover

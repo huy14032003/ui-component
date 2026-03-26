@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
+@import "@radix-ui/themes/styles.css";
 
 @theme {
     --color-primary: #3b82f6;

@@ -1,124 +1,84 @@
-import { Button as AriaButton, type ButtonProps as AriaButtonProps } from 'react-aria-components'
 import React from 'react'
-import { cn } from '@lib/utils/cn'
-import Spinner from '../spinner/Spinner'
-import { tv } from 'tailwind-variants';
+import { Slot } from '@radix-ui/react-slot'
+import { tv, type VariantProps } from 'tailwind-variants'
+import { Loader2 } from 'lucide-react'
+import { cn } from '../../../lib/utils/cn'
 
-interface ButtonProps extends AriaButtonProps {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'outline' | 'outlineDanger' | 'outlineSuccess' | 'outlineWarning' | 'outlinePrimary' | 'outlineSecondary' | 'dashed' | 'dashedDanger' | 'dashedSuccess' | 'dashedWarning' | 'dashedPrimary' | 'dashedSecondary' | 'ghost' | 'ghostDanger' | 'ghostSuccess' | 'ghostWarning' | 'ghostPrimary' | 'ghostSecondary'
-  size?: 'xs' | 'sm' | 'md' | 'lg'
-  isLoading?: boolean
-  icon?: React.ReactNode
-  iconPosition?: 'left' | 'right'
-}
-
-const buttonStyles = tv({
-  base: 'inline-flex items-center justify-center rounded transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none',
+const buttonVariants = tv({
+  base: 'relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium  transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer active:scale-[0.98]',
   variants: {
-    intent: {
-      solid: 'text-white hover:opacity-80',
-      ghost: 'bg-transparent hover:bg-opacity-10',
-      outline: 'border hover:bg-opacity-5',
-      dashed: 'border border-dashed hover:bg-opacity-5',
+    variant: {
+      solid: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_1px_2px_rgba(0,0,0,0.1)] border border-black/5',
+      glass: 'backdrop-blur-xl border border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_3px_rgba(0,0,0,0.1)]',
+      outline: 'bg-transparent border border-input hover:bg-secondary/10 hover:text-accent-foreground',
+      ghost: 'bg-transparent hover:text-accent-foreground',
+      link: 'text-primary underline-offset-4 hover:underline !shadow-none !border-none !bg-transparent',
     },
     color: {
-      primary: ' text-primary-foreground border-primary',
-      secondary: ' text-secondary-foreground border-secondary',
-      danger: ' text-danger-foreground border-danger',
-      success: ' text-success-foreground border-success',
-      warning: ' text-warning-foreground border-warning',
+      primary: 'text-primary hover:bg-primary/10',
+      secondary: 'text-secondary hover:bg-secondary/10',
+      success: 'text-success hover:bg-success/10',
+      danger: 'text-danger hover:bg-danger/10',
+      warning: 'text-warning hover:bg-warning/10',
     },
     size: {
-      xs: 'px-2 py-1 text-xs',
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2 text-sm',
-      lg: 'px-5 py-2.5 text-base',
+      sm: 'h-6 px-2 text-xs',
+      md: 'h-8 px-4',
+      lg: 'h-10 px-8 text-base',
+      icon: 'h-10 w-10',
     },
   },
-  // Đây là phần "ảo thuật" để xử lý các case ghostPrimary, outlineDanger...
   compoundVariants: [
-    // Ghost variants — dùng CSS variable
-    { intent: 'ghost', color: 'primary', class: 'text-primary   hover:bg-primary/10' },
-    { intent: 'ghost', color: 'danger', class: 'text-danger    hover:bg-danger/10' },
-    { intent: 'ghost', color: 'success', class: 'text-success   hover:bg-success/10' },
-    { intent: 'ghost', color: 'warning', class: 'text-warning   hover:bg-warning/10' },
-    { intent: 'ghost', color: 'secondary', class: 'text-secondary hover:bg-secondary/10' },
-    // Outline variants
-    { intent: 'outline', color: 'primary', class: 'border-primary/40   text-primary   hover:bg-primary/5' },
-    { intent: 'outline', color: 'danger', class: 'border-danger/40    text-danger    hover:bg-danger/5' },
-    { intent: 'outline', color: 'success', class: 'border-success/40   text-success   hover:bg-success/5' },
-    { intent: 'outline', color: 'warning', class: 'border-warning/40   text-warning   hover:bg-warning/5' },
-    { intent: 'outline', color: 'secondary', class: 'border-secondary/40 text-secondary hover:bg-secondary/5' },
-    // Dashed variants
-    { intent: 'dashed', color: 'primary', class: 'border-primary/40   text-primary   hover:bg-primary/5' },
-    { intent: 'dashed', color: 'danger', class: 'border-danger/40    text-danger    hover:bg-danger/5' },
-    { intent: 'dashed', color: 'success', class: 'border-success/40   text-success   hover:bg-success/5' },
-    { intent: 'dashed', color: 'warning', class: 'border-warning/40   text-warning   hover:bg-warning/5' },
-    { intent: 'dashed', color: 'secondary', class: 'border-secondary/40 text-secondary hover:bg-secondary/5' },
     // Solid variants
-    { intent: 'solid', color: 'primary', class: 'bg-primary   text-primary-foreground' },
-    { intent: 'solid', color: 'danger', class: 'bg-danger    text-danger-foreground' },
-    { intent: 'solid', color: 'success', class: 'bg-success   text-success-foreground' },
-    { intent: 'solid', color: 'warning', class: 'bg-warning   text-warning-foreground' },
-    { intent: 'solid', color: 'secondary', class: 'bg-secondary text-secondary-foreground' },
+    { variant: 'solid', color: 'primary', class: 'bg-primary text-primary-foreground hover:bg-primary/90' },
+    { variant: 'solid', color: 'secondary', class: 'bg-secondary text-secondary-foreground hover:bg-secondary/80' },
+    { variant: 'solid', color: 'success', class: 'bg-success text-success-foreground hover:bg-success/90' },
+    { variant: 'solid', color: 'danger', class: 'bg-danger text-danger-foreground hover:bg-danger/90' },
+    { variant: 'solid', color: 'warning', class: 'bg-warning text-warning-foreground hover:bg-warning/90' },
+
+    // Glass variants with subtle gradients
+    { variant: 'glass', color: 'primary', class: 'bg-gradient-to-b from-primary/30 to-primary/10 text-primary border-primary/30 hover:from-primary/40' },
+    { variant: 'glass', color: 'secondary', class: 'bg-gradient-to-b from-slate-800/60 to-slate-900/80 text-white border-white/10 hover:from-slate-800/80' },
+    { variant: 'glass', color: 'success', class: 'bg-gradient-to-b from-success/30 to-success/10 text-success border-success/30 hover:from-success/40' },
+    { variant: 'glass', color: 'danger', class: 'bg-gradient-to-b from-danger/30 to-danger/10 text-danger border-danger/30 hover:from-danger/40' },
+    { variant: 'glass', color: 'warning', class: 'bg-gradient-to-b from-warning/30 to-warning/10 text-warning border-warning/30 hover:from-warning/40' },
   ],
   defaultVariants: {
-    intent: 'solid',
+    variant: 'solid',
     color: 'primary',
     size: 'md',
   },
-});
+})
 
-type ButtonIntent = 'solid' | 'ghost' | 'outline' | 'dashed';
-type ButtonColor = 'primary' | 'secondary' | 'danger' | 'success' | 'warning';
-
-const getVariantProps = (variant: NonNullable<ButtonProps['variant']>): { intent: ButtonIntent; color: ButtonColor } => {
-  if (variant.startsWith('outline')) {
-    return { intent: 'outline', color: (variant.replace('outline', '').toLowerCase() || 'primary') as ButtonColor };
-  }
-  if (variant.startsWith('dashed')) {
-    return { intent: 'dashed', color: (variant.replace('dashed', '').toLowerCase() || 'primary') as ButtonColor };
-  }
-  if (variant.startsWith('ghost')) {
-    return { intent: 'ghost', color: (variant.replace('ghost', '').toLowerCase() || 'primary') as ButtonColor };
-  }
-  return { intent: 'solid', color: variant as ButtonColor };
-};
-
-const Button = ({
-  variant = 'primary',
-  size = 'md',
-  isLoading,
-  icon,
-  iconPosition = 'left',
-  className,
-  children,
-  isDisabled,
-  ...props
-}: ButtonProps) => {
-  const { intent, color } = getVariantProps(variant);
-
-  return (
-    <AriaButton
-      aria-label={props['aria-label'] || (typeof children === 'string' ? children : undefined) || "Button"}
-      isDisabled={isDisabled || isLoading}
-      className={(values) =>
-        buttonStyles({
-          intent,
-          color,
-          size,
-          className: typeof className === 'function' ? className(values) : className
-        })
-      }
-      {...props}
-    >
-      <>
-        {isLoading && iconPosition === 'left' ? <Spinner variant='circle' size={size} /> : icon && iconPosition === 'left' && icon}
-        {children}
-        {isLoading && iconPosition === 'right' ? <Spinner variant='circle' size={size} /> : icon && iconPosition === 'right' && icon}
-      </>
-    </AriaButton>
-  )
+export interface ButtonProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>,
+  VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+  isLoading?: boolean
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
 }
 
-export default Button
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, color, size, asChild = false, isLoading, leftIcon, rightIcon, children, ...props }, ref) => {
+    const Component = asChild ? Slot : 'button'
+
+    return (
+      <Component
+        className={cn(buttonVariants({ variant, color, size, className }))}
+        ref={ref}
+        disabled={isLoading || props.disabled}
+        {...props}
+      >
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {!isLoading && leftIcon && <span className="inline-flex shrink-0">{leftIcon}</span>}
+        {children}
+        {!isLoading && rightIcon && <span className="inline-flex shrink-0">{rightIcon}</span>}
+      </Component>
+    )
+  }
+)
+
+Button.displayName = 'Button'
+
+export { Button, buttonVariants }

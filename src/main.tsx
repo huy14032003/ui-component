@@ -2,16 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import Test from './Test'
 import './styles/index.css'
-import { MyToastRegion } from './components/ui/toast/Toast'
-import { ThemeProvider } from './lib/theme/ThemeProvider'
-import { ThemeSwitcher } from './lib/theme/ThemeSwitcher'
+import { Theme , ThemePanel} from "@radix-ui/themes";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
-      <ThemeSwitcher />
-      <MyToastRegion placement="bottom-right" />
+   <Theme >
+      {/* <ThemePanel /> */}
       <Test />
-    </ThemeProvider>
+    </Theme>
   </StrictMode>,
 )
