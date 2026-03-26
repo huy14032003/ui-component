@@ -1,19 +1,37 @@
+import React, { useState } from 'react';
 import { Flex, Text, Box, TextArea } from "@radix-ui/themes";
 import { Button } from './components/ui/button';
-import { Mail, Send, Trash, Plus, ArrowRight } from 'lucide-react';
 import { Select, MultiSelect, Autocomplete } from './components/ui/select';
 import { Skeleton } from './components/ui/skeleton';
 import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from './components/ui/popover';
 import { Avatar, AvatarGroup } from "./components/ui/avatar";
+import { Badge } from "./components/ui/badge";
+import * as Icons from '@components/icons';
+import { Timeline, TimelineItem } from "./components/ui/timeline";
+import { Modal } from "./components/ui/modal";
+import { RadioGroup, Radio, RadioCard } from "./components/ui/radio";
+import { Spinner } from './components/ui/spinner';
 
 const Test = () => {
+  const [basicOpen, setBasicOpen] = useState(false);
+  const [glassOpen, setGlassOpen] = useState(false);
+  const [loadingOpen, setLoadingOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const handleOk = async () => {
+    setConfirmLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setConfirmLoading(false);
+    setLoadingOpen(false);
+  };
+
   return (
     <div className="p-8 min-h-screen">
       <Flex direction="column" gap="8">
         <section>
           <Text size="5" weight="bold" className="mb-6 block text-slate-400 uppercase tracking-widest">1. Glass 3D (Subtle Effect)</Text>
           <Flex gap="4" wrap="wrap" className="p-8 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm">
-            <Button size="sm" variant="glass" color="secondary" rightIcon={<ArrowRight size={16} />}>Next</Button>
+            <Button size="sm" variant="glass" color="secondary" rightIcon={<Icons.ArrowRight size={16} />}>Next</Button>
             <Button size='md' variant="glass" color="primary">Primary Glass</Button>
             <Button size='lg' variant="glass" color="success">Success Glass</Button>
             <Button size='md' variant="glass" color="danger">Danger Glass</Button>
@@ -48,8 +66,8 @@ const Test = () => {
             <Button variant="ghost">Ghost</Button>
             <Button variant="ghost" color='danger'>Ghost</Button>
             <Button variant="link">Link Style</Button>
-            <Button variant="glass" color="primary" leftIcon={<Mail size={16} />}>Messages</Button>
-            <Button variant="solid" color="success" leftIcon={<Plus size={16} />}>Create New</Button>
+            <Button variant="glass" color="primary" leftIcon={<Icons.Mail size={16} />}>Messages</Button>
+            <Button variant="solid" color="success" leftIcon={<Icons.Plus size={16} />}>Create New</Button>
           </Flex>
         </section>
       </Flex>
@@ -265,6 +283,216 @@ const Test = () => {
             />
           </AvatarGroup>
         </div>
+      </section>
+      <section>
+        <Text size="5" weight="bold" className="mb-6 block text-slate-400 uppercase tracking-widest">9. Badge & Status</Text>
+        
+        <div className="space-y-8">
+          {/* Status (Filled - Subtle) */}
+          <div>
+            <Text size="3" weight="bold" className="mb-4 block text-slate-300">Status (filled)</Text>
+            <div className="flex flex-wrap gap-3">
+              <Badge variant="filled" intent="success" leftIcon={<Icons.CheckCircle2 className="w-3.5 h-3.5" />}>success</Badge>
+              <Badge variant="filled" intent="info" leftIcon={<Icons.RefreshCcw className="w-3.5 h-3.5 animate-spin-slow" />}>processing</Badge>
+              <Badge variant="filled" intent="warning" leftIcon={<Icons.AlertTriangle className="w-3.5 h-3.5" />}>warning</Badge>
+              <Badge variant="filled" intent="error" leftIcon={<Icons.AlertCircle className="w-3.5 h-3.5" />}>error</Badge>
+              <Badge variant="filled" intent="default" leftIcon={<Icons.Clock className="w-3.5 h-3.5" />}>default</Badge>
+            </div>
+          </div>
+
+          {/* Status (Solid - Strong) */}
+          <div>
+            <Text size="3" weight="bold" className="mb-4 block text-slate-300">Status (solid)</Text>
+            <div className="flex flex-wrap gap-3">
+              <Badge variant="solid" intent="success" leftIcon={<Icons.CheckCircle2 className="w-3.5 h-3.5" />}>success</Badge>
+              <Badge variant="solid" intent="info" leftIcon={<Icons.RefreshCcw className="w-3.5 h-3.5 animate-spin-slow" />}>processing</Badge>
+              <Badge variant="solid" intent="warning" leftIcon={<Icons.AlertTriangle className="w-3.5 h-3.5" />}>warning</Badge>
+              <Badge variant="solid" intent="error" leftIcon={<Icons.AlertCircle className="w-3.5 h-3.5" />}>error</Badge>
+              <Badge variant="solid" intent="default" leftIcon={<Icons.Clock className="w-3.5 h-3.5" />}>default</Badge>
+            </div>
+          </div>
+
+          {/* Status (Outlined) */}
+          <div>
+            <Text size="3" weight="bold" className="mb-4 block text-slate-300">Status (outlined)</Text>
+            <div className="flex flex-wrap gap-3">
+              <Badge variant="outline" intent="success" leftIcon={<Icons.CheckCircle2 className="w-3.5 h-3.5" />}>success</Badge>
+              <Badge variant="outline" intent="info" leftIcon={<Icons.RefreshCcw className="w-3.5 h-3.5 animate-spin-slow" />}>processing</Badge>
+              <Badge variant="outline" intent="warning" leftIcon={<Icons.AlertTriangle className="w-3.5 h-3.5" />}>warning</Badge>
+              <Badge variant="outline" intent="error" leftIcon={<Icons.AlertCircle className="w-3.5 h-3.5" />}>error</Badge>
+              <Badge variant="outline" intent="default" leftIcon={<Icons.Clock className="w-3.5 h-3.5" />}>default</Badge>
+            </div>
+          </div>
+
+          {/* Sizes */}
+          <div>
+            <Text size="3" weight="bold" className="mb-4 block text-slate-300">Sizes</Text>
+            <div className="flex items-end gap-4">
+              <Badge size="sm" variant="glass" intent="info">Small Tag</Badge>
+              <Badge size="md" variant="glass" intent="success">Medium Tag</Badge>
+              <Badge size="lg" variant="glass" intent="error">Large Tag</Badge>
+            </div>
+          </div>
+
+          {/* Premium Glass Variants */}
+          <div>
+            <Text size="3" weight="bold" className="mb-4 block text-slate-300">Premium Glassmorphism</Text>
+            <div className="flex flex-wrap gap-3">
+              <Badge variant="glass" intent="success" leftIcon={<Icons.CheckCircle2 className="w-3.5 h-3.5" />}>Complete</Badge>
+              <Badge variant="glass" intent="info" rightIcon={<Icons.RefreshCcw className="w-3.5 h-3.5 animate-spin-slow" />}>Syncing</Badge>
+              <Badge variant="glass" intent="warning" leftIcon={<Icons.AlertTriangle className="w-3.5 h-3.5" />}>Waiting</Badge>
+              <Badge variant="glass" intent="error" leftIcon={<Icons.AlertCircle className="w-3.5 h-3.5" />}>Critical</Badge>
+              <Badge variant="glass" intent="default" leftIcon={<Icons.AlertCircle className="w-3.5 h-3.5" />}>Critical</Badge>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <Text size="5" weight="bold" className="mb-6 block text-slate-400 uppercase tracking-widest">10. Timeline</Text>
+        <Timeline>
+          <TimelineItem>Event 1</TimelineItem>
+          <TimelineItem>Content 1</TimelineItem>
+          <TimelineItem>Event 2</TimelineItem>
+          <TimelineItem>Content 2</TimelineItem>
+          <TimelineItem>Event 3</TimelineItem>
+          <TimelineItem isLast color='success' dot={<Icons.CheckCircle2  className="w-3.5 h-3.5" />}>Content 3</TimelineItem>
+        </Timeline>
+
+        <Timeline direction="horizontal" itemWidth={160}>
+          <TimelineItem>Event 1</TimelineItem>
+          <TimelineItem>Content 1</TimelineItem>
+          <TimelineItem width={100}>Short Event</TimelineItem>
+          <TimelineItem dot={<Icons.CheckCircle2  className="w-3.5 h-3.5 text-danger" />}>Event 3</TimelineItem>
+          <TimelineItem isLast={true} color='success' dot={<Icons.CheckCircle2  className="w-3.5 h-3.5 text-success" />}>Content 3</TimelineItem>
+        </Timeline>
+      </section>
+      <section>
+        <Text size="5" weight="bold" className="mb-6 block text-slate-400 uppercase tracking-widest">11. Modal (AntD Style)</Text>
+        <Flex gap="4">
+          <Button variant="solid" color="primary" onClick={() => setBasicOpen(true)}>Open Basic Modal</Button>
+          <Button variant="glass" color="primary" onClick={() => setGlassOpen(true)}>Open Glass Modal</Button>
+          <Button variant="outline" onClick={() => setLoadingOpen(true)}>Open Loading Modal</Button>
+        </Flex>
+
+        {/* Basic Modal */}
+        <Modal 
+          open={basicOpen} 
+          onOpenChange={setBasicOpen}
+          title="Basic Modal"
+          variant="solid"
+          onOk={() => setBasicOpen(false)}
+        >
+          <p>Đây là nội dung của modal cơ bản. Nó có giao diện sạch sẽ và hiện đại.</p>
+          <p className="mt-2 text-slate-500">Bạn có thể sử dụng prop `onOk` và `onCancel` một cách dễ dàng.</p>
+        </Modal>
+
+        {/* Glass Modal */}
+        <Modal 
+          open={glassOpen} 
+          onOpenChange={setGlassOpen}
+          title="Premium Glass Modal"
+          variant="glass"
+          onOk={() => setGlassOpen(false)}
+          okText="Đã hiểu"
+          cancelText="Đóng"
+        >
+          <div className="space-y-4">
+            <p>Hiệu ứng Glassmorphism cực kỳ sang trọng với backdrop-blur và viền phản chiếu ánh sáng.</p>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <Text size="2" color="gray">Nội dung bên trong cũng có thể được style theo phong cách glass.</Text>
+            </div>
+            <p>Phù hợp cho các ứng dụng Dashboard cao cấp.</p>
+          </div>
+        </Modal>
+
+        {/* Loading Modal */}
+        <Modal 
+          open={loadingOpen} 
+          onOpenChange={setLoadingOpen}
+          title="Confirm Action"
+          confirmLoading={confirmLoading}
+          onOk={handleOk}
+          okText="Xử lý ngay"
+        >
+          <p>Khi nhấn "Xử lý ngay", nút OK sẽ hiển thị trạng thái loading trong 2 giây.</p>
+          <p className="mt-2 text-warning">Hành động này không thể hoàn tác.</p>
+        </Modal>
+      </section>
+
+      <section className="mb-12">
+        <Text size="5" weight="bold" className="mb-6 block text-slate-400 uppercase tracking-widest">12. Radio & Selection</Text>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Standard Radios */}
+          <div className="space-y-8">
+            <div>
+              <Text size="3" weight="bold" className="mb-4 block text-slate-300">Standard Radio (Sizes & Intents)</Text>
+              <RadioGroup defaultValue="md-primary" orientation="horizontal">
+                <Radio value="sm-success" size="sm" intent="success" label="Small Success" />
+                <Radio value="md-primary" size="md" intent="primary" label="Medium Primary" />
+                <Radio value="lg-danger" size="lg" intent="danger" label="Large Danger" />
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Text size="3" weight="bold" className="mb-4 block text-slate-300">Radio Variants (Vertical)</Text>
+              <div className="grid grid-cols-2 gap-8">
+                <RadioGroup defaultValue="glass">
+                  <Radio value="solid" variant="solid" label="Solid Variant" description="Clean and simple" />
+                </RadioGroup>
+                
+                <RadioGroup defaultValue="disabled">
+                   <Radio value="enabled" label="Enabled Option" />
+                   <Radio value="disabled" disabled label="Disabled Option" description="This cannot be selected" />
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+
+          {/* Radio Cards */}
+          <div className="space-y-8">
+            <div>
+              <Text size="3" weight="bold" className="mb-4 block text-slate-300">Radio Cards (Selection UI)</Text>
+              <RadioGroup defaultValue="pro" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <RadioCard 
+                  value="free" 
+                  title="Free Plan" 
+                  description="Great for starters and hobbyists."
+                  icon={<Icons.Mail className="w-5 h-5" />}
+                />
+                <RadioCard 
+                  value="pro" 
+                  title="Pro Plan" 
+                  description="Advanced features for professionals."
+                  icon={<Icons.CheckCircle2 className="w-5 h-5" />}
+                />
+                <RadioCard 
+                  value="enterprise" 
+                  title="Enterprise" 
+                  description="Custom solutions for large teams."
+                  icon={<Icons.Plus className="w-5 h-5" />}
+                  variant="solid"
+                />
+                <RadioCard 
+                  value="custom" 
+                  disabled
+                  title="Custom (Disabled)" 
+                  description="Contact us for a tailored plan."
+                  icon={<Icons.AlertCircle className="w-5 h-5" />}
+                />
+              </RadioGroup>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <Text size="5" weight="bold" className="mb-6 block text-slate-400 uppercase tracking-widest">13. Loader</Text>
+        <Spinner icon={<Icons.Mail className="w-5 h-5 " />} size='lg'/>
+        <Spinner  size='md'/>
+        <Spinner  size='sm'/>
+        <Spinner  size='xs'/>
       </section>
     </div>
   )

@@ -6,8 +6,9 @@ interface SpinnerProps {
   variant?: SpinnerVariant;
   size?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
+  icon?: React.ReactNode;
 }
-const Spinner = ({ variant = 'circle', size = 'md', className }: SpinnerProps) => {
+const Spinner = ({ variant = 'circle', size = 'md', className, icon }: SpinnerProps) => {
     const sizeClasses = {
         xs: "w-2 h-2",
         sm: "w-3 h-3",
@@ -24,7 +25,13 @@ const Spinner = ({ variant = 'circle', size = 'md', className }: SpinnerProps) =
     const variantClass = variantClasses[variant];
     if(variant === 'circle'){
         return (
-            <Icons.Loader2 className={cn(sizeClass, variantClass, className)} />
+            icon ? (
+                <div className={cn(sizeClass, variantClass, className)}>
+                    {icon}
+                </div>
+            ) : (
+                <Icons.Loader className={cn(sizeClass, variantClass, className)} />
+            )
         )
     }
   

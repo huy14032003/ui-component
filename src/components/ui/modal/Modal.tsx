@@ -1,152 +1,175 @@
-import { useEffect } from 'react';
-import { ModalOverlay, type ModalOverlayProps, Modal as RACModal, Heading } from 'react-aria-components';
-import { tv } from 'tailwind-variants';
+import React from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { tv, type VariantProps } from 'tailwind-variants';
 import * as Icons from '@components/icons';
-import Button from '../button/Button';
+import { cn } from '@lib/utils/cn';
+import { Button } from '../button';
 
-export interface ResponsiveWidth {
-  xs?: string | number;
-  sm?: string | number;
-  md?: string | number;
-  lg?: string | number;
-  xl?: string | number;
-  default?: string | number;
-}
+/**
+ * Modal variants using tailwind-variants
+ */
+const modalVariants = tv({
+  slots: {
+    overlay: 'fixed inset-0 z-50 bg-black/10 backdrop-blur-xs data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    content: 'fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 p-0 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95  rounded-lg ',
+    header: 'flex flex-col space-y-1.5 text-center sm:text-left px-6 py-4 border-b border-white/10',
+    footer: 'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 px-6 py-2 border-t border-white/10  rounded-b-lg',
+    title: 'text-lg font-semibold leading-none tracking-tight',
+    description: 'text-sm text-slate-500 dark:text-slate-400',
+    close: 'absolute right-4 top-4 rounded-full p-1 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:bg-white/10',
+  },
+  variants: {
+    variant: {
+      solid: {
+        content: 'bg-white dark:bg-white/80 border border-slate-200 dark:border-white/80 ',
+      },
+      glass: {
+        content: 'bg-white/70 dark:bg-white/70 backdrop-blur-2xl border border-white/20 dark:border-white/10 ',
+        header: 'border-white/10',
+        footer: 'border-white/10 bg-white/5',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'glass',
+  },
+});
 
-export interface CustomModalProps extends ModalOverlayProps {
-  width?: string | number | ResponsiveWidth;
-  /** Chiều cao modal. Truyền số (px), string (vd: '80vh'), hoặc 'auto' để co theo nội dung. Mặc định: 90vh */
-  height?: string | number | 'auto';
+export interface ModalProps extends VariantProps<typeof modalVariants> {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   title?: React.ReactNode;
+  description?: React.ReactNode;
+  children?: React.ReactNode;
   footer?: React.ReactNode;
+  onOk?: () => void | Promise<void>;
+  onCancel?: () => void;
+  okText?: string;
+  cancelText?: string;
+  okButtonProps?: any; // Partial<ButtonProps>
+  cancelButtonProps?: any; // Partial<ButtonProps>
+  confirmLoading?: boolean;
+  width?: string | number;
+  className?: string;
   showCloseButton?: boolean;
-  handleClose: () => void;
-  handleConfirm?: () => void;
+  maskClosable?: boolean;
 }
 
-const overlayStyles = tv({
-  base: 'fixed z-50 w-screen h-screen bg-black/50 inset-0 flex items-center justify-center text-center backdrop-blur-xs',
-  variants: {
-    isEntering: {
-      true: 'animate-in fade-in duration-200 ease-out'
-    },
-    isExiting: {
-      true: 'animate-out fade-out duration-200 ease-in'
+export const Modal = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+  footer,
+  onOk,
+  onCancel,
+  okText = 'Xác nhận',
+  cancelText = 'Hủy',
+  okButtonProps,
+  cancelButtonProps,
+  confirmLoading = false,
+  width = 520,
+  variant = 'glass',
+  className,
+  showCloseButton = true,
+  maskClosable = true,
+}: ModalProps) => {
+  const styles = modalVariants({ variant });
+
+  const handleCancel = () => {
+    onCancel?.();
+    onOpenChange?.(false);
+  };
+
+  const handleOk = async () => {
+    if (onOk) {
+      await onOk();
     }
-  }
-});
+  };
 
-const modalStyles = tv({
-  base: 'font-sans w-full flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-neutral-800/70 dark:backdrop-blur-2xl dark:backdrop-saturate-200 forced-colors:bg-[Canvas] text-left align-middle text-neutral-700 dark:text-neutral-300 shadow-2xl bg-clip-padding border border-black/10 dark:border-white/10 max-w-[var(--modal-w,min(90vw,450px))] sm:max-w-[var(--modal-w-sm,var(--modal-w,min(90vw,450px)))] md:max-w-[var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px))))] lg:max-w-[var(--modal-w-lg,var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px)))))] xl:max-w-[var(--modal-w-xl,var(--modal-w-lg,var(--modal-w-md,var(--modal-w-sm,var(--modal-w,min(90vw,450px))))))]',
-  variants: {
-    isEntering: {
-      true: 'animate-in zoom-in-105 ease-out duration-200'
-    },
-    isExiting: {
-      true: 'animate-out zoom-out-95 ease-in duration-200'
-    }
-  }
-});
-
-export function Modal(props: CustomModalProps) {
-  const { handleClose, isOpen, width, height, title, footer, showCloseButton = true, handleConfirm, ...rest } = props;
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    // Cleanup function: Đảm bảo scroll được khôi phục khi component bị unmount
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isOpen]);
-
-  const toSize = (val: string | number) => typeof val === 'number' ? `${val}px` : val;
-
-  const widthStyles = {
-    ...(typeof width === 'string' || typeof width === 'number' ? { '--modal-w': toSize(width) } : {}),
-    ...(typeof width === 'object' ? {
-      ...(width.default && { '--modal-w': toSize(width.default) }),
-      ...(width.xs && { '--modal-w': toSize(width.xs) }),
-      ...(width.sm && { '--modal-w-sm': toSize(width.sm) }),
-      ...(width.md && { '--modal-w-md': toSize(width.md) }),
-      ...(width.lg && { '--modal-w-lg': toSize(width.lg) }),
-      ...(width.xl && { '--modal-w-xl': toSize(width.xl) }),
-    } : {})
-  } as React.CSSProperties;
-
-  const isAutoHeight = height === 'auto' || height === undefined;
-  const heightStyles = isAutoHeight
-    ? { maxHeight: 'calc(var(--visual-viewport-height, 100vh) * 0.9)' }
-    : { height: toSize(height as string | number), maxHeight: 'calc(var(--visual-viewport-height, 100vh) * 0.9)' };
-  const getFooter = () => {
-    if (footer) {
-      return (
-        <div className="p-3 border-t border-black/5 dark:border-white/10 shrink-0 bg-neutral-50/50 dark:bg-neutral-900/20">
-          {footer}
-        </div>
-      )
-    }
-
-    else if (footer === null) {
-      return null
-    }
-    else {
-      return (
-        <div className="px-6 py-4 border-t border-black/5 dark:border-white/10 shrink-0 bg-neutral-50/50 dark:bg-neutral-900/20">
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" size="sm" onPress={handleClose || (() => props.onOpenChange?.(false))}>Hủy</Button>
-            <Button variant="primary" size="sm" onPress={handleConfirm}>Xác nhận</Button>
-          </div>
-        </div>
-      )
-    }
-  }
-  return (
-    <ModalOverlay isOpen={isOpen} {...rest} className={overlayStyles}>
-      <RACModal
-        {...rest}
-        className={modalStyles}
-        style={(renderProps) => ({
-          ...widthStyles,
-          ...heightStyles,
-          ...(typeof rest.style === 'function' ? rest.style(renderProps) : rest.style)
-        })}
-      >
-        {(renderProps) => (
-          <div className={`flex flex-col overflow-hidden px-4 ${isAutoHeight ? 'max-h-full' : 'h-full'}`}>
-            {(title || showCloseButton) && (
-              <div className="flex items-center justify-between py-4 border-b border-black/5 dark:border-white/10 shrink-0 min-h-[64px]">
-                <Heading slot="title" className="text-xl font-bold text-neutral-800 dark:text-white truncate pr-4">
-                  {title}
-                </Heading>
-                {showCloseButton && (
-                  <Button
-                    aria-label="Đóng"
-                    variant='ghost'
-                    size="sm"
-                    className="shrink-0 p-1 rounded-full hover:bg-black/5 outline-none transition-colors"
-                    onPress={handleClose || (() => props.onOpenChange?.(false))}
-                  >
-                    <Icons.X className="w-5 h-5 text-neutral-500 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-white" />
-                  </Button>
-                )}
-              </div>
-            )}
-
-            <div className="flex-1 overflow-y-auto px-6 py-2 scroll-smooth">
-              {typeof props.children === 'function' ? props.children(renderProps) : props.children}
-            </div>
-
-            <div >
-              {getFooter()}
-            </div>
-          </div>
-        )}
-      </RACModal>
-    </ModalOverlay>
+  const internalFooter = footer === null ? null : (
+    footer || (
+      <div className={styles.footer()}>
+        <Button
+          variant="outline"
+          size="md"
+          onClick={handleCancel}
+          {...cancelButtonProps}
+        >
+          {cancelText}
+        </Button>
+        <Button
+          variant="solid"
+          color="primary"
+          size="md"
+          onClick={handleOk}
+          isLoading={confirmLoading}
+          {...okButtonProps}
+        >
+          {okText}
+        </Button>
+      </div>
+    )
   );
-}
+
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className={styles.overlay()} />
+        <DialogPrimitive.Content
+          className={cn(styles.content(), className)}
+          style={{ width: typeof width === 'number' ? `${width}px` : width, maxWidth: '95vw' }}
+          onPointerDownOutside={(e) => {
+            if (!maskClosable) e.preventDefault();
+          }}
+        >
+          {(title || description) && (
+            <div className={styles.header()}>
+              {title && (
+                <DialogPrimitive.Title className={styles.title()}>
+                  {title}
+                </DialogPrimitive.Title>
+              )}
+              {description && (
+                <DialogPrimitive.Description className={styles.description()}>
+                  {description}
+                </DialogPrimitive.Description>
+              )}
+            </div>
+          )}
+
+          <div className="px-6 py-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            {children}
+          </div>
+
+          {internalFooter}
+
+          {showCloseButton && (
+            <DialogPrimitive.Close className={styles.close()}>
+              <Icons.Plus className="w-5 h-5 rotate-45" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+};
+
+// Sub-components for flexible usage
+Modal.Header = ({ children, className, variant }: any) => {
+  const styles = modalVariants({ variant });
+  return <div className={cn(styles.header(), className)}>{children}</div>;
+};
+
+Modal.Content = ({ children, className }: any) => {
+  return <div className={cn('px-6 py-4', className)}>{children}</div>;
+};
+
+Modal.Footer = ({ children, className, variant }: any) => {
+  const styles = modalVariants({ variant });
+  return <div className={cn(styles.footer(), className)}>{children}</div>;
+};
+
+Modal.displayName = 'Modal';
