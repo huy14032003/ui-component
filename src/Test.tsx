@@ -239,6 +239,21 @@ const ComboBoxPage = () => {
           />
         </div>
       </ShowcaseCard>
+
+      <ShowcaseCard
+        title="Single Select (No Autocomplete) & Clear"
+        description="Không cho phép nhập liệu, chỉ chọn từ danh sách và có nút X để xóa nhanh."
+        code={`<ComboBox \n  options={options} \n  autocomplete={false} \n  label="Fixed Single" \n  placeholder="Chọn..." \n/>`}
+      >
+        <div className="w-80">
+          <ComboBox
+            options={options}
+            autocomplete={false}
+            label="Lựa chọn Framework"
+            placeholder="Chọn một framework..."
+          />
+        </div>
+      </ShowcaseCard>
     </div>
   );
 };

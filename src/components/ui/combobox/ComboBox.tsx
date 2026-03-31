@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Combobox as BaseCombobox } from '@base-ui/react';
 import { Check, ChevronDown, X, Loader2 } from 'lucide-react';
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv } from 'tailwind-variants';
 import { cn } from '@lib/utils/cn';
 
 const comboboxVariants = tv({
   slots: {
     root: 'flex flex-col gap-1.5 w-full',
-    inputContainer: 'flex flex-wrap items-center gap-1.5 min-h-10 w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm  focus-within:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-shadow transition-colors',
+    inputContainer: 'flex flex-wrap items-center gap-1.5 min-h-10 w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm focus-within:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-shadow transition-colors',
     input: 'flex-1 min-w-[120px] bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed',
     popup: 'z-50 w-[var(--anchor-width,var(--reference-width))] max-w-[var(--available-width)] overflow-hidden rounded-md border border-border bg-background text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-side-bottom:slide-in-from-top-2 data-side-left:slide-in-from-right-2 data-side-right:slide-in-from-left-2 data-side-top:slide-in-from-bottom-2',
     item: 'cursor-pointer relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
@@ -51,13 +51,29 @@ const ComboBox = React.forwardRef<HTMLInputElement, ComboBoxProps>(
       onValueChange?.(newVal);
     };
 
-    // Filter options based on input value
+    const handleClear = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleValueChange(multiple ? [] : null);
+      setInputValue('');
+    };
+
+    const hasValue = multiple
+      ? Array.isArray(activeValue) && activeValue.length > 0
+      : !!activeValue;
+
+    // Lọc options theo text người dùng đang gõ
     const filteredOptions = React.useMemo(() => {
       if (!inputValue || !autocomplete) return options;
+      // Khi đã có value được chọn, input hiển thị label → không filter theo label đó
+      if (!multiple && activeValue) {
+        const selectedOption = options.find((o) => o.value === activeValue);
+        if (selectedOption && inputValue === selectedOption.label) return options;
+      }
       return options.filter(opt =>
         opt.label.toLowerCase().includes(inputValue.toLowerCase())
       );
-    }, [options, inputValue, autocomplete]);
+    }, [options, inputValue, autocomplete, multiple, activeValue]);
 
     const { root, inputContainer, input, popup, item, indicator, chip, chipRemove, actionsHeader, actionButton } = comboboxVariants();
     const inputGroupRef = React.useRef<HTMLDivElement>(null);
@@ -69,6 +85,7 @@ const ComboBox = React.forwardRef<HTMLInputElement, ComboBoxProps>(
         multiple={multiple}
         onInputValueChange={setInputValue}
         autoHighlight
+        itemToStringLabel={(val: string) => options.find((o) => o.value === val)?.label ?? val}
       >
         <div className={root({ className })}>
           {label && <label className="text-sm font-medium text-foreground">{label}</label>}
@@ -100,8 +117,18 @@ const ComboBox = React.forwardRef<HTMLInputElement, ComboBoxProps>(
                   ref={ref}
                   readOnly={!autocomplete}
                   placeholder={placeholder}
-                  className={input()}
+                  className={cn(input(), !autocomplete && 'cursor-pointer')}
                 />
+              )}
+
+              {hasValue && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="p-1 hover:bg-muted rounded-full text-muted-foreground transition-colors mr-1"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
               )}
 
               <BaseCombobox.Trigger className="text-muted-foreground transition-transform group-data-open:rotate-180 ml-auto">
