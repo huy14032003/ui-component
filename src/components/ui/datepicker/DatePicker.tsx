@@ -4,181 +4,391 @@ import { DayPicker, type DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronDown, Clock } from 'lucide-react';
 import { tv } from 'tailwind-variants';
-import * as locales from "react-day-picker/locale";
+import * as locales from 'react-day-picker/locale';
 
 import 'react-day-picker/dist/style.css';
 import { Button } from '../button/Button';
-import { Select } from '../select/Select';
-import { Input } from '../input/Input';
 
-const popoverContent = tv({
-    base: 'text-center z-50 min-w-[var(--anchor-width)] rounded-md border border-border bg-background p-0 text-foreground shadow-md outline-none data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-side-bottom:slide-in-from-top-2 data-side-left:slide-in-from-right-2 data-side-right:slide-in-from-left-2 data-side-top:slide-in-from-bottom-2'
-});
+// ---------- types ----------
+
+export type TimeFormat = 'HH' | 'HH:mm' | 'HH:mm:ss';
+export type DatePickerMode = 'single' | 'range' | 'time-only';
+export type TimePickerStyle = 'input' | 'select';
+
+interface TimeParts {
+    h: string;
+    m: string;
+    s: string;
+}
 
 export interface DatePickerProps {
-    mode?: 'single' | 'range';
+    mode?: DatePickerMode;
+    /** single → Date | range → DateRange | time-only → dùng timeValue */
     date?: Date | DateRange;
-    onDateChange?: (date: any) => void;
+    onDateChange?: (date: Date | DateRange | undefined) => void;
+    /** Chỉ dùng khi mode='time-only' */
+    timeValue?: string;
+    onTimeChange?: (time: string) => void;
     label?: string;
     placeholder?: string;
     disablePastDates?: boolean;
     showTime?: boolean;
-    timePickerStyle?: 'input' | 'select'; // Cả 2 cách
+    timeFormat?: TimeFormat;
+    timePickerStyle?: TimePickerStyle;
+    disabled?: boolean;
     className?: string;
 }
+
+// ---------- helpers ----------
+
+const DEFAULT_TIME: TimeParts = { h: '00', m: '00', s: '00' };
+
+function parseTimeParts(timeStr: string): TimeParts {
+    const [h = '00', m = '00', s = '00'] = timeStr.split(':');
+    return {
+        h: h.padStart(2, '0'),
+        m: m.padStart(2, '0'),
+        s: s.padStart(2, '0'),
+    };
+}
+
+function buildTimeString(parts: TimeParts, fmt: TimeFormat): string {
+    if (fmt === 'HH') return parts.h;
+    if (fmt === 'HH:mm') return `${parts.h}:${parts.m}`;
+    return `${parts.h}:${parts.m}:${parts.s}`;
+}
+
+function applyTimeToDate(base: Date, parts: TimeParts): Date {
+    const d = new Date(base);
+    d.setHours(Number(parts.h), Number(parts.m), Number(parts.s), 0);
+    return d;
+}
+
+function dateToTimeParts(d: Date): TimeParts {
+    return {
+        h: d.getHours().toString().padStart(2, '0'),
+        m: d.getMinutes().toString().padStart(2, '0'),
+        s: d.getSeconds().toString().padStart(2, '0'),
+    };
+}
+
+function formatDateDisplay(d: Date, showTime: boolean, fmt: TimeFormat): string {
+    const datePart = format(d, 'dd/MM/yyyy');
+    if (!showTime) return datePart;
+    if (fmt === 'HH') return `${datePart} ${format(d, 'HH')}h`;
+    if (fmt === 'HH:mm') return `${datePart} ${format(d, 'HH:mm')}`;
+    return `${datePart} ${format(d, 'HH:mm:ss')}`;
+}
+
+function padOptions(count: number) {
+    return Array.from({ length: count }, (_, i) => ({
+        label: i.toString().padStart(2, '0'),
+        value: i.toString().padStart(2, '0'),
+    }));
+}
+
+const hoursOptions = padOptions(24);
+const minutesOptions = padOptions(60);
+const secondsOptions = padOptions(60);
+
+// ---------- styles ----------
+
+const popoverContent = tv({
+    base: 'z-50 min-w-[var(--anchor-width)] rounded-xl border border-border bg-background text-foreground shadow-xl outline-none data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-side-bottom:slide-in-from-top-2 data-side-left:slide-in-from-right-2 data-side-right:slide-in-from-left-2 data-side-top:slide-in-from-bottom-2',
+});
+
+// ---------- sub-components ----------
+
+interface NativeSelectProps {
+    value: string;
+    options: { label: string; value: string }[];
+    onChange: (val: string) => void;
+    'aria-label'?: string;
+}
+
+const NativeScrollSelect: React.FC<NativeSelectProps> = ({ value, options, onChange, 'aria-label': ariaLabel }) => (
+    <select
+        aria-label={ariaLabel}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground focus:border-primary focus:outline-none"
+    >
+        {options.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+        ))}
+    </select>
+);
+
+interface TimePickerProps {
+    parts: TimeParts;
+    onChange: (parts: TimeParts) => void;
+    timeFormat: TimeFormat;
+    timePickerStyle: TimePickerStyle;
+}
+
+const TimePicker: React.FC<TimePickerProps> = ({ parts, onChange, timeFormat, timePickerStyle }) => {
+    const showMinutes = timeFormat === 'HH:mm' || timeFormat === 'HH:mm:ss';
+    const showSeconds = timeFormat === 'HH:mm:ss';
+
+    if (timePickerStyle === 'input') {
+        const inputType = timeFormat === 'HH:mm:ss' ? 'time' : 'time';
+
+        // Native time input — giả lập với step
+        const step = showSeconds ? 1 : 60;
+        const rawValue = showSeconds
+            ? `${parts.h}:${parts.m}:${parts.s}`
+            : `${parts.h}:${parts.m}`;
+
+        return (
+            <input
+                type="time"
+                value={rawValue}
+                step={step}
+                onChange={(e) => {
+                    const [h = '00', m = '00', s = '00'] = e.target.value.split(':');
+                    onChange({ h: h.padStart(2, '0'), m: m.padStart(2, '0'), s: s.padStart(2, '0') });
+                }}
+                className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
+            />
+        );
+    }
+
+    return (
+        <div className="flex items-center gap-1.5">
+            <div className="flex-1">
+                <NativeScrollSelect
+                    aria-label="Giờ"
+                    value={parts.h}
+                    options={hoursOptions}
+                    onChange={(val) => onChange({ ...parts, h: val })}
+                />
+            </div>
+            {showMinutes && (
+                <>
+                    <span className="text-sm font-bold text-muted-foreground">:</span>
+                    <div className="flex-1">
+                        <NativeScrollSelect
+                            aria-label="Phút"
+                            value={parts.m}
+                            options={minutesOptions}
+                            onChange={(val) => onChange({ ...parts, m: val })}
+                        />
+                    </div>
+                </>
+            )}
+            {showSeconds && (
+                <>
+                    <span className="text-sm font-bold text-muted-foreground">:</span>
+                    <div className="flex-1">
+                        <NativeScrollSelect
+                            aria-label="Giây"
+                            value={parts.s}
+                            options={secondsOptions}
+                            onChange={(val) => onChange({ ...parts, s: val })}
+                        />
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
+
+// ---------- main component ----------
 
 export const DatePicker: React.FC<DatePickerProps> = ({
     mode = 'single',
     date,
     onDateChange,
+    timeValue,
+    onTimeChange,
     label,
     placeholder = 'Chọn ngày...',
     disablePastDates = false,
     showTime = false,
+    timeFormat = 'HH:mm:ss',
     timePickerStyle = 'select',
-    className
+    disabled = false,
+    className,
 }) => {
     const [open, setOpen] = React.useState(false);
     const triggerRef = React.useRef<HTMLButtonElement>(null);
 
-    // State for Time
-    const [timeStr, setTimeStr] = React.useState<string>("12:00:00");
+    // Khởi tạo parts từ date prop hoặc timeValue
+    const initParts = React.useMemo<TimeParts>(() => {
+        if (mode === 'time-only' && timeValue) return parseTimeParts(timeValue);
+        if (date instanceof Date) return dateToTimeParts(date);
+        return DEFAULT_TIME;
+    }, []);
 
+    const [timeParts, setTimeParts] = React.useState<TimeParts>(initParts);
+
+    // Sync khi prop thay đổi từ ngoài
     React.useEffect(() => {
-        if (date && mode === 'single' && date instanceof Date) {
-            const h = date.getHours().toString().padStart(2, '0');
-            const m = date.getMinutes().toString().padStart(2, '0');
-            const s = date.getSeconds().toString().padStart(2, '0');
-            setTimeStr(`${h}:${m}:${s}`);
+        if (mode === 'time-only' && timeValue) {
+            setTimeParts(parseTimeParts(timeValue));
+        } else if (date instanceof Date) {
+            setTimeParts(dateToTimeParts(date));
         }
-    }, [date, mode]);
+    }, [date, timeValue, mode]);
 
-    const handleTimeChange = (newTime: string) => {
-        setTimeStr(newTime);
-        if (date && mode === 'single' && date instanceof Date) {
-            const [h, m] = newTime.split(':').map(Number);
-            const newDate = new Date(date);
-            newDate.setHours(h);
-            newDate.setMinutes(m);
-            onDateChange?.(newDate);
+    // Gọi callback khi timeParts thay đổi
+    const handlePartsChange = (newParts: TimeParts) => {
+        setTimeParts(newParts);
+        if (mode === 'time-only') {
+            onTimeChange?.(buildTimeString(newParts, timeFormat));
+            return;
+        }
+        if (date instanceof Date) {
+            onDateChange?.(applyTimeToDate(date, newParts));
         }
     };
 
     const handleDateSelect = (selectedDate: any) => {
         if (!selectedDate) {
-            onDateChange?.(selectedDate);
+            onDateChange?.(undefined);
             return;
         }
-
         if (mode === 'single' && showTime) {
-            const [h, m] = timeStr.split(':').map(Number);
-            const newDate = new Date(selectedDate);
-            newDate.setHours(h || 0);
-            newDate.setMinutes(m || 0);
-            onDateChange?.(newDate);
-            // Don't auto close when time is needed
+            onDateChange?.(applyTimeToDate(selectedDate, timeParts));
+            // Không đóng → chờ người dùng bấm "Xác nhận"
         } else {
             onDateChange?.(selectedDate);
-            if (mode === 'single') setOpen(false);
+            // if (mode === 'single') setOpen(false);
+            // if (mode === 'range') {
+            //     const range = selectedDate as DateRange;
+            //     if (range.from && range.to && range.from.getTime() !== range.to.getTime()) {
+            //         setOpen(false);
+            //     }
+            // }
         }
     };
 
-    const parseDisplayValue = () => {
-        if (!date) return <span>{placeholder}</span>;
+    // ---------- render trigger label ----------
+    const triggerLabel = React.useMemo(() => {
+        if (mode === 'time-only') {
+            const val = timeValue ?? buildTimeString(timeParts, timeFormat);
+            if (!val || val === '00' || val === '00:00' || val === '00:00:00')
+                return <span className="text-muted-foreground">{placeholder || 'Chọn giờ...'}</span>;
+            return <span>{val}</span>;
+        }
+
+        if (!date) return <span className="text-muted-foreground">{placeholder}</span>;
 
         if (mode === 'single' && date instanceof Date) {
-            return format(date, showTime ? "PPP HH:mm" : "PPP");
+            return <span>{formatDateDisplay(date, showTime, timeFormat)}</span>;
         }
+
         if (mode === 'range') {
             const range = date as DateRange;
             if (range.from && range.to) {
-                return <>{format(range.from, "PP")} - {format(range.to, "PP")}</>;
+                return (
+                    <span>
+                        {format(range.from, 'dd/MM/yyyy')} – {format(range.to, 'dd/MM/yyyy')}
+                    </span>
+                );
             }
-            if (range.from) {
-                return format(range.from, "PP");
-            }
+            if (range.from) return <span>{format(range.from, 'dd/MM/yyyy')} –</span>;
         }
-        return <span>{placeholder}</span>;
-    };
 
-    const hoursOptions = Array.from({ length: 24 }, (_, i) => ({ label: i.toString().padStart(2, '0'), value: i.toString().padStart(2, '0') }));
-    const minutesOptions = Array.from({ length: 60 }, (_, i) => ({ label: i.toString().padStart(2, '0'), value: i.toString().padStart(2, '0') }));
-    const secondsOptions = Array.from({ length: 60 }, (_, i) => ({ label: i.toString().padStart(2, '0'), value: i.toString().padStart(2, '0') }));
+        return <span className="text-muted-foreground">{placeholder}</span>;
+    }, [date, mode, showTime, timeFormat, timeValue, timeParts, placeholder]);
+
+    const isTimeMode = mode === 'time-only';
+    const needsTimePicker = isTimeMode || (mode === 'single' && showTime);
 
     return (
         <div className={`flex flex-col gap-1.5 w-full ${className || ''}`}>
-            {label && <label className="text-sm font-medium text-foreground">{label}</label>}
-            <BasePopover.Root open={open} onOpenChange={setOpen}>
-                <BasePopover.Trigger render={
-                    <Button
-                        ref={triggerRef}
-                        variant="outline"
-                        className={`w-full justify-start text-left font-normal group ${!date ? "text-muted-foreground" : ""}`}
-                    >
-                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-                        <div className="flex-1 truncate">{parseDisplayValue()}</div>
-                        <ChevronDown className="h-4 w-4 opacity-50 shrink-0 transition-transform duration-200 group-data-open:rotate-180 ml-2" />
-                    </Button>
-                } />
+            {label && (
+                <label className="text-sm font-medium text-foreground leading-none">
+                    {label}
+                </label>
+            )}
+
+            <BasePopover.Root open={open} onOpenChange={disabled ? undefined : setOpen}>
+                <BasePopover.Trigger
+                    render={
+                        <button
+                            ref={triggerRef}
+                            type="button"
+                            disabled={disabled}
+                            className={[
+                                'flex h-10 w-full items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm',
+                                'ring-offset-background transition-shadow',
+                                'hover:border-primary focus:border-primary focus:outline-none',
+                                'disabled:cursor-not-allowed disabled:opacity-50',
+                                'group',
+                            ].join(' ')}
+                        >
+                            {isTimeMode ? (
+                                <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            ) : (
+                                <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            )}
+                            <div className="flex-1 truncate text-left">{triggerLabel}</div>
+                            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-open:rotate-180" />
+                        </button>
+                    }
+                />
+
                 <BasePopover.Portal>
-                    <BasePopover.Positioner anchor={triggerRef} sideOffset={4} className="z-50">
+                    <BasePopover.Positioner anchor={triggerRef} sideOffset={6} className="z-50">
                         <BasePopover.Popup className={popoverContent()}>
-                            <div className="p-3 pb-0 flex justify-center w-full">
-                                <DayPicker
-                                    locale={locales.vi}
-                                    mode={mode as any}
-                                    selected={date as any}
-                                    onSelect={handleDateSelect}
-                                    disabled={disablePastDates ? [{ before: new Date() }] : undefined}
-                                />
-                            </div>
+                            {/* Calendar — ẩn khi time-only */}
+                            {!isTimeMode && (
+                                <div className="p-2 flex justify-center">
+                                    <DayPicker
+                                        locale={locales.vi}
+                                        mode={mode as any}
+                                        selected={date as any}
+                                        onSelect={handleDateSelect}
+                                        disabled={disablePastDates ? [{ before: new Date() }] : undefined}
+                                        className="rdp-custom"
+                                    />
+                                </div>
+                            )}
 
-                            {showTime && mode === 'single' && (
-                                <div className="border-t border-border p-3 flex flex-col gap-2">
-                                    <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                                        <Clock className="w-4 h-4" /> Chọn giờ
+                            {/* Time picker */}
+                            {needsTimePicker && (
+                                <div className={`border-t border-border p-3 flex flex-col gap-2 ${isTimeMode ? 'border-t-0' : ''}`}>
+                                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        <span>
+                                            {timeFormat === 'HH' ? 'Chọn giờ' : timeFormat === 'HH:mm' ? 'Giờ : Phút' : 'Giờ : Phút : Giây'}
+                                        </span>
                                     </div>
-                                    {timePickerStyle === 'input' ? (
-                                        <Input
-                                            type="time"
-                                            value={timeStr}
-                                            onChange={(e) => handleTimeChange(e.target.value)}
-                                            className="h-8 w-full"
-                                        />
-                                    ) : (
-                                        <div className="flex items-center gap-2 w-full">
-                                            <Select
-                                                options={hoursOptions}
-                                                value={timeStr.split(':')[0]}
-                                                onValueChange={(val) => handleTimeChange(`${val}:${timeStr.split(':')[2]}`)}
-                                            />
-                                            <span className="font-bold">:</span>
-                                            <Select
-                                                options={minutesOptions}
-                                                value={timeStr.split(':')[1]}
-                                                onValueChange={(val) => handleTimeChange(`${timeStr.split(':')[0]}:${val}`)}
-                                            />
-
-                                            <Select
-                                                options={secondsOptions}
-                                                value={timeStr.split(':')[2]}
-                                                onValueChange={(val) => handleTimeChange(`${timeStr.split(':')[0]}:${timeStr.split(':')[1]}:${val}`)}
-                                            />
-
-                                        </div>
-                                    )}
+                                    <TimePicker
+                                        parts={timeParts}
+                                        onChange={handlePartsChange}
+                                        timeFormat={timeFormat}
+                                        timePickerStyle={timePickerStyle}
+                                    />
                                 </div>
                             )}
 
-                            {showTime && mode === 'single' && (
-                                <div className="p-3 border-t border-border flex justify-end">
-                                    <Button size="sm" onClick={() => setOpen(false)}>Xác nhận</Button>
-                                </div>
-                            )}
+                            {/* Footer actions */}
+                            <div className="flex items-center justify-between gap-2 p-3 border-t border-border">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (mode === 'time-only') {
+                                            setTimeParts(DEFAULT_TIME);
+                                            onTimeChange?.('');
+                                        } else {
+                                            onDateChange?.(undefined);
+                                        }
+                                    }}
+                                    className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-2 hover:underline"
+                                >
+                                    Xóa
+                                </button>
+                                <Button size="sm" onClick={() => setOpen(false)}>
+                                    Xác nhận
+                                </Button>
+                            </div>
                         </BasePopover.Popup>
                     </BasePopover.Positioner>
                 </BasePopover.Portal>
             </BasePopover.Root>
         </div>
-    )
-}
+    );
+};

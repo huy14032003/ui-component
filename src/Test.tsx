@@ -624,7 +624,12 @@ const DatePickerPage = () => {
         title="Single Date"
         code={`<DatePicker date={date} onDateChange={setDate} />`}
       >
-        <DatePicker label="Ngày sinh" date={singleDate} onDateChange={setSingleDate} placeholder="Chọn ngày..." />
+        <div className="flex  gap-6 overflow-auto w-full">
+          <DatePicker label="Ngày sinh" date={singleDate} onDateChange={(d) => setSingleDate(d as Date | undefined)} placeholder="Chọn ngày..." />
+          <DatePicker label="Ngày sinh" date={singleDate} onDateChange={(d) => setSingleDate(d as Date | undefined)} placeholder="Chọn ngày..." />
+          <DatePicker label="Ngày sinh" date={singleDate} onDateChange={(d) => setSingleDate(d as Date | undefined)} placeholder="Chọn ngày..." />
+          <DatePicker label="Ngày sinh" date={singleDate} onDateChange={(d) => setSingleDate(d as Date | undefined)} placeholder="Chọn ngày..." />
+        </div>
       </ShowcaseCard>
 
       <ShowcaseCard
@@ -632,7 +637,7 @@ const DatePickerPage = () => {
         description="Chọn khoảng thời gian từ ngày đến ngày."
         code={`<DatePicker mode="range" date={range} onDateChange={setRange} />`}
       >
-        <DatePicker mode="range" label="Khoảng thời gian" date={rangeDate} onDateChange={setRangeDate} placeholder="Từ ngày — Đến ngày" />
+        <DatePicker mode="range" label="Khoảng thời gian" date={rangeDate} onDateChange={(d) => setRangeDate(d as DateRange | undefined)} placeholder="Từ ngày — Đến ngày" />
       </ShowcaseCard>
 
       <ShowcaseCard
@@ -640,7 +645,7 @@ const DatePickerPage = () => {
         description="Không cho phép chọn ngày trước hôm nay."
         code={`<DatePicker disablePastDates date={date} onDateChange={setDate} />`}
       >
-        <DatePicker label="Lịch hẹn" date={singleDate} onDateChange={setSingleDate} disablePastDates placeholder="Chỉ chọn ngày tương lai..." />
+        <DatePicker label="Lịch hẹn" date={singleDate} onDateChange={(d) => setSingleDate(d as Date | undefined)} disablePastDates placeholder="Chỉ chọn ngày tương lai..." />
       </ShowcaseCard>
 
       <ShowcaseCard
@@ -648,7 +653,7 @@ const DatePickerPage = () => {
         description="Tích hợp ô nhập giờ dạng text input."
         code={`<DatePicker showTime timePickerStyle="input" date={dt} onDateChange={setDt} />`}
       >
-        <DatePicker label="Ngày & Giờ (input)" showTime timePickerStyle="input" date={datetimeInput} onDateChange={setDatetimeInput} placeholder="Chọn ngày giờ..." />
+        <DatePicker label="Ngày & Giờ (input)" showTime timePickerStyle="input" date={datetimeInput} onDateChange={(d) => setDatetimeInput(d as Date | undefined)} placeholder="Chọn ngày giờ..." />
       </ShowcaseCard>
 
       <ShowcaseCard
@@ -656,7 +661,7 @@ const DatePickerPage = () => {
         description="Tích hợp select dropdown cho giờ và phút."
         code={`<DatePicker showTime timePickerStyle="select" date={dt} onDateChange={setDt} />`}
       >
-        <DatePicker label="Ngày & Giờ (select)" showTime timePickerStyle="select" date={datetimeSelect} onDateChange={setDatetimeSelect} placeholder="Chọn ngày giờ..." />
+        <DatePicker label="Ngày & Giờ (select)" showTime timePickerStyle="select" date={datetimeSelect} onDateChange={(d) => setDatetimeSelect(d as Date | undefined)} placeholder="Chọn ngày giờ..." />
       </ShowcaseCard>
     </div>
   );
