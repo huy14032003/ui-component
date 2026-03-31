@@ -1,84 +1,73 @@
-import React from 'react'
-import { Slot } from '@radix-ui/react-slot'
-import { tv, type VariantProps } from 'tailwind-variants'
-import { Loader2 } from 'lucide-react'
-import { cn } from '../../../lib/utils/cn'
+import * as React from 'react';
+import { Button as BaseButton } from '@base-ui/react';
+import { tv, type VariantProps } from 'tailwind-variants';
 
 const buttonVariants = tv({
-  base: 'relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium  transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer active:scale-[0.98]',
+  base: 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-open:bg-muted cursor-pointer',
   variants: {
     variant: {
-      solid: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_1px_2px_rgba(0,0,0,0.1)] border border-black/5',
-      glass: 'backdrop-blur-xl border border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_3px_rgba(0,0,0,0.1)]',
-      outline: 'bg-transparent border border-input hover:bg-secondary/10 hover:text-accent-foreground',
-      ghost: 'bg-transparent hover:text-accent-foreground',
-      link: 'text-primary underline-offset-4 hover:underline !shadow-none !border-none !bg-transparent',
-    },
-    color: {
-      primary: 'text-primary hover:bg-primary/10',
-      secondary: 'text-secondary hover:bg-secondary/10',
-      success: 'text-success hover:bg-success/10',
-      danger: 'text-danger hover:bg-danger/10',
-      warning: 'text-warning hover:bg-warning/10',
+      solid: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm',
+      outline: 'border border-border bg-transparent hover:bg-muted hover:text-foreground',
+      ghost: 'hover:bg-muted hover:text-foreground',
+      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm',
+      danger: 'bg-danger text-danger-foreground hover:bg-danger/90 shadow-sm',
+      glass: 'bg-white/10 backdrop-blur-md border border-white/20 text-foreground hover:bg-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)]',
+      link: 'text-primary underline-offset-4 hover:underline h-auto px-0 py-0 font-normal',
     },
     size: {
-      sm: 'h-6 px-2 text-xs',
-      md: 'h-8 px-4',
-      lg: 'h-10 px-8 text-base',
+      sm: 'h-8 px-3 text-xs',
+      md: 'h-10 px-4 py-2',
+      lg: 'h-11 px-8',
       icon: 'h-10 w-10',
     },
   },
-  compoundVariants: [
-    // Solid variants
-    { variant: 'solid', color: 'primary', class: 'bg-primary text-primary-foreground hover:bg-primary/90' },
-    { variant: 'solid', color: 'secondary', class: 'bg-secondary text-secondary-foreground hover:bg-secondary/80' },
-    { variant: 'solid', color: 'success', class: 'bg-success text-success-foreground hover:bg-success/90' },
-    { variant: 'solid', color: 'danger', class: 'bg-danger text-danger-foreground hover:bg-danger/90' },
-    { variant: 'solid', color: 'warning', class: 'bg-warning text-warning-foreground hover:bg-warning/90' },
-
-    // Glass variants with subtle gradients
-    { variant: 'glass', color: 'primary', class: 'bg-gradient-to-b from-primary/30 to-primary/10 text-primary border-primary/30 hover:from-primary/40' },
-    { variant: 'glass', color: 'secondary', class: 'bg-gradient-to-b from-slate-800/60 to-slate-900/80 text-white border-white/10 hover:from-slate-800/80' },
-    { variant: 'glass', color: 'success', class: 'bg-gradient-to-b from-success/30 to-success/10 text-success border-success/30 hover:from-success/40' },
-    { variant: 'glass', color: 'danger', class: 'bg-gradient-to-b from-danger/30 to-danger/10 text-danger border-danger/30 hover:from-danger/40' },
-    { variant: 'glass', color: 'warning', class: 'bg-gradient-to-b from-warning/30 to-warning/10 text-warning border-warning/30 hover:from-warning/40' },
-  ],
   defaultVariants: {
     variant: 'solid',
-    color: 'primary',
     size: 'md',
   },
-})
+});
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>,
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'className'>,
   VariantProps<typeof buttonVariants> {
-  asChild?: boolean
-  isLoading?: boolean
-  leftIcon?: React.ReactNode
-  rightIcon?: React.ReactNode
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  isLoading?: boolean;
+  className?: string;
+  children?: React.ReactNode;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, color, size, asChild = false, isLoading, leftIcon, rightIcon, children, ...props }, ref) => {
-    const Component = asChild ? Slot : 'button'
-
+const Button = React.forwardRef<React.ElementRef<typeof BaseButton>, ButtonProps>(
+  ({ className, variant, size, leftIcon, rightIcon, isLoading, children, ...props }, ref) => {
     return (
-      <Component
-        className={cn(buttonVariants({ variant, color, size, className }))}
+      <BaseButton
         ref={ref}
+        className={buttonVariants({ variant, size, className: className || '' })}
         disabled={isLoading || props.disabled}
         {...props}
       >
-        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {!isLoading && leftIcon && <span className="inline-flex shrink-0">{leftIcon}</span>}
+        {isLoading && (
+          <svg
+            className="mr-2 h-4 w-4 animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        )}
+        {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
         {children}
-        {!isLoading && rightIcon && <span className="inline-flex shrink-0">{rightIcon}</span>}
-      </Component>
-    )
+        {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
+      </BaseButton>
+    );
   }
-)
+);
+Button.displayName = 'Button';
 
-Button.displayName = 'Button'
-
-export { Button, buttonVariants }
+export { Button, buttonVariants };

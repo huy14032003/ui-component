@@ -1,83 +1,70 @@
-import { Input as AriaInput, type InputProps as AriaInputProps, Button } from 'react-aria-components'
-import { cn } from '@lib/utils/cn'
-import { useState } from 'react'
-import { Eye, EyeOff } from '@components/icons'
-interface Props extends Omit<AriaInputProps, 'size'> {
-    className?: string
-    size?: 'sm' | 'md' | 'lg'
-    placeholder?: string
-    type?: 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url'
-    label?: string
+import * as React from 'react';
+import { Input as BaseInput, Field as BaseField } from '@base-ui/react';
+import { tv } from 'tailwind-variants';
+
+const inputVariants = tv({
+  base: 'flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:border-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-shadow',
+  variants: {
+    variant: {
+      default: '',
+      filled: 'bg-muted border-transparent focus-visible:border-primary',
+      flushed: 'border-b-2 border-transparent border-b-border rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-primary bg-transparent',
+    }
+  },
+  defaultVariants: {
+    variant: 'default'
+  }
+});
+
+export interface InputProps extends Omit<React.ComponentPropsWithoutRef<typeof BaseInput>, 'className'> {
+  label?: string;
+  error?: string;
+  description?: string;
+  variant?: 'default' | 'filled' | 'flushed';
+  icon?: React.ReactNode;
+  placeholder?: string;
+  className?: string;
 }
 
-const sizeClasses = {
-    sm: 'px-2 py-1 text-sm',
-    md: 'px-3 py-1.5 text-sm',
-    lg: 'px-4 py-2 text-base'
-}
-const textClasses = {
-    sm: 'text-sm',
-    md: 'text-sm',
-    lg: 'text-base'
-}
-
-function Input({ className, label, size = 'md', placeholder, type = 'text', ...props }: Props) {
-  return (
-    <div className={cn('flex flex-col gap-1 ', className)}>
-      {label && (
-        <label className={cn("font-medium text-gray-700", textClasses[size])}>
-          {label}
-        </label>
-      )}
-      <AriaInput
-        aria-label={label || placeholder || "Input"}
-        type={type}
-        placeholder={placeholder}
-        className={cn(
-          'bg-white border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary ', 
-          sizeClasses[size] 
-        )}
-        {...props}
-      />
-    </div>
-  );
-}
-function InputPassword({ className, label, size = 'md', placeholder, ...props }: Props) {
-    const [showPassword, setShowPassword] = useState(false)
+const Input = React.forwardRef<React.ElementRef<typeof BaseInput>, InputProps>(
+  ({ className, variant, label, error, description, icon, id, ...props }, ref) => {
+    const defaultId = React.useId();
+    const inputId = id || defaultId;
 
     return (
-        <div className={cn('flex flex-col gap-1', className)}>
-            {label && (
-                <label className={cn("font-medium text-gray-700", textClasses[size])}>
-                    {label}
-                </label>
-            )}
-            <div className="relative w-full group">
-                <AriaInput
-                    aria-label={label || placeholder || "Password input"}
-                    type={showPassword ? 'text' : 'password'}
-                    className={cn(
-                        'bg-white w-full border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary pr-10',
-                        sizeClasses[size]
-                    )}
-                    placeholder={placeholder || 'Nhập...'}
-                    {...props}
-                />
-                <Button
-                    onPress={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 outline-none transition-colors"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                    {showPassword ? (
-                        <EyeOff className={cn("w-4 h-4", size === 'lg' && "w-5 h-5")} />
-                    ) : (
-                        <Eye className={cn("w-4 h-4", size === 'lg' && "w-5 h-5")} />
-                    )}
-                </Button>
+      <BaseField.Root className="flex flex-col gap-1.5 w-full">
+        {label && (
+          <BaseField.Label htmlFor={inputId} className="text-sm font-medium text-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            {label}
+          </BaseField.Label>
+        )}
+        <div className="relative">
+          {icon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              {icon}
             </div>
+          )}
+          <BaseField.Control render={<BaseInput
+            ref={ref}
+            id={inputId}
+            className={inputVariants({ variant, className: icon ? 'pl-9 ' + (className || '') : (className || '') })}
+            {...props}
+          />} />
         </div>
-    )
-}
+        {description && !error && (
+          <BaseField.Description className="text-[0.8rem] text-muted-foreground">
+            {description}
+          </BaseField.Description>
+        )}
+        {error && (
+          <BaseField.Error className="text-[0.8rem] font-medium text-danger">
+            {error}
+          </BaseField.Error>
+        )}
+      </BaseField.Root>
+    );
+  }
+);
+Input.displayName = 'Input';
 
-
-export { Input, InputPassword }
+export { Input };

@@ -21,10 +21,10 @@ declare module '@tanstack/react-table' {
     }
 }
 import { cn } from '@lib/utils/cn';
-import { Checkbox } from '../checkbox/Checkbox';
-import Spinner from '../spinner/Spinner';
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import Button from '../button/Button';
+import { Button } from '../button/Button';
+import { Checkbox } from '../checkbox/Checkbox';
+import { Spinner } from '../spinner/Spinner';
 
 export interface TableProps<TData> {
     data: TData[];
@@ -87,9 +87,9 @@ export function Table<TData>({
                     <div className="flex items-center justify-center">
                         <Checkbox
                             size="sm"
-                            isSelected={table.getIsAllRowsSelected()}
-                            isIndeterminate={table.getIsSomeRowsSelected()}
-                            onChange={(checked) => table.toggleAllRowsSelected(checked)}
+                            checked={table.getIsAllRowsSelected()}
+                            indeterminate={table.getIsSomeRowsSelected()}
+                            onCheckedChange={(checked) => table.toggleAllRowsSelected(!!checked)}
                         />
                     </div>
                 ),
@@ -97,9 +97,9 @@ export function Table<TData>({
                     <div className="flex items-center justify-center">
                         <Checkbox
                             size="sm"
-                            isSelected={row.getIsSelected()}
-                            isDisabled={!row.getCanSelect()}
-                            onChange={(checked) => row.toggleSelected(checked)}
+                            checked={row.getIsSelected()}
+                            disabled={!row.getCanSelect()}
+                            onCheckedChange={(checked) => row.toggleSelected(!!checked)}
                         />
                     </div>
                 ),
@@ -120,9 +120,9 @@ export function Table<TData>({
                     return row.getCanExpand() ? (
                         <div className="flex items-center justify-center">
                             <Button
-                                variant="outlineSecondary"
-                                size="xs"
-                                onPress={row.getToggleExpandedHandler()}
+                                variant="outline"
+                                size="sm"
+                                onClick={row.getToggleExpandedHandler()}
                                 className="p-0.5 hover:bg-gray-200 text-gray-500 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-primary/50"
                             >
                                 {row.getIsExpanded() ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
@@ -170,8 +170,8 @@ export function Table<TData>({
 
             {/* Loading Overlay */}
             {isLoading && (
-                <div className="absolute inset-0  bg-black/30 z-10 flex items-center justify-center   ">
-                    <Spinner size="lg" variant="circle" className='text-blue-700' />
+                <div className="absolute inset-0 bg-black/10 z-10 flex items-center justify-center backdrop-blur-[2px]">
+                    <Spinner size="lg" variant="primary" />
                 </div>
             )}
 

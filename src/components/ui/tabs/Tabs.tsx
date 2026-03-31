@@ -1,106 +1,61 @@
-import React from 'react';
-import { 
-  Tabs as AriaTabs, 
-  TabList as AriaTabList, 
-  Tab as AriaTab, 
-  TabPanel as AriaTabPanel,
-  type TabsProps,
-  type TabListProps,
-  type TabProps,
-  type TabPanelProps
-} from 'react-aria-components';
+import * as React from 'react';
+import { Tabs as BaseTabs } from '@base-ui/react';
+import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '@lib/utils/cn';
-import { tv } from 'tailwind-variants';
 
-export interface CustomTabsProps extends TabsProps {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning';
-}
-
-const TabsContext = React.createContext<{ variant: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' }>({ variant: 'primary' });
-
-const tabVariantClasses = tv({
-  variants: {
-    variant: {
-      primary: 'data-[selected]:bg-primary data-[selected]:text-white',
-      secondary: 'data-[selected]:bg-secondary data-[selected]:text-white',
-      danger: 'data-[selected]:bg-danger data-[selected]:text-white',
-      success: 'data-[selected]:bg-success data-[selected]:text-white',
-      warning: 'data-[selected]:bg-warning data-[selected]:text-white',
-    },
-  },
+const tabsVariants = tv({
+  slots: {
+    rootSlots: 'flex flex-col w-full',
+    list: 'relative inline-flex items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground w-fit',
+    indicator: 'absolute top-1 bottom-1 left-[var(--active-tab-left)] w-[var(--active-tab-width)] rounded-md bg-background shadow-sm transition-all duration-300 ease-out z-0',
+    trigger: 'relative z-10 inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-active:text-foreground data-active:font-semibold',
+    panel: 'mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+  }
 });
 
-const underlineVariantClasses = tv({
-  variants: {
-    variant: {
-      primary: 'data-[selected]:border-b-2 data-[selected]:border-primary data-[selected]:text-primary',
-      secondary: 'data-[selected]:border-b-2 data-[selected]:border-secondary data-[selected]:text-secondary',
-      danger: 'data-[selected]:border-b-2 data-[selected]:border-danger data-[selected]:text-danger',
-      success: 'data-[selected]:border-b-2 data-[selected]:border-success data-[selected]:text-success',
-      warning: 'data-[selected]:border-b-2 data-[selected]:border-warning data-[selected]:text-warning',
-    },
-  },
-});
-
-export function Tabs({ variant = 'primary', className, ...props }: CustomTabsProps) {
-  return (
-    <TabsContext.Provider value={{ variant }}>
-      <AriaTabs 
-        {...props} 
-        className={cn("flex flex-col w-full", className as string)} 
-      />
-    </TabsContext.Provider>
-  );
+export interface TabsProps
+  extends Omit<BaseTabs.Root.Props, 'className' | 'children'>,
+    VariantProps<typeof tabsVariants> {
+  className?: string;
+  items: { label: string; value: string; content: React.ReactNode }[];
 }
 
-export interface CustomTabListProps<T> extends TabListProps<T> {
-  styleType?: 'pill' | 'underline';
-}
+const Tabs = React.forwardRef<React.ElementRef<typeof BaseTabs.Root>, TabsProps>(
+  ({ className, items, ...props }, ref) => {
+    const { rootSlots, list, indicator, trigger, panel } = tabsVariants();
+    
+    return (
+      <BaseTabs.Root
+        ref={ref}
+        className={rootSlots({ className })}
+        {...props}
+      >
+        <BaseTabs.List className={list()}>
+          <BaseTabs.Indicator className={indicator()} />
+          {items.map((item) => (
+            <BaseTabs.Tab
+              key={item.value}
+              value={item.value}
+              className={trigger()}
+            >
+              {item.label}
+            </BaseTabs.Tab>
+          ))}
+        </BaseTabs.List>
+        {items.map((item) => (
+          <BaseTabs.Panel
+            key={item.value}
+            value={item.value}
+            className={panel()}
+          >
+            {item.content}
+          </BaseTabs.Panel>
+        ))}
+      </BaseTabs.Root>
+    );
+  }
+);
 
-export function TabList<T extends object>({ styleType = 'underline', className, ...props }: CustomTabListProps<T>) {
-  return (
-    <AriaTabList 
-      {...props} 
-      className={cn(
-        "flex gap-4 border-b border-gray-200 w-full overflow-x-auto no-scrollbar",
-        styleType === 'pill' ? "border-none gap-2 bg-gray-100 p-1 rounded-lg w-fit" : "",
-        className as string
-      )} 
-    />
-  );
-}
+Tabs.displayName = 'Tabs';
 
-export interface CustomTabProps extends TabProps {
-  styleType?: 'pill' | 'underline';
-}
-
-export function Tab({ styleType = 'underline', className, ...props }: CustomTabProps) {
-  const { variant } = React.useContext(TabsContext);
-  
-  return (
-    <AriaTab 
-      {...props} 
-      className={cn(
-        "px-4 py-2 cursor-pointer outline-none transition-all duration-200 text-sm font-medium",
-        "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded-sm",
-        "text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed",
-        styleType === 'pill' 
-          ? cn("rounded-md px-4 py-1.5", tabVariantClasses({ variant }))
-          : cn("rounded-none border-b-2 border-transparent", underlineVariantClasses({ variant })),
-        className as string
-      )} 
-    />
-  );
-}
-
-export function TabPanel(props: TabPanelProps) {
-  return (
-    <AriaTabPanel 
-      {...props} 
-      className={cn(
-        "p-4 pt-6 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md",
-        props.className as string
-      )} 
-    />
-  );
-}
+export { Tabs };

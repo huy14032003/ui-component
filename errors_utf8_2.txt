@@ -1,0 +1,4 @@
+﻿src/components/ui/table/Table.tsx(127,33): error TS2322: Type '"outlineSecondary"' is not assignable to type '"solid" | "outline" | "ghost" | "secondary" | "danger" | "glass" | undefined'.
+src/components/ui/table/Table.tsx(128,33): error TS2322: Type '"xs"' is not assignable to type '"md" | "sm" | "lg" | "icon" | undefined'.
+src/lib/theme/ThemeSwitcher.tsx(1,28): error TS2307: Cannot find module '@components/ui/disclosure/Disclosure' or its corresponding type declarations.
+src/main.tsx(5,35): error TS2307: Cannot find module '@radix-ui/themes' or its corresponding type declarations.

@@ -1,126 +1,72 @@
-import { Checkbox as AriaCheckbox, CheckboxGroup as AriaCheckboxGroup, Label, Text, type CheckboxGroupProps, type CheckboxProps as AriaCheckboxProps } from 'react-aria-components';
+import * as React from 'react';
+import { Checkbox as BaseCheckbox } from '@base-ui/react';
+import { Check, Minus } from 'lucide-react';
+import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '@lib/utils/cn';
-import React from 'react';
-import { tv } from 'tailwind-variants';
 
-// === CHECBOX ===
-export interface CustomCheckboxProps extends Omit<AriaCheckboxProps, 'children'> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning';
-  size?: 'sm' | 'md' | 'lg';
-  label?: string;
-  description?: string;
-  children?: React.ReactNode;
-}
-
-const checkboxSizeClasses = {
-  xs: 'w-3 h-3 rounded text-xs',
-  sm: 'w-4 h-4 rounded text-sm',
-  md: 'w-5 h-5 rounded text-base',
-  lg: 'w-6 h-6 rounded text-lg',
-};
-
-const iconSizeClasses = {
-  xs: 'w-2 h-2',
-  sm: 'w-2.5 h-2.5',
-  md: 'w-3.5 h-3.5',
-  lg: 'w-4 h-4',
-};
-
-
-const checkboxVariantClasses =tv(
-  {
-    base: "group text-sm transition-colors outline-none",
-    variants: {
-      variant: {
-        primary: "group-data-[selected]:bg-primary group-data-[selected]:border-primary group-data-[indeterminate]:bg-primary group-data-[indeterminate]:border-primary group-data-[focus-visible]:ring-primary/50",
-        secondary: "group-data-[selected]:bg-secondary group-data-[selected]:border-secondary group-data-[indeterminate]:bg-secondary group-data-[indeterminate]:border-secondary group-data-[focus-visible]:ring-secondary/50",
-        danger: "group-data-[selected]:bg-danger group-data-[selected]:border-danger group-data-[indeterminate]:bg-danger group-data-[indeterminate]:border-danger group-data-[focus-visible]:ring-danger/50",
-        success: "group-data-[selected]:bg-success group-data-[selected]:border-success group-data-[indeterminate]:bg-success group-data-[indeterminate]:border-success group-data-[focus-visible]:ring-success/50",
-        warning: "group-data-[selected]:bg-warning group-data-[selected]:border-warning group-data-[indeterminate]:bg-warning group-data-[indeterminate]:border-warning group-data-[focus-visible]:ring-warning/50 group-data-[selected]:text-black group-data-[indeterminate]:text-black",
-      },
-      size: {
-        xs: 'w-3 h-3 rounded text-xs',
-        sm: 'w-4 h-4 rounded text-sm',
-        md: 'w-5 h-5 rounded text-base',
-        lg: 'w-6 h-6 rounded text-lg',
-      },
-    },
+const checkboxVariants = tv({
+  slots: {
+    root: 'group flex shrink-0 items-center justify-center rounded border transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-border bg-background data-checked:bg-primary/90 data-checked:border-primary/90 data-indeterminate:bg-primary/90 data-indeterminate:border-primary/90',
+    indicator: 'dark:text-primary-foreground text-primary flex items-center justify-center',
+    icon: 'h-full w-full stroke-[4]',
+  },
+  variants: {
+    size: {
+      sm: { root: 'h-4 w-4' },
+      md: { root: 'h-5 w-5' },
+      lg: { root: 'h-6 w-6' },
+    }
+  },
+  defaultVariants: {
+    size: 'md'
   }
-)
-export function Checkbox({ variant = 'primary', size = 'md', label, description, className, ...props }: CustomCheckboxProps) {
-  return (
-    <AriaCheckbox
-      {...props}
-      aria-label={props['aria-label'] || label || "Checkbox"}
-      className={cn(
-        "group flex items-start gap-2.5 text-sm transition-colors outline-none",
-        props.isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90",
-        className
-      )}
-    >
-      <div className={cn(
-        "flex shrink-0 items-center justify-center border transition-all duration-200 mt-0.5",
-        "bg-white border-gray-300 text-transparent shadow-sm",
-        checkboxSizeClasses[size],
-        "group-data-focus-visible:ring-2 group-data-focus-visible:ring-offset-1",
-        "group-data-hovered:border-gray-400 group-data-selected:text-white group-data-indeterminate:text-white",
-        
-        // Variants
-        
-        checkboxVariantClasses({variant, size}),
-        
-        "group-data-invalid:border-danger group-data-invalid:group-data-selected:bg-danger"
-      )}>
-        {/* Check Icon */}
-        <svg viewBox="0 0 14 14" fill="none" className={cn("group-data-selected:block group-data-indeterminate:hidden hidden", iconSizeClasses[size])}>
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 8L6 11L11 3.5"/>
-        </svg>
-        {/* Indeterminate Icon (Minus) */}
-        <svg viewBox="0 0 14 14" fill="none" className={cn("group-data-indeterminate:block hidden", iconSizeClasses[size])}>
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 7H11"/>
-        </svg>
-      </div>
-      {(label || props.children) && (
-        <div className="flex flex-col">
-          <span className="text-gray-900 group-data-disabled:text-gray-500 font-medium">
-            {label || props.children}
-          </span>
-          {description && (
-            <Text slot="description" className="text-xs text-gray-500 mt-0.5">
-              {description}
-            </Text>
-          )}
-        </div>
-      )}
-    </AriaCheckbox>
-  );
-}
+});
 
-// === CHECKBOX GROUP ===
-export interface CustomCheckboxGroupProps extends Omit<CheckboxGroupProps, 'children'> {
+const { root, indicator, icon } = checkboxVariants();
+
+export interface CheckboxProps
+  extends Omit<BaseCheckbox.Root.Props, 'className'>,
+  VariantProps<typeof checkboxVariants> {
   label?: string;
-  description?: string;
-  errorMessage?: string;
-  children: React.ReactNode;
-  orientation?: 'vertical' | 'horizontal';
   className?: string;
 }
 
-export function CheckboxGroup({ label, description, errorMessage, children, orientation = 'vertical', className, ...props }: CustomCheckboxGroupProps) {
-    return (
-        <AriaCheckboxGroup {...props} aria-label={props['aria-label'] || label || "Checkbox Group"} className={cn("flex flex-col gap-2", className)}>
-            {label && <Label className="text-sm font-semibold text-gray-800">{label}</Label>}
-            <div className={cn("flex", orientation === 'horizontal' ? "flex-row gap-5 flex-wrap" : "flex-col gap-3")}>
-                {children}
-            </div>
-            {description && <Text slot="description" className="text-xs text-gray-500">{description}</Text>}
-            {errorMessage && <Text slot="errorMessage" className="text-xs text-danger font-medium">{errorMessage}</Text>}
-        </AriaCheckboxGroup>
-    );
-}
+const Checkbox = React.forwardRef<React.ElementRef<typeof BaseCheckbox.Root>, CheckboxProps>(
+  ({ className, size = 'md', label, id, indeterminate, ...props }, ref) => {
+    const defaultId = React.useId();
+    const checkboxId = id || defaultId;
+    const { root, indicator, icon } = checkboxVariants({ size });
 
-// Export named objects for barrel imports if needed
-export default {
-    Checkbox,
-    CheckboxGroup
-}
+    return (
+      <div className="flex items-center gap-2">
+        <BaseCheckbox.Root
+          ref={ref}
+          id={checkboxId}
+          className={root({ className: cn('cursor-pointer', className) })}
+          indeterminate={indeterminate}
+          {...props}
+        >
+          <BaseCheckbox.Indicator className={indicator()}>
+            {indeterminate ? (
+              <Minus className={icon()} />
+            ) : (
+              <Check className={icon()} />
+            )}
+          </BaseCheckbox.Indicator>
+        </BaseCheckbox.Root>
+        {label && (
+          <label
+            htmlFor={checkboxId}
+            className="text-sm font-medium leading-none cursor-pointer select-none disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {label}
+          </label>
+        )}
+      </div>
+    );
+  }
+);
+
+Checkbox.displayName = 'Checkbox';
+
+export { Checkbox };

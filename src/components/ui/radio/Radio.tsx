@@ -1,108 +1,64 @@
-import React from 'react';
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import * as React from 'react';
+import { Radio as BaseRadio } from '@base-ui/react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
 
 const radioVariants = tv({
   slots: {
-    root: 'group flex items-start gap-3 cursor-pointer select-none outline-none',
-    indicator: 'relative flex shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-    dot: 'block rounded-full transition-transform duration-200 scale-0 group-data-[state=checked]:scale-100',
-    labelContainer: 'flex flex-col gap-0.5',
-    label: 'text-sm font-medium leading-none text-slate-900',
-    description: 'text-xs text-slate-500',
+    root: 'group flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-background transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50  data-checked:border-primary',
+    indicator: 'flex items-center justify-center',
+    dot: 'h-2 w-2 rounded-full dark:bg-primary-foreground bg-primary',
   },
   variants: {
-    variant: {
-      solid: {
-        indicator: 'bg-white border-slate-300 group-data-[state=checked]:border-primary',
-        dot: 'bg-primary',
-      },
-     
-    
-    },
-    intent: {
-      primary: {
-        indicator: 'group-data-[state=checked]:border-primary',
-        dot: 'bg-primary',
-      },
-      success: {
-        indicator: 'group-data-[state=checked]:border-success',
-        dot: 'bg-success',
-      },
-      danger: {
-        indicator: 'group-data-[state=checked]:border-danger',
-        dot: 'bg-danger',
-      },
-      warning: {
-        indicator: 'group-data-[state=checked]:border-warning',
-        dot: 'bg-warning',
-      },
-    },
     size: {
-      sm: {
-        indicator: 'h-4 w-4',
-        dot: 'h-1.5 w-1.5',
-        label: 'text-xs',
-      },
-      md: {
-        indicator: 'h-5 w-5',
-        dot: 'h-2 w-2',
-        label: 'text-sm',
-      },
-      lg: {
-        indicator: 'h-6 w-6',
-        dot: 'h-2.5 w-2.5',
-        label: 'text-base',
-      },
-    },
-    disabled: {
-      true: {
-        root: 'opacity-50 cursor-not-allowed pointer-events-none',
-      },
-    },
+      sm: { root: 'h-4 w-4', dot: 'h-1.5 w-1.5' },
+      md: { root: 'h-5 w-5', dot: 'h-2 w-2' },
+      lg: { root: 'h-6 w-6', dot: 'h-2.5 w-2.5' },
+    }
   },
   defaultVariants: {
-    variant: 'solid',
-    intent: 'primary',
-    size: 'md',
-  },
+    size: 'md'
+  }
 });
 
 export interface RadioProps
-  extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>,
-    VariantProps<typeof radioVariants> {
-  label?: React.ReactNode;
-  description?: React.ReactNode;
+  extends Omit<BaseRadio.Root.Props, 'className'>,
+  VariantProps<typeof radioVariants> {
+  label?: string;
+  className?: string;
 }
 
-export const Radio = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  RadioProps
->(({ className, variant, intent, size, disabled, label, description, children, ...props }, ref) => {
-  const styles = radioVariants({ variant, intent, size, disabled });
+const Radio = React.forwardRef<React.ElementRef<typeof BaseRadio.Root>, RadioProps>(
+  ({ className, size, label, id, ...props }, ref) => {
+    const defaultId = React.useId();
+    const radioId = id || defaultId;
 
-  return (
-    <RadioGroupPrimitive.Item
-      ref={ref}
-      className={cn(styles.root(), className)}
-      disabled={disabled}
-      {...props}
-    >
-      <div className={styles.indicator()}>
-        <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-          <div className={styles.dot()} />
-        </RadioGroupPrimitive.Indicator>
+    const { root, indicator, dot } = radioVariants({ size });
+
+    return (
+      <div className="flex items-center gap-2 w-fit">
+        <BaseRadio.Root
+          ref={ref}
+          id={radioId}
+          className={root({ className })}
+          {...props}
+        >
+          <BaseRadio.Indicator className={indicator()}>
+            <div className={dot()} />
+          </BaseRadio.Indicator>
+        </BaseRadio.Root>
+        {label && (
+          <label
+            htmlFor={radioId}
+            className="text-sm font-medium leading-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            {label}
+          </label>
+        )}
       </div>
-      {(label || description || children) && (
-        <div className={styles.labelContainer()}>
-          {label && <span className={styles.label()}>{label}</span>}
-          {children && <span className={styles.label()}>{children}</span>}
-          {description && <span className={styles.description()}>{description}</span>}
-        </div>
-      )}
-    </RadioGroupPrimitive.Item>
-  );
-});
+    );
+  }
+);
 
-Radio.displayName = RadioGroupPrimitive.Item.displayName;
+Radio.displayName = 'Radio';
+
+export { Radio };

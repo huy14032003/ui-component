@@ -1,89 +1,69 @@
-import { Switch as AriaSwitch, type SwitchProps as AriaSwitchProps } from 'react-aria-components';
-import { cn } from '@lib/utils/cn';
-import React from 'react';
-import { tv } from 'tailwind-variants';
+import * as React from 'react';
+import { Switch as BaseSwitch } from '@base-ui/react';
+import { tv, type VariantProps } from 'tailwind-variants';
 
-export interface CustomSwitchProps extends Omit<AriaSwitchProps, 'children'> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning';
-  size?: 'sm' | 'md' | 'lg';
+const switchVariants = tv({
+  base: 'cursor-pointer',
+  slots: {
+    root: 'group inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-checked:bg-primary data-unchecked:bg-switch-background',
+    thumb: 'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-checked:translate-x-5 data-unchecked:translate-x-0',
+  },
+  variants: {
+    size: {
+      sm: {
+        root: 'h-5 w-9',
+        thumb: 'h-4 w-4 data-checked:translate-x-4',
+      },
+      md: {
+        root: 'h-6 w-11',
+        thumb: 'h-5 w-5 data-checked:translate-x-5',
+      }
+    }
+  },
+  defaultVariants: {
+    size: 'md'
+  }
+});
+
+
+
+export interface SwitchProps
+  extends Omit<BaseSwitch.Root.Props, 'className'>,
+  VariantProps<typeof switchVariants> {
   label?: string;
-  children?: React.ReactNode;
+  className?: string;
 }
 
-const switchSizeClasses = {
-  sm: 'w-8 h-4.5',
-  md: 'w-10 h-5.5',
-  lg: 'w-12 h-6.5',
-};
+const Switch = React.forwardRef<React.ElementRef<typeof BaseSwitch.Root>, SwitchProps>(
+  ({ className, size, label, id, ...props }, ref) => {
+    const defaultId = React.useId();
+    const switchId = id || defaultId;
 
-const variantClasses = tv({
-  variants: {
-    variant: {
-      primary: "group-data-[selected]:bg-primary group-data-[focus-visible]:ring-primary/50",
-      secondary: "group-data-[selected]:bg-secondary group-data-[focus-visible]:ring-secondary/50",
-      danger: "group-data-[selected]:bg-danger group-data-[focus-visible]:ring-danger/50",
-      success: "group-data-[selected]:bg-success group-data-[focus-visible]:ring-success/50",
-      warning: "group-data-[selected]:bg-warning group-data-[focus-visible]:ring-warning/50",
-    },
-    size: {
-      sm: 'w-8 h-4.5',
-      md: 'w-10 h-5.5',
-      lg: 'w-12 h-6.5',
-    },
-  },
-})
+    const { root, thumb } = switchVariants({ size });
 
-const thumbVariantClasses = tv({
-  variants: {
-    variant: {
-      primary: "bg-primary",
-      secondary: "bg-secondary",
-      danger: "bg-danger",
-      success: "bg-success",
-      warning: "bg-warning",
-    },
-    size: {
-      sm: 'w-3.5 h-3.5 translate-x-0.5 group-data-[selected]:translate-x-[15px]',
-      md: 'w-4.5 h-4.5 translate-x-0.5 group-data-[selected]:translate-x-[19px]',
-      lg: 'w-5.5 h-5.5 translate-x-0.5 group-data-[selected]:translate-x-[23px]',
-    },
-  },
-})
-export function Switch({ variant = 'primary', size = 'md', label, className, ...props }: CustomSwitchProps) {
-  return (
-    <AriaSwitch
-      {...props}
-      aria-label={props['aria-label'] || label || "Switch"}
-      className={cn(
-        "group flex items-center gap-3 text-sm transition-opacity outline-none",
-        props.isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90",
-        className
-      )}
-    >
-      <div className={cn(
-        "relative flex shrink-0 items-center bg-gray-300 rounded-full transition-colors duration-200 shadow-inner",
-        switchSizeClasses[size],
-        "group-data-focus-visible:ring-2 group-data-focus-visible:ring-offset-1",
-        "group-data-hovered:bg-gray-400",
-        
-        // Variants
-        variantClasses({ variant, size }),
-      )}>
-        <span className={cn(
-          "bg-white rounded-full transition-transform duration-200 shadow-sm origin-left",
-          thumbVariantClasses({ variant, size }),
-          props.isDisabled ? "bg-gray-100" : "bg-white",
-          // Scale down click effect
-          // "group-data-[pressed]:w-[20%] group-data-[pressed]:group-data-[selected]:-translate-x-[25%]"
-        )} />
+    return (
+      <div className="flex items-center gap-2 w-fit">
+        <BaseSwitch.Root
+          ref={ref}
+          id={switchId}
+          className={root({ className })}
+          {...props}
+        >
+          <BaseSwitch.Thumb className={thumb()} />
+        </BaseSwitch.Root>
+        {label && (
+          <label
+            htmlFor={switchId}
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            {label}
+          </label>
+        )}
       </div>
-      {(label || props.children) && (
-        <span className="text-gray-900 group-data-disabled:text-gray-500 font-medium select-none">
-          {label || props.children}
-        </span>
-      )}
-    </AriaSwitch>
-  );
-}
+    );
+  }
+);
 
-export default Switch;
+Switch.displayName = 'Switch';
+
+export { Switch };

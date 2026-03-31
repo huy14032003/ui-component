@@ -1,49 +1,104 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
-@import "@radix-ui/themes/styles.css";
 
 @theme {
-    --color-primary: #3b82f6;
-    --color-primary-foreground: #ffffff;
-    --color-secondary: #2e2e2e;
-    --color-secondary-foreground: #ffffff;
-    --color-accent: #f59e0b;
     --color-background: #ffffff;
-    --color-foreground: #0f172a;
+    --color-foreground: #1e1e24;
+
+    --color-primary: #2f27ce;
+    --color-primary-foreground: #ffffff;
+
+    --color-secondary: #dedcff;
+    --color-secondary-foreground: #2f27ce;
+
+    --color-muted: #f8fafc;
+    --color-muted-foreground: #94a3b8;
+
+    --color-switch-background: #d6d6d6;
+
+    --color-border: #e2e8f0;
+
     --color-success: #10b981;
     --color-success-foreground: #ffffff;
-    --color-destructive: #ef4444;
-    --color-destructive-foreground: #ffffff;
+
     --color-warning: #f59e0b;
     --color-warning-foreground: #ffffff;
+
+    --color-destructive: #ef4444;
+    --color-destructive-foreground: #ffffff;
+
     --color-danger: #ef4444;
     --color-danger-foreground: #ffffff;
 
-    /* Custom Border Radius */
+    --color-accent: #dedcff;
+    --color-accent-foreground: #2f27ce;
+
+    --radius-sm: 0.125rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
     --radius-xl: 1rem;
 
-    /* Custom Animations */
     --animate-spin-slow: spin 3s linear infinite;
 }
 
 @layer base {
     :root {
-        --background: var(--color-background);
-        --foreground: var(--color-foreground);
-        --primary: var(--color-primary);
-        --primary-foreground: var(--color-primary-foreground);
-        --secondary: var(--color-secondary);
-        --secondary-foreground: var(--color-secondary-foreground);
-        --accent: var(--color-accent);
-        --accent-foreground: var(--color-accent-foreground);
-        --destructive: var(--color-destructive);
-        --destructive-foreground: var(--color-destructive-foreground);
-        --success: var(--color-success);
-        --success-foreground: var(--color-success-foreground);
-        --warning: var(--color-warning);
-        --warning-foreground: var(--color-warning-foreground);
-        --danger: var(--color-danger);
-        --danger-foreground: var(--color-danger-foreground);
+        --background: #ffffff;
+        --foreground: #1e1e24;
+        --primary: #2f27ce;
+        --primary-foreground: #ffffff;
+        --secondary: #dedcff;
+        --secondary-foreground: #2f27ce;
+        --muted: #f1f5f9;
+        --muted-foreground: #94a3b8;
+        --switch-background: #d6d6d6;
+        --accent: #dedcff;
 
+        --border: #e2e8f0;
+        --success: #10b981;
+        --success-foreground: #ffffff;
+        --warning: #f59e0b;
+        --warning-foreground: #ffffff;
+        --danger: #ef4444;
+        --danger-foreground: #ffffff;
+    }
+
+    * {
+        border-color: var(--border);
+    }
+
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: 'Inter', system-ui, sans-serif;
+        scrollbar-gutter: stable;
+    }
+}
+
+/* Hard-fix for primary colors across all components */
+@layer utilities {
+    .bg-primary {
+        background-color: var(--primary) !important;
+    }
+
+    .text-primary-foreground {
+        color: var(--primary-foreground) !important;
+    }
+
+    .border-primary {
+        border-color: var(--primary) !important;
+    }
+}
+
+/* Ensure data-state="checked" always works for background */
+[data-state="checked"] {
+    &.bg-primary {
+        background-color: var(--primary) !important;
+    }
+}
+
+[data-state="indeterminate"] {
+    &.bg-primary {
+        background-color: var(--primary) !important;
     }
 }
