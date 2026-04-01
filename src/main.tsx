@@ -7,6 +7,6 @@ import { Toaster } from './components/ui/toast/Toaster'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
       <Test />
-      <Toaster position="top-right" expand={true} richColors />
+      <Toaster position="top-center" expand={true} richColors />
   </StrictMode>,
 )

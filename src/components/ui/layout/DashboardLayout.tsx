@@ -97,7 +97,7 @@ export const Sidebar = () => {
 
 export const Header = () => {
     return (
-        <header className="h-[72px] bg-background border-b border-border/50 flex flex-col justify-center px-8 fixed top-0 w-[calc(100%-16rem)] right-0 z-40">
+        <header className="h-[72px]  bg-background border-b border-border/50 flex flex-col justify-center px-8 fixed top-0 w-[calc(100%-16rem)] right-0 z-40">
             <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col">
                     <h1 className="text-xl font-semibold text-primary">Example</h1>
@@ -126,14 +126,16 @@ export const Header = () => {
 
 export const DashboardLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     return (
-        <div className="min-h-screen bg-muted/30">
+        <div className="flex h-screen overflow-hidden bg-muted/30">
             <Sidebar />
-            <Header />
-            <main className="pl-64 pt-[72px] min-h-screen w-full">
-                <div className="p-6 h-full">
-                    {children ? children : <Outlet />}
-                </div>
-            </main>
+            <div className="flex flex-col flex-1 pl-64 w-full">
+                <Header />
+                <main className="flex-1 mt-[72px] overflow-y-auto bg-muted/10">
+                    <div className="p-6">
+                        {children ? children : <Outlet />}
+                    </div>
+                </main>
+            </div>
         </div>
     )
 }

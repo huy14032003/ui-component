@@ -41,6 +41,10 @@
     --animate-spin-slow: spin 3s linear infinite;
 }
 
+#root {
+    width: 100%;
+}
+
 @layer base {
     :root {
         --background: #ffffff;
@@ -67,11 +71,33 @@
         border-color: var(--border);
     }
 
-    body {
+    html, body {
+        margin: 0;
+        padding: 0;
         background-color: var(--background);
         color: var(--foreground);
         font-family: 'Inter', system-ui, sans-serif;
-        scrollbar-gutter: stable;
+        overflow: hidden; /* Khóa scroll tổng để dùng nội bộ */
+        height: 100%;
+    }
+
+    /* Fix dải trắng khi mở modal/dialog trong các thư viện (Base UI, Radix) */
+    body[style*="overflow: hidden"],
+    body[data-scroll-locked] {
+        padding-right: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Đảm bảo Backdrop luôn phủ kín màn hình bất chấp các tính toán của thư viện */
+    [data-base-ui-dialog-backdrop],
+    .base-ui-backdrop,
+    [role="presentation"] > div[style*="fixed"] {
+        width: 100vw !important;
+        height: 100vh !important;
+        left: 0 !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
     }
 }
 
