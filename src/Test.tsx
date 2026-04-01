@@ -422,14 +422,14 @@ const ComboBoxPage = () => {
     { label: 'Tanstack Table', value: 'table' },
   ];
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-full ">
       <PageHeader title="ComboBox" description="Dropdown kết hợp tìm kiếm, hỗ trợ single và multi-select." />
-
-      <ShowcaseCard title="Single + Autocomplete">
-        <div className="w-80">
-          <ComboBox options={options} label="Framework" placeholder="Tìm kiếm..." />
-        </div>
-      </ShowcaseCard>
+      <div className="grid grid-cols-4 gap-4">
+        <ShowcaseCard title="Single + Autocomplete">
+          <div className="w-80">
+            <ComboBox options={options} label="Framework" placeholder="Tìm kiếm..." />
+          </div>
+        </ShowcaseCard>
 
       <ShowcaseCard title="Multi-select (Chips inside Input)">
         <div className="w-full">
@@ -445,9 +445,10 @@ const ComboBoxPage = () => {
 
       <ShowcaseCard title="Multi (No Autocomplete)">
         <div className="w-full">
-          <ComboBox options={options} multiple autocomplete={false} label="Danh sách cố định" placeholder="Chọn mục..." />
+          <ComboBox className='' options={options} multiple autocomplete={false} label="Danh sách cố định" placeholder="Chọn mục..." />
         </div>
       </ShowcaseCard>
+      </div>
     </div>
   );
 };
