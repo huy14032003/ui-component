@@ -80,11 +80,15 @@ const buildRegistry = () => {
   console.log('Building component registry...');
   const registry: any = {
     core: {
-        dependencies: ["@base-ui/react", "clsx", "tailwind-merge"],
+        dependencies: ["@base-ui/react", "clsx", "tailwind-merge", "tailwind-variants", "tailwindcss-animate", "@tailwindcss/vite", "autoprefixer",  "tailwindcss", "postcss"],
         files: [
             {
                 path: "src/lib/utils/cn.ts",
                 content: fs.readFileSync("./src/lib/utils/cn.ts", "utf-8")
+            },
+            {
+                path: "src/styles/index.css",
+                content: fs.readFileSync("./src/styles/index.css", "utf-8")
             }
         ]
     },
