@@ -6,7 +6,7 @@ import { cn } from '@lib/utils/cn';
 
 const checkboxVariants = tv({
   slots: {
-    root: 'group flex shrink-0 items-center justify-center rounded border transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-border bg-background data-checked:bg-primary/90 data-checked:border-primary/90 data-indeterminate:bg-primary/90 data-indeterminate:border-primary/90',
+    root: 'group flex shrink-0 items-center justify-center rounded border transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-border bg-background  dark:data-checked:bg-primary/90 dark:data-checked:border-primary/90 dark:data-indeterminate:bg-primary/90 dark:data-indeterminate:border-primary/90',
     indicator: 'dark:text-primary-foreground text-primary flex items-center justify-center',
     icon: 'h-full w-full stroke-[4]',
   },
@@ -38,11 +38,11 @@ const Checkbox = React.forwardRef<React.ElementRef<typeof BaseCheckbox.Root>, Ch
     const { root, indicator, icon } = checkboxVariants({ size });
 
     return (
-      <div className="flex items-center gap-2">
+      <div className={cn("flex items-center gap-2", props.disabled && "opacity-50 cursor-not-allowed")}>
         <BaseCheckbox.Root
           ref={ref}
           id={checkboxId}
-          className={root({ className: cn('cursor-pointer', className) })}
+          className={root({ className: cn(!props.disabled&&'cursor-pointer', className) })}
           indeterminate={indeterminate}
           {...props}
         >
@@ -57,7 +57,7 @@ const Checkbox = React.forwardRef<React.ElementRef<typeof BaseCheckbox.Root>, Ch
         {label && (
           <label
             htmlFor={checkboxId}
-            className="text-sm font-medium leading-none cursor-pointer select-none disabled:cursor-not-allowed disabled:opacity-70"
+            className={cn("text-sm font-medium leading-none select-none", props.disabled && "opacity-50 cursor-not-allowed")}
           >
             {label}
           </label>

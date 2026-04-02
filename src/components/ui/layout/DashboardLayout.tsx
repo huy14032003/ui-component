@@ -1,146 +1,295 @@
 import * as React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import { Menu, Home, CreditCard, BookOpen, Clock, Wallet, ShieldCheck, Users, Settings, CircleDollarSign, Percent, User, LogOut } from 'lucide-react';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../accordion/Accordion';
-import { Button } from '../button/Button';
+import { Outlet, useLocation } from 'react-router-dom';
+import {
+  Settings, Star, LayoutDashboard,
+  Square, Tag, UserCircle, Layers3, Loader2, TrendingUp,
+  Bell, SlidersHorizontal, ListChecks, Circle, ChevronsUpDown,
+  CalendarDays, Eye, ToggleLeft, PanelLeft, Type,
+  Table2, Rows3, ChevronRight, Columns3, Menu, Code2,
+  MessageSquare, Info, AlertTriangle, Lightbulb,
+  BookOpen, Users, CreditCard, ShieldCheck,
+  Sparkles, BadgeCheck, CreditCard as BillingIcon, Bell as BellIcon, LogOut,
+} from 'lucide-react';
 import { ThemeToggle } from '../ThemeToggle';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarNavLink,
+  SidebarMenuCollapsible,
+  SidebarSeparator,
+  SidebarTrigger,
+  SidebarInset,
+  UserMenuPopover,
+  UserMenuItem,
+  useSidebar,
+} from '../sidebar/Sidebar';
 
-// ----------------------------------------------------------------------------
-// Sidebar Component
-// ----------------------------------------------------------------------------
+// ─── Nav Config ───────────────────────────────────────────────────────────────
 
-export const Sidebar = () => {
-    return (
-        <aside className="w-64 h-screen bg-background border-r border-border border-dashed flex flex-col fixed left-0 top-0 overflow-y-auto">
-            <div className="p-6 flex items-center justify-center border-b border-border/50 border-dashed">
-                {/* Flexpay Logo Mock */}
-                <span className="text-2xl font-bold italic tracking-tighter">
-                    <img src="/logo.png" alt="Logo" />
-                </span>
+const NAV_OVERVIEW = [
+  { to: '/', end: true, icon: <LayoutDashboard className="w-4 h-4" />, label: 'Dashboard' },
+];
+
+const NAV_COLLAPSIBLES = [
+  {
+    id: 'general',
+    icon: <BookOpen className="w-4 h-4" />,
+    label: 'General',
+    defaultOpen: true,
+    prefix: '/components',
+    items: [
+      { to: '/components/button', icon: <Square className="w-4 h-4" />, label: 'Button' },
+      { to: '/components/badge', icon: <Tag className="w-4 h-4" />, label: 'Badge' },
+      { to: '/components/avatar', icon: <UserCircle className="w-4 h-4" />, label: 'Avatar' },
+      { to: '/components/skeleton', icon: <Layers3 className="w-4 h-4" />, label: 'Skeleton' },
+      { to: '/components/spinner', icon: <Loader2 className="w-4 h-4" />, label: 'Spinner' },
+      { to: '/components/progress', icon: <TrendingUp className="w-4 h-4" />, label: 'Progress' },
+      { to: '/components/alert', icon: <Bell className="w-4 h-4" />, label: 'Alert' },
+      { to: '/components/calendar', icon: <CalendarDays className="w-4 h-4" />, label: 'Calendar' },
+      { to: '/components/preview-card', icon: <Eye className="w-4 h-4" />, label: 'Preview Card' },
+      { to: '/components/rate', icon: <Star className="w-4 h-4" />, label: 'Rate (Star)' },
+    ],
+  },
+  {
+    id: 'forms',
+    icon: <Users className="w-4 h-4" />,
+    label: 'Forms',
+    defaultOpen: false,
+    prefix: '/components',
+    items: [
+      { to: '/components/input', icon: <Type className="w-4 h-4" />, label: 'Input' },
+      { to: '/components/select', icon: <ChevronsUpDown className="w-4 h-4" />, label: 'Select' },
+      { to: '/components/datepicker', icon: <CalendarDays className="w-4 h-4" />, label: 'DatePicker' },
+      { to: '/components/checkbox', icon: <ListChecks className="w-4 h-4" />, label: 'Checkbox' },
+      { to: '/components/radio', icon: <Circle className="w-4 h-4" />, label: 'Radio Group' },
+      { to: '/components/combobox', icon: <Columns3 className="w-4 h-4" />, label: 'ComboBox' },
+      { to: '/components/switch', icon: <ToggleLeft className="w-4 h-4" />, label: 'Switch' },
+      { to: '/components/slider', icon: <SlidersHorizontal className="w-4 h-4" />, label: 'Slider' },
+      { to: '/components/toggle', icon: <ToggleLeft className="w-4 h-4" />, label: 'Toggle' },
+      { to: '/components/advanced-form', icon: <Rows3 className="w-4 h-4" />, label: 'Advanced Form', badge: 'New' },
+    ],
+  },
+  {
+    id: 'complex',
+    icon: <CreditCard className="w-4 h-4" />,
+    label: 'Complex',
+    defaultOpen: false,
+    prefix: '/components',
+    items: [
+      { to: '/components/table', icon: <Table2 className="w-4 h-4" />, label: 'Data Table' },
+      { to: '/components/tabs', icon: <Layers3 className="w-4 h-4" />, label: 'Tabs' },
+      { to: '/components/accordion', icon: <ChevronRight className="w-4 h-4" />, label: 'Accordion' },
+      { to: '/components/collapsible', icon: <Menu className="w-4 h-4" />, label: 'Collapsible' },
+      { to: '/components/sidebar', icon: <PanelLeft className="w-4 h-4" />, label: 'Sidebar' },
+      { to: '/components/vscode', icon: <Code2 className="w-4 h-4" />, label: 'VS Code IDE', badge: 'New' },
+    ],
+  },
+  {
+    id: 'overlays',
+    icon: <ShieldCheck className="w-4 h-4" />,
+    label: 'Overlays',
+    defaultOpen: false,
+    prefix: '/components',
+    items: [
+      { to: '/components/dialog', icon: <MessageSquare className="w-4 h-4" />, label: 'Dialog (Modal)' },
+      { to: '/components/alert-dialog', icon: <AlertTriangle className="w-4 h-4" />, label: 'Alert Dialog' },
+      { to: '/components/popover', icon: <Lightbulb className="w-4 h-4" />, label: 'Popover' },
+      { to: '/components/tooltip', icon: <Info className="w-4 h-4" />, label: 'Tooltip' },
+      { to: '/components/drawer', icon: <PanelLeft className="w-4 h-4" />, label: 'Drawer' },
+    ],
+  },
+];
+
+// ─── App Sidebar ──────────────────────────────────────────────────────────────
+
+const AppSidebar: React.FC = () => {
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
+  const location = useLocation();
+
+  return (
+    <Sidebar collapsible="icon">
+      {/* Header */}
+      <SidebarHeader className="border-b border-sidebar-border">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <div
+              className={`flex items-center gap-3 px-2 py-2 rounded-md transition-all duration-200 ${isCollapsed ? 'justify-center' : ''}`}
+            >
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0 shadow-sm">
+                <span className="text-primary-foreground font-bold text-sm select-none">UI</span>
+              </div>
+              {!isCollapsed && (
+                <div className="overflow-hidden min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate leading-tight">UI Library</p>
+                  <p className="text-xs text-muted-foreground truncate leading-tight">Component Showcase</p>
+                </div>
+              )}
             </div>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-            <nav className="flex-1 py-4 px-3 space-y-1">
-                <div className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Overview
-                </div>
-                <NavLink to="/" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${isActive ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
-                    <Home className="w-4 h-4" /> Dashboard
-                </NavLink>
+      {/* Content */}
+      <SidebarContent>
+        {/* Overview */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Overview</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {NAV_OVERVIEW.map((item) => (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarNavLink to={item.to} end={item.end} icon={item.icon} label={item.label} />
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-                <div className="px-3 mt-6 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Components
-                </div>
-                <Accordion multiple={true} defaultValue={["general-components", "forms-components"]}>
-                    <AccordionItem value="general-components" className="border-none">
-                        <AccordionTrigger className="px-3 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/5 data-panel-open:text-primary data-panel-open:font-semibold py-2.5 border-none">
-                            <div className="flex items-center gap-3"><BookOpen className="w-4 h-4" /> General</div>
-                        </AccordionTrigger>
-                        <AccordionContent className="ml-4 border-l border-border/50 pl-2 space-y-0.5">
-                            <NavLink to="/components/button" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Button</NavLink>
-                            <NavLink to="/components/badge" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Badge</NavLink>
-                            <NavLink to="/components/avatar" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Avatar</NavLink>
-                            <NavLink to="/components/skeleton" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Skeleton</NavLink>
-                            <NavLink to="/components/spinner" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Spinner</NavLink>
-                            <NavLink to="/components/progress" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Progress</NavLink>
-                            <NavLink to="/components/alert" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Alert</NavLink>
-                        </AccordionContent>
-                    </AccordionItem>
+        <SidebarSeparator />
 
-                    <AccordionItem value="forms-components" className="border-none">
-                        <AccordionTrigger className="px-3 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/5 data-panel-open:text-primary data-panel-open:font-semibold py-2.5 border-none">
-                            <div className="flex items-center gap-3"><Users className="w-4 h-4" /> Forms</div>
-                        </AccordionTrigger>
-                        <AccordionContent className="ml-4 border-l border-border/50 pl-2 space-y-0.5">
-                            <NavLink to="/components/input" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Input</NavLink>
-                            <NavLink to="/components/select" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Select</NavLink>
-                            <NavLink to="/components/datepicker" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>DatePicker</NavLink>
-                            <NavLink to="/components/checkbox" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Checkbox</NavLink>
-                            <NavLink to="/components/radio" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Radio Group</NavLink>
-                            <NavLink to="/components/combobox" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>ComboBox</NavLink>
-                            <NavLink to="/components/switch" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Switch</NavLink>
-                            <NavLink to="/components/slider" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Slider</NavLink>
-                            <div className="h-px bg-border/50 my-2 mx-2"></div>
-                            <NavLink to="/components/advanced-form" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Advanced Form <span className="text-[10px] ml-1 bg-primary text-white rounded px-1.5">New</span></NavLink>
-                        </AccordionContent>
-                    </AccordionItem>
+        {/* Components Collapsible Groups */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Components</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {NAV_COLLAPSIBLES.map((group) => {
+                // Detect xem có child nào đang active không
+                const isChildActive = group.items.some((item) =>
+                  location.pathname === item.to || location.pathname.startsWith(item.to + '/')
+                );
 
-                    <AccordionItem value="complex-components" className="border-none">
-                        <AccordionTrigger className="px-3 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/5 data-panel-open:text-primary data-panel-open:font-semibold py-2.5 border-none">
-                            <div className="flex items-center gap-3"><CreditCard className="w-4 h-4" /> Complex</div>
-                        </AccordionTrigger>
-                        <AccordionContent className="ml-4 border-l border-border/50 pl-2 space-y-0.5">
-                            <NavLink to="/components/table" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Data Table</NavLink>
-                            <NavLink to="/components/tabs" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Tabs</NavLink>
-                            <NavLink to="/components/accordion" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Accordion</NavLink>
-                            <NavLink to="/components/collapsible" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Collapsible</NavLink>
-                        </AccordionContent>
-                    </AccordionItem>
+                return (
+                  <SidebarMenuItem key={group.id}>
+                    <SidebarMenuCollapsible
+                      id={group.id}
+                      icon={group.icon}
+                      label={group.label}
+                      defaultOpen={group.defaultOpen}
+                      isChildActive={isChildActive}
+                    >
+                      {group.items.map((item) => (
+                        <SidebarNavLink
+                          key={item.to}
+                          to={item.to}
+                          icon={item.icon}
+                          label={item.label}
+                          size="sm"
+                          badge={
+                            'badge' in item && !isCollapsed ? (
+                              <span className="text-[10px] bg-primary text-primary-foreground rounded px-1.5 py-0.5 font-medium leading-none">
+                                {(item as any).badge}
+                              </span>
+                            ) : undefined
+                          }
+                        />
+                      ))}
+                    </SidebarMenuCollapsible>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-                    <AccordionItem value="overlay-components" className="border-none">
-                        <AccordionTrigger className="px-3 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/5 data-panel-open:text-primary data-panel-open:font-semibold py-2.5 border-none">
-                            <div className="flex items-center gap-3"><ShieldCheck className="w-4 h-4" /> Overlays</div>
-                        </AccordionTrigger>
-                        <AccordionContent className="ml-4 border-l border-border/50 pl-2 space-y-0.5">
-                            <NavLink to="/components/dialog" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Dialog (Modal)</NavLink>
-                            <NavLink to="/components/alert-dialog" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Alert Dialog</NavLink>
-                            <NavLink to="/components/popover" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Popover</NavLink>
-                            <NavLink to="/components/tooltip" className={({ isActive }) => `block px-3 py-1.5 rounded-md text-sm transition-colors ${isActive ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>Tooltip</NavLink>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+      {/* Footer — User menu */}
+      <SidebarFooter className="border-t border-sidebar-border pb-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <UserMenuPopover
+              name="admin2"
+              email="admin@example.com"
+              avatar="https://i.pravatar.cc/100"
+            >
+              <UserMenuItem icon={<Sparkles className="w-4 h-4" />}>
+                Upgrade to Pro
+              </UserMenuItem>
+              <div className="h-px bg-border/50 my-1" />
+              <UserMenuItem icon={<BadgeCheck className="w-4 h-4" />}>
+                Account
+              </UserMenuItem>
+              <UserMenuItem icon={<BillingIcon className="w-4 h-4" />}>
+                Billing
+              </UserMenuItem>
+              <UserMenuItem icon={<BellIcon className="w-4 h-4" />}>
+                Notifications
+              </UserMenuItem>
+              <div className="h-px bg-border/50 my-1" />
+              <UserMenuItem icon={<LogOut className="w-4 h-4" />} destructive>
+                Log out
+              </UserMenuItem>
+            </UserMenuPopover>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+};
 
-            </nav>
-        </aside>
-    )
-}
+// ─── Header ───────────────────────────────────────────────────────────────────
 
-// ----------------------------------------------------------------------------
-// Header Component
-// ----------------------------------------------------------------------------
+const Header: React.FC = () => {
+  const location = useLocation();
+  const segments = location.pathname.replace(/^\//, '').split('/').filter(Boolean);
 
-export const Header = () => {
-    return (
-        <header className="h-[72px]  bg-background border-b border-border/50 flex flex-col justify-center px-8 fixed top-0 w-[calc(100%-16rem)] right-0 z-40">
-            <div className="flex items-center justify-between w-full">
-                <div className="flex flex-col">
-                    <h1 className="text-xl font-semibold text-primary">Example</h1>
-                    <div className="flex items-center text-sm text-slate-400 gap-1.5 mt-0.5">
-                        <Home className="w-3.5 h-3.5" />
-                        <span>Home</span>
-                        <span className="text-slate-300">/</span>
-                        <span className="text-primary font-medium">Example</span>
-                    </div>
-                </div>
+  return (
+    <header className="h-[60px] bg-background/95 backdrop-blur-sm border-b border-border/50 flex items-center px-4 gap-3 sticky top-0 z-30">
+      <SidebarTrigger />
+      <div className="h-4 w-px bg-border/60" />
+      <nav className="flex items-center gap-1 text-sm flex-1 min-w-0">
+        <span className="text-muted-foreground hover:text-foreground transition-colors cursor-default">
+          Home
+        </span>
+        {segments.map((seg, i) => (
+          <React.Fragment key={i}>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+            <span
+              className={
+                i === segments.length - 1
+                  ? 'text-foreground font-medium capitalize truncate'
+                  : 'text-muted-foreground capitalize'
+              }
+            >
+              {seg.replace(/-/g, ' ')}
+            </span>
+          </React.Fragment>
+        ))}
+      </nav>
+      <div className="flex items-center gap-2 shrink-0">
+        <ThemeToggle />
+        <img
+          src="https://i.pravatar.cc/100"
+          alt="avatar"
+          className="w-8 h-8 rounded-full object-cover border border-border cursor-pointer"
+        />
+      </div>
+    </header>
+  );
+};
 
-
-                <div className="flex items-center gap-4">
-                    <ThemeToggle />
-                    <span className="text-sm font-medium text-foreground">admin2</span>
-                    <div className="w-9 h-9 bg-muted rounded-full flex items-center justify-center text-primary font-bold overflow-hidden shadow-sm border border-border">
-                        <img src="https://i.pravatar.cc/100" alt="avatar" />
-                    </div>
-                </div>
-            </div>
-        </header>
-    )
-}
-
-// ----------------------------------------------------------------------------
-// Dashboard Layout
-// ----------------------------------------------------------------------------
+// ─── DashboardLayout ──────────────────────────────────────────────────────────
 
 export const DashboardLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-    return (
-        <div className="flex h-screen overflow-hidden bg-muted/30">
-            <Sidebar />
-            <div className="flex flex-col flex-1 pl-64 w-full">
-                <Header />
-                <main className="flex-1 mt-[72px] overflow-y-auto bg-muted/10">
-                    <div className="p-6">
-                        {children ? children : <Outlet />}
-                    </div>
-                </main>
-            </div>
-        </div>
-    )
-}
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <Header />
+        <main className="flex-1 overflow-y-auto bg-muted/10">
+          <div className="p-6 h-[calc(100vh-60px)] overflow-auto">
+            {children ? children : <Outlet />}
+          </div>
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+};

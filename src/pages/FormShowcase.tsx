@@ -137,7 +137,7 @@ export const FormShowcase = () => {
                       <Input
                         label="Mật khẩu"
                         type="password"
-                        placeholder="••••••••"
+                        placeholder="********"
                         icon={<ShieldCheck className="w-4 h-4" />}
                         error={fieldState.error?.message}
                         {...field}

@@ -10,5 +10,7 @@ export {
   RefreshCcw,
   Clock,
   Loader2,
-  Loader
+  Loader,
+  Search,
+  Lock,
 } from 'lucide-react';
