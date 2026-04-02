@@ -1,16 +1,28 @@
 {
-  "name": "ui_lib",
-  "private": true,
-  "version": "0.0.0",
+  "name": "cus-ui",
+  "private": false,
+  "version": "0.1.0",
   "type": "module",
+  "bin": {
+    "cus-ui": "./dist/ui-cli.js"
+  },
+  "files": [
+    "dist",
+    "registry.json",
+    "scripts",
+    "README_CLI.md"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:cli": "npx -y esbuild scripts/ui-cli.ts --bundle --platform=node --outfile=dist/ui-cli.js --format=esm --packages=external",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "registry:build": "npx -y tsx scripts/build-registry.ts",
+    "ui:add": "npx -y tsx scripts/ui-cli.ts add"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
