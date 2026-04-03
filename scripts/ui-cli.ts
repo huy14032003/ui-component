@@ -126,6 +126,7 @@ const setupViteConfig = (cwd: string) => {
     const configTs = path.join(cwd, 'vite.config.ts');
     const configJs = path.join(cwd, 'vite.config.js');
 
+    // No config exists — create from template
     if (!fs.existsSync(configTs) && !fs.existsSync(configJs)) {
         fs.writeFileSync(configTs, VITE_CONFIG_TEMPLATE);
         log('Created vite.config.ts with Tailwind + React Compiler setup.');
@@ -133,49 +134,87 @@ const setupViteConfig = (cwd: string) => {
     }
 
     const existingPath = fs.existsSync(configTs) ? configTs : configJs;
-    const content = fs.readFileSync(existingPath, 'utf-8');
+    let content = fs.readFileSync(existingPath, 'utf-8');
 
     const missingImports: string[] = [];
     if (!content.includes('@tailwindcss/vite')) missingImports.push("import tailwindcss from '@tailwindcss/vite';");
     if (!content.includes('@vitejs/plugin-react')) missingImports.push("import react from '@vitejs/plugin-react';");
     if (!content.includes('vite-plugin-babel')) missingImports.push("import babel from 'vite-plugin-babel';");
     if (!content.includes('babel-plugin-react-compiler')) missingImports.push("import { reactCompilerPreset } from 'babel-plugin-react-compiler';");
+    if (!content.includes("from 'path'") && !content.includes('from "path"')) missingImports.push("import path from 'path';");
 
     const missingPlugins: string[] = [];
     if (!content.includes('tailwindcss()')) missingPlugins.push('tailwindcss()');
     if (!content.includes('react()') && !content.includes('react({')) missingPlugins.push('react()');
-    if (!content.includes('reactCompilerPreset')) missingPlugins.push('babel({ presets: [reactCompilerPreset()] })');
+    if (!content.includes('reactCompilerPreset')) missingPlugins.push("babel({ presets: [reactCompilerPreset()] })");
 
-    const hasAlias = content.includes('alias:') || content.includes("'@'") || content.includes('"@"');
+    const hasAlias = content.includes('alias:') || content.includes('alias(') || content.includes("'@'") || content.includes('"@"');
 
     if (missingImports.length === 0 && missingPlugins.length === 0 && hasAlias) {
         log('vite.config already configured — skipping.');
         return;
     }
 
-    warn(`${path.basename(existingPath)} exists but is missing required setup. Add the following manually:`);
+    // --- Auto-patch the file ---
+
+    // 1. Insert missing imports after the last import statement
     if (missingImports.length > 0) {
-        console.log('\n  // Imports to add:');
-        for (const imp of missingImports) console.log(`  ${imp}`);
+        const importBlock = missingImports.join('\n');
+        const allImports = [...content.matchAll(/^import\s.+$/gm)];
+        if (allImports.length > 0) {
+            const last = allImports[allImports.length - 1];
+            const pos = last.index! + last[0].length;
+            content = content.slice(0, pos) + '\n' + importBlock + content.slice(pos);
+        } else {
+            content = importBlock + '\n' + content;
+        }
     }
+
+    // 2. Insert missing plugins into plugins: [...]
     if (missingPlugins.length > 0) {
-        console.log('\n  // Plugins to add inside defineConfig({ plugins: [...] }):');
-        for (const plugin of missingPlugins) console.log(`    ${plugin},`);
+        const match = content.match(/plugins:\s*\[/);
+        if (match && match.index !== undefined) {
+            const pos = match.index + match[0].length;
+            const pluginLines = missingPlugins.map((p) => `\n      ${p},`).join('');
+            content = content.slice(0, pos) + pluginLines + content.slice(pos);
+        }
     }
+
+    // 3. Insert resolve.alias block if missing
     if (!hasAlias) {
-        console.log('\n  // resolve.alias to add inside defineConfig({}):');
-        console.log("  resolve: {");
-        console.log("    alias: {");
-        console.log("      '@': path.resolve(__dirname, './src'),");
-        console.log("      '@lib': path.resolve(__dirname, './src/lib'),");
-        console.log("      '@components': path.resolve(__dirname, './src/components'),");
-        console.log("      '@assets': path.resolve(__dirname, './src/assets'),");
-        console.log("      '@pages': path.resolve(__dirname, './src/pages'),");
-        console.log("      '@styles': path.resolve(__dirname, './src/styles'),");
-        console.log("    },");
-        console.log("  },");
+        const aliasBlock = [
+            '  resolve: {',
+            '    alias: {',
+            "      '@': path.resolve(__dirname, './src'),",
+            "      '@lib': path.resolve(__dirname, './src/lib'),",
+            "      '@components': path.resolve(__dirname, './src/components'),",
+            "      '@assets': path.resolve(__dirname, './src/assets'),",
+            "      '@pages': path.resolve(__dirname, './src/pages'),",
+            "      '@styles': path.resolve(__dirname, './src/styles'),",
+            '    },',
+            '  },',
+        ].join('\n');
+
+        // Find end of plugins array, then insert after that line
+        const pluginsStart = content.search(/plugins:\s*\[/);
+        if (pluginsStart !== -1) {
+            let depth = 0;
+            let foundStart = false;
+            for (let i = pluginsStart; i < content.length; i++) {
+                if (content[i] === '[') { depth++; foundStart = true; }
+                if (content[i] === ']') depth--;
+                if (foundStart && depth === 0) {
+                    let lineEnd = content.indexOf('\n', i);
+                    if (lineEnd === -1) lineEnd = content.length;
+                    content = content.slice(0, lineEnd + 1) + aliasBlock + '\n' + content.slice(lineEnd + 1);
+                    break;
+                }
+            }
+        }
     }
-    console.log('');
+
+    fs.writeFileSync(existingPath, content);
+    log(`Updated ${path.basename(existingPath)} with Tailwind + React Compiler + path aliases.`);
 };
 
 const ensureTailwindCss = (cwd: string) => {
@@ -215,16 +254,20 @@ const setupTsConfig = (cwd: string) => {
         }
 
         try {
-            // Strip single-line and block comments before parsing
-            const stripped = raw.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+            // Strip comments safely: block comments first, then single-line comments
+            // only when they appear outside of string values (preceded by whitespace or line start)
+            const stripped = raw
+                .replace(/\/\*[\s\S]*?\*\//g, '')
+                .replace(/(^|[\s,{[\]])\/\/[^\n]*/g, '$1');
             const parsed = JSON.parse(stripped) as { compilerOptions?: Record<string, unknown> };
             if (!parsed.compilerOptions) parsed.compilerOptions = {};
             parsed.compilerOptions.baseUrl = '.';
             parsed.compilerOptions.paths = TSCONFIG_PATHS;
             fs.writeFileSync(configPath, JSON.stringify(parsed, null, 2));
             log(`Added path aliases to ${candidate}.`);
-        } catch {
-            warn(`Could not auto-patch ${candidate}. Add these to compilerOptions manually:`);
+        } catch (err) {
+            warn(`Could not auto-patch ${candidate}: ${err instanceof Error ? err.message : err}`);
+            warn('Add these to compilerOptions manually:');
             console.log('\n  "baseUrl": ".",');
             console.log('  "paths": {');
             for (const [alias, targets] of Object.entries(TSCONFIG_PATHS)) {
