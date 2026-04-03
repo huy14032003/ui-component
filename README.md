@@ -26,6 +26,7 @@ Lệnh này tự động thực hiện:
 | Bước | Nội dung |
 |------|----------|
 | Cài dev packages | `tailwindcss`, `@tailwindcss/vite`, `@vitejs/plugin-react`, `vite-plugin-babel`, `babel-plugin-react-compiler`, `@types/node` |
+| Cài runtime packages | `@base-ui/react`, `tailwind-variants`, `clsx`, `tailwind-merge`, `tailwindcss-animate` |
 | Tạo / cập nhật `vite.config.ts` | Thêm plugin Tailwind, React, React Compiler + alias `@`, `@lib`, `@components`, `@assets`, `@pages`, `@styles` |
 | Cập nhật `tsconfig.json` | Thêm `baseUrl` + `paths` tương ứng với alias trên |
 | Setup Tailwind CSS | Thêm `@import "tailwindcss";` vào `src/index.css` (tạo mới nếu chưa có) |

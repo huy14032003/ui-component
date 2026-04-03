@@ -81,6 +81,9 @@ const installNpmPackages = (packages: string[], cwd: string, dev = false) => {
 
 const VITE_DEV_PACKAGES = ['tailwindcss', '@tailwindcss/vite', '@vitejs/plugin-react', 'vite-plugin-babel', 'babel-plugin-react-compiler', '@types/node'];
 
+// Runtime packages always required — installed regardless of registry content
+const RUNTIME_PACKAGES = ['@base-ui/react', 'tailwind-variants', 'clsx', 'tailwind-merge', 'tailwindcss-animate'];
+
 const VITE_CONFIG_TEMPLATE = `import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -390,6 +393,7 @@ const main = async () => {
             setupViteConfig(cwd);
             setupTsConfig(cwd);
             ensureTailwindCss(cwd);
+            installNpmPackages(RUNTIME_PACKAGES, cwd);
             ensureCore(registry, cwd);
             log('Initialization complete.');
             break;
