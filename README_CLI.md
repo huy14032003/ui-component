@@ -1,51 +1,44 @@
-# CUS-UI CLI (Remote/NPM Ready)
+# basuicn CLI Documentation
 
-Bộ công cụ CLI giúp bạn cài đặt các components từ thư viện UI này vào bất kỳ dự án React nào khác thông qua `npx`.
+Bộ công cụ dòng lệnh mạnh mẽ để quản lý các component UI. Tương thích hoàn toàn với dự án React + Vite + TypeScript + Tailwind CSS.
 
-## 🚀 Cách sử dụng từ dự án khác
+## 🚀 Cài đặt & Khởi tạo
 
-Bạn không cần cài đặt gì cả, chỉ cần đứng tại thư mục dự án của bạn và gõ:
+Để bắt đầu sử dụng `basuicn` trong dự án của bạn, hãy chạy:
 
-### 1. Khởi tạo dự án (Lần đầu)
 ```bash
 npx basuicn init
 ```
-Lệnh này sẽ tự động cài các gói cần thiết (`clsx`, `tailwind-merge`) và tạo file `src/lib/utils/cn.ts`.
 
-### 2. Thêm Component
+Lệnh này sẽ chuẩn bị mọi thứ cần thiết: dependencies, path aliases, Tailwind v4 configuration, và `ThemeProvider` để quản lý giao diện sáng/tối.
+
+## 🛠 Lệnh thông dụng
+
+### Thêm Component
 ```bash
-npx basuicn add button input switch
+npx basuicn add <component-name>
 ```
-*Lưu ý: CLI sẽ tự động nhận diện và tải thêm các component phụ thuộc nếu cần.*
+Ví dụ: `npx basuicn add button input`.
 
-### 3. Cấu hình Tailwind
-Chạy lệnh sau để nhận hướng dẫn copy-paste cấu hình theme:
+### Quản lý phiên bản
+-   **So sánh**: `npx basuicn diff <component-name>` để xem các thay đổi bạn đã sửa so với bản gốc.
+-   **Cập nhật**: `npx basuicn update <component-name>` để lấy bản mới nhất từ remote registry.
+
+### Kiểm tra lỗi cấu hình
+Nếu component không hiển thị đúng style hoặc lỗi import, hãy dùng:
 ```bash
-npx basuicn tailwind
-```
-
----
-
-## 🛠 Cách để tự bạn quản lý và phát hành
-
-### 1. Cập nhật Registry (Khi thêm component mới)
-```bash
-npm run registry:build
-```
-Sau đó hãy `git commit` và `git push` lên GitHub để CLI trên máy người dùng có thể thấy update mới.
-
-### 2. Biên dịch CLI
-```bash
-npm run build:cli
+npx basuicn doctor
 ```
 
-### 3. Phát hành lên NPM
-Để mọi người có thể gõ `npx basuicn`, bạn cần đưa nó lên NPM:
-1. Đăng nhập: `npm login`
-2. Phát hành: `npm publish` (Nếu tên `basuicn` đã bị trùng trên NPM, hãy đổi tên trong `package.json`).
+## ⚙️ Cơ chế hoạt động
 
----
+CLI hoạt động dựa trên một file `registry.json` phân phối từ GitHub. Khi bạn thêm một component:
+1.  CLI tải Metadata của component đó.
+2.  Tự động cài đặt các thư viện `npm` tương ứng.
+3.  Kiểm tra và tải các component phụ thuộc nội bộ.
+4.  Copy source code trực tiếp vào thư mục dự án của bạn.
+5.  (Tùy chọn) Thêm code khởi tạo vào `src/main.tsx` nếu component cần (ví dụ: `Toaster`).
 
-## 📂 Cơ chế hoạt động
-- **Local Mode**: Nếu bạn chạy `npx cus-ui add --local`, nó sẽ tìm file `registry.json` ngay tại thư mục hiện tại.
-- **Remote Mode (Mặc định)**: CLI sẽ tải dữ liệu trực tiếp từ: `https://raw.githubusercontent.com/huy14032003/ui-component/main/registry.json`.
+## 🛡 Bảo mật & Tin cậy
+-   Không phụ thuộc vào runtime sau khi cài đặt.
+-   Mã nguồn mở 100%, bạn có thể thoải mái tùy chỉnh sau khi copy vào dự án.

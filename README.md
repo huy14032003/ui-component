@@ -1,146 +1,96 @@
-# basuicn
+# basuicn — UI Component CLI
 
-Bộ component UI cho React, phân phối qua CLI — copy trực tiếp vào dự án của bạn, không cần cài như package dependency (tương tự shadcn/ui).
-
----
-
-## Yêu cầu
-
-- Node.js 18+
-- Dự án React + Vite + TypeScript
+Bộ sưu tập component React hiện đại, được phân phối trực tiếp vào dự án của bạn thông qua CLI. Không cần cài đặt dependencies cồng kềnh, bạn hoàn toàn kiểm soát mã nguồn của mình (tương tự shadcn/ui).
 
 ---
 
-## Bắt đầu nhanh
+## 🚀 Yêu cầu hệ thống
+
+- **Node.js**: Phiên bản 18 trở lên.
+- **Framework**: React + Vite + TypeScript.
+- **Styling**: Tailwind CSS v4 (hoặc v3).
+
+---
+
+## 📦 Bắt đầu nhanh
 
 ### 1. Khởi tạo dự án
 
-Đứng tại thư mục gốc dự án của bạn, chạy:
+Di chuyển đến thư mục gốc của dự án React và chạy lệnh:
 
 ```bash
 npx basuicn init
 ```
 
-Lệnh này tự động thực hiện:
-
-| Bước | Nội dung |
-|------|----------|
-| Cài dev packages | `tailwindcss`, `@tailwindcss/vite`, `@vitejs/plugin-react`, `vite-plugin-babel`, `babel-plugin-react-compiler`, `@types/node` |
-| Cài runtime packages | `@base-ui/react`, `tailwind-variants`, `clsx`, `tailwind-merge`, `tailwindcss-animate` |
-| Tạo / cập nhật `vite.config.ts` | Thêm plugin Tailwind, React, React Compiler + alias `@`, `@lib`, `@components`, `@assets`, `@pages`, `@styles` |
-| Cập nhật `tsconfig.json` | Thêm `baseUrl` + `paths` tương ứng với alias trên |
-| Setup Tailwind CSS | Thêm `@import "tailwindcss";` vào `src/index.css` (tạo mới nếu chưa có) |
-| Cài core utilities | `clsx`, `tailwind-merge` + tạo `src/lib/utils/cn.ts` |
-
-> Nếu `vite.config.ts` hoặc `tsconfig.json` đã tồn tại và đã có cấu hình, CLI sẽ bỏ qua bước đó — không ghi đè.
-
-**Kết quả `vite.config.ts` sau init:**
-
-```ts
-import { defineConfig } from 'vite';
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import babel from 'vite-plugin-babel';
-import { reactCompilerPreset } from 'babel-plugin-react-compiler';
-import path from 'path';
-
-export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    react(),
-    babel({ presets: [reactCompilerPreset()] }),
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@lib': path.resolve(__dirname, './src/lib'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@assets': path.resolve(__dirname, './src/assets'),
-      '@pages': path.resolve(__dirname, './src/pages'),
-      '@styles': path.resolve(__dirname, './src/styles'),
-    },
-  },
-});
-```
+Lệnh này sẽ thực hiện một chuỗi các thao tác tự động:
+- **Cài đặt thư viện**: `@base-ui/react`, `tailwind-variants`, `clsx`, `tailwind-merge`, `lucide-react`, ...
+- **Cấu hình Vite**: Tự động thêm alias `@/`, `@components/`, `@lib/`, ... vào `vite.config.ts`.
+- **Cấu hình TypeScript**: Thêm `paths` tương ứng vào `tsconfig.json`.
+- **Core Components**: Copy các file tiện ích như `cn.ts`, `ThemeProvider.tsx`, `themes.ts` và biến CSS theme vào dự án.
+- **Patching Entry**: Tự động bọc ứng dụng của bạn trong `<ThemeProvider>` tại file `src/main.tsx`.
 
 ---
 
-### 2. Thêm component
+### 2. Thêm Component
+
+Sử dụng lệnh `add` để tải component bạn cần:
 
 ```bash
 npx basuicn add button
-npx basuicn add button input switch   # nhiều component cùng lúc
-npx basuicn add button --force        # ghi đè nếu đã tồn tại
+npx basuicn add button input switch  # Thêm nhiều component cùng lúc
+npx basuicn add toast                # Tự động thêm <Toaster /> vào main.tsx
 ```
 
-Component được copy thẳng vào `src/components/ui/<name>/`. Các component phụ thuộc lẫn nhau sẽ tự động được kéo theo.
+> **Lưu ý**: CLI sẽ tự động nhận diện và tải về các component phụ thuộc (ví dụ `add select` sẽ tự tải thêm `popover`).
 
 ---
 
-### 3. Xóa component
+### 3. Cập nhật & So sánh (Update & Diff)
+
+Nếu có phiên bản mới của component từ thư viện gốc, bạn có thể kiểm tra và cập nhật:
 
 ```bash
-npx basuicn remove button
+npx basuicn diff button    # Xem sự khác biệt giữa code local và bản gốc trên registry
+npx basuicn update button  # Ghi đè phiên bản cục bộ bằng bản mới nhất
 ```
 
 ---
 
-### 4. Liệt kê tất cả component
+### 4. Kiểm tra sức khỏe dự án (Doctor)
 
-```bash
-npx basuicn list
+Nếu bạn gặp lỗi về import hoặc cấu hình, hãy chạy lệnh sau để CLI kiểm tra và gợi ý cách sửa lỗi:
+
+```bash\nnpx basuicn doctor
 ```
 
 ---
 
-### 5. Hướng dẫn cấu hình Tailwind theme
+## 🛠 Danh sách các lệnh (Commands)
 
-```bash
-npx basuicn tailwind
-```
-
----
-
-## Tùy chọn
-
-| Flag | Mô tả |
+| Lệnh | Mô tả |
 |------|-------|
-| `--local` | Dùng `registry.json` cục bộ thay vì tải từ remote |
-| `--force` | Ghi đè file đã tồn tại khi `add` |
+| `init` | Thiết lập môi trường dự án ban đầu. |
+| `add <name>` | Thêm component vào thư mục `src/components/ui/`. |
+| `update <name>` | Cập nhật component lên phiên bản mới nhất. |
+| `diff <name>` | So sánh code hiện tại với bản gốc. |
+| `remove <name>` | Xóa component khỏi dự án. |
+| `list` | Xem danh sách tất cả các component có sẵn. |
+| `doctor` | Kiểm tra cấu hình và các file core của dự án. |
 
 ---
 
-## Dành cho maintainer
+## 📂 Tùy chọn (Options)
 
-### Cập nhật registry (sau khi thêm/sửa component)
-
-```bash
-npm run registry:build
-```
-
-Sau đó commit + push lên GitHub để người dùng nhận được bản mới nhất.
-
-### Build CLI
-
-```bash
-npm run build:cli
-```
-
-Output: `dist/ui-cli.js`
-
-### Phát hành lên NPM
-
-```bash
-npm login
-npm publish
-```
-
-> Nếu tên package bị trùng, đổi `name` trong `package.json` trước khi publish.
+- `--force`: Ghi đè các file đã tồn tại nếu có xung đột khi `add` hoặc `init`.
+- `--local`: Chỉ dành cho phát triển — Đọc `registry.json` từ thư mục cục bộ thay vì từ GitHub.
 
 ---
 
-## Cơ chế hoạt động
+## 👨‍💻 Dành cho Maintainers
 
-- **Remote mode (mặc định):** Tải `registry.json` từ `https://raw.githubusercontent.com/huy14032003/ui-component/main/registry.json`
-- **Local mode (`--local`):** Đọc `registry.json` ngay tại thư mục hiện tại
-- Registry chứa source code + danh sách npm dependencies của từng component — CLI đọc rồi copy/install vào dự án target
+Nếu bạn muốn đóng góp hoặc tự xây dựng registry riêng:
+
+1.  **Biên dịch CLI**: `npm run build:cli`
+2.  **Đồng bộ Theme**: `npm run theme:sync` (Tạo file CSS theme từ `themes.ts`).
+3.  **Xây dựng Registry**: `npm run registry:build` (Gom toàn bộ code component vào `registry.json`).
+4.  **Publish**: `npm publish`
