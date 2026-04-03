@@ -6,9 +6,9 @@ import { execSync } from 'child_process';
 const REGISTRY_LOCAL = './registry.json';
 const REGISTRY_REMOTE = 'https://raw.githubusercontent.com/huy14032003/ui-component/main/registry.json';
 
-const log = (msg: string) => console.log(`[base-cus-ui] ${msg}`);
-const warn = (msg: string) => console.warn(`[base-cus-ui] WARN: ${msg}`);
-const error = (msg: string) => console.error(`[base-cus-ui] ERROR: ${msg}`);
+const log = (msg: string) => console.log(`[basuicn] ${msg}`);
+const warn = (msg: string) => console.warn(`[basuicn] WARN: ${msg}`);
+const error = (msg: string) => console.error(`[basuicn] ERROR: ${msg}`);
 
 const getTargetProjectDir = () => process.cwd();
 
@@ -403,7 +403,7 @@ const main = async () => {
     switch (command) {
         case 'add': {
             if (componentNames.length === 0) {
-                error('Usage: npx base-cus-ui add <component-name> [--force]');
+                error('Usage: npx basuicn add <component-name> [--force]');
                 return;
             }
 
@@ -426,7 +426,7 @@ const main = async () => {
 
         case 'remove': {
             if (componentNames.length === 0) {
-                error('Usage: npx base-cus-ui remove <component-name>');
+                error('Usage: npx basuicn remove <component-name>');
                 return;
             }
             for (const name of componentNames) {
@@ -465,7 +465,7 @@ const main = async () => {
 
         default: {
             console.log(`
-  base-cus-ui — UI Component CLI
+  basuicn — UI Component CLI
 
   Commands:
     init                     Initialize project (install core deps + files)
