@@ -16,9 +16,13 @@ const avatarVariants = tv({
   },
 });
 
+/** Props for the Avatar component */
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof avatarVariants> {
+  /** Image URL for the avatar */
   src?: string;
+  /** Alt text for the image; first 2 chars used as fallback if no `fallback` prop */
   alt?: string;
+  /** Text shown when the image fails to load or is not provided */
   fallback?: string;
 }
 

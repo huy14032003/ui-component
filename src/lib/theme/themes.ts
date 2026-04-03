@@ -12,8 +12,6 @@ export interface ThemeColors {
   warningForeground: string;
   danger: string;
   dangerForeground: string;
-  destructive: string;
-  destructiveForeground: string;
 }
 
 export interface Theme {
@@ -40,8 +38,6 @@ export const themes: Theme[] = [
       warningForeground: '#ffffff',
       danger: '#ef4444',
       dangerForeground: '#ffffff',
-      destructive: '#ef4444',
-      destructiveForeground: '#ffffff',
     },
   },
   {
@@ -61,8 +57,6 @@ export const themes: Theme[] = [
       warningForeground: '#ffffff',
       danger: '#ef4444',
       dangerForeground: '#ffffff',
-      destructive: '#ef4444',
-      destructiveForeground: '#ffffff',
     },
   },
   {
@@ -82,8 +76,6 @@ export const themes: Theme[] = [
       warningForeground: '#ffffff',
       danger: '#ef4444',
       dangerForeground: '#ffffff',
-      destructive: '#ef4444',
-      destructiveForeground: '#ffffff',
     },
   },
   {
@@ -103,8 +95,6 @@ export const themes: Theme[] = [
       warningForeground: '#ffffff',
       danger: '#ef4444',
       dangerForeground: '#ffffff',
-      destructive: '#ef4444',
-      destructiveForeground: '#ffffff',
     },
   },
   {
@@ -124,8 +114,6 @@ export const themes: Theme[] = [
       warningForeground: '#ffffff',
       danger: '#ef4444',
       dangerForeground: '#ffffff',
-      destructive: '#ef4444',
-      destructiveForeground: '#ffffff',
     },
   },
   {
@@ -145,13 +133,13 @@ export const themes: Theme[] = [
       warningForeground: '#ffffff',
       danger: '#ef4444',
       dangerForeground: '#ffffff',
-      destructive: '#ef4444',
-      destructiveForeground: '#ffffff',
     },
   },
 ];
 
 export function applyTheme(theme: Theme) {
+  if (typeof window === 'undefined') return;
+  if (!theme?.colors) return;
   const root = document.documentElement;
   const { colors: c } = theme;
 
@@ -168,6 +156,5 @@ export function applyTheme(theme: Theme) {
   root.style.setProperty('--color-warning-foreground', c.warningForeground);
   root.style.setProperty('--color-danger', c.danger);
   root.style.setProperty('--color-danger-foreground', c.dangerForeground);
-  root.style.setProperty('--color-destructive', c.destructive);
-  root.style.setProperty('--color-destructive-foreground', c.destructiveForeground);
+  // destructive aliases danger (mapped via CSS: --color-destructive: var(--danger))
 }

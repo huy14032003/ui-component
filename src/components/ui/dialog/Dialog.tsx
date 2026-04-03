@@ -30,16 +30,22 @@ const dialogVariants = tv({
 
 const { overlay, content, header, footer, title, description, close } = dialogVariants();
 
+/** Props for the Dialog component */
 export interface DialogProps extends React.ComponentPropsWithoutRef<typeof BaseDialog.Root>, VariantProps<typeof dialogVariants> {
+  /** Element that opens the dialog when clicked */
   trigger?: React.ReactNode;
+  /** Title text displayed in the dialog header */
   headerTitle?: string;
+  /** Description text displayed below the title */
   headerDescription?: string;
   children?: React.ReactNode;
+  /** Content rendered in the dialog footer area */
   footerContent?: React.ReactNode;
+  /** Additional CSS class applied to the dialog content panel */
   contentClassName?: string;
 }
 
-const Dialog = React.forwardRef<React.ElementRef<typeof BaseDialog.Root>, DialogProps>(
+const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
   ({ trigger, headerTitle, headerDescription, children, footerContent, size, contentClassName, ...props }, ref) => {
     const slots = dialogVariants({ size });
 
@@ -48,7 +54,7 @@ const Dialog = React.forwardRef<React.ElementRef<typeof BaseDialog.Root>, Dialog
         {trigger && <BaseDialog.Trigger render={trigger as React.ReactElement} />}
         <BaseDialog.Portal>
           <BaseDialog.Backdrop className={slots.overlay()} />
-          <BaseDialog.Popup className={slots.content({ className: contentClassName })}>
+          <BaseDialog.Popup ref={ref} className={slots.content({ className: contentClassName })}>
             {(headerTitle || headerDescription) && (
               <div className={slots.header()}>
                 {headerTitle && <BaseDialog.Title className={slots.title()}>{headerTitle}</BaseDialog.Title>}

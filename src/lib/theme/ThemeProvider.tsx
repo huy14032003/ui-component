@@ -15,11 +15,18 @@ const ThemeContext = createContext<ThemeContextValue>({
   themes,
 });
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
+const getStoredTheme = (): Theme => {
+  if (typeof window === 'undefined') return themes[0];
+  try {
     const saved = localStorage.getItem(STORAGE_KEY);
     return themes.find(t => t.name === saved) ?? themes[0];
-  });
+  } catch {
+    return themes[0];
+  }
+};
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [currentTheme, setCurrentTheme] = useState<Theme>(getStoredTheme);
 
   useEffect(() => {
     applyTheme(currentTheme);
@@ -28,7 +35,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = (name: string) => {
     const found = themes.find(t => t.name === name);
     if (!found) return;
-    localStorage.setItem(STORAGE_KEY, name);
+    try { localStorage.setItem(STORAGE_KEY, name); } catch { /* SSR / quota */ }
     setCurrentTheme(found);
   };
 

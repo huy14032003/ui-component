@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Input as BaseInput, Field as BaseField } from '@base-ui/react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '@/lib/utils/cn';
-import * as Icon from "@components/ui/icons";
+import * as Icon from "@/components/ui/icons";
 import { Toggle } from '@/components/ui/toggle/Toggle';
 
 const inputVariants = tv({
@@ -19,11 +19,17 @@ const inputVariants = tv({
   }
 });
 
+/** Props for the Input component */
 export interface InputProps extends Omit<React.ComponentPropsWithoutRef<typeof BaseInput>, 'className'>, VariantProps<typeof inputVariants> {
+  /** Label text displayed above the input */
   label?: string;
+  /** Error message displayed below the input; also applies danger styling */
   error?: string;
+  /** Helper text displayed below the input (hidden when error is present) */
   description?: string;
+  /** Icon rendered at the start (left side) of the input */
   icon?: React.ReactNode;
+  /** Icon rendered at the end (right side) of the input; ignored for password type */
   endIcon?: React.ReactNode;
   placeholder?: string;
   className?: string;
@@ -72,7 +78,7 @@ const Input = React.forwardRef<React.ElementRef<typeof BaseInput>, InputProps>(
               className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
               pressed={showPassword}
               onPressedChange={setShowPassword}
-              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <Icon.EyeOff className="h-4 w-4" /> : <Icon.Eye className="h-4 w-4" />}
             </Toggle>

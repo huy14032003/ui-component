@@ -29,7 +29,7 @@ export const AccordionItem = React.forwardRef<React.ElementRef<typeof BaseAccord
 )
 AccordionItem.displayName = 'AccordionItem';
 
-export const AccordionTrigger = React.forwardRef<React.ElementRef<typeof BaseAccordion.Trigger>, Omit<React.ComponentPropsWithoutRef<typeof BaseAccordion.Trigger>, 'className'> & { className?: string; hideChevron?: boolean }>(
+export const AccordionTrigger = React.forwardRef<React.ElementRef<typeof BaseAccordion.Trigger>, Omit<React.ComponentPropsWithoutRef<typeof BaseAccordion.Trigger>, 'className'> & { className?: string; /** Hide the default chevron icon */hideChevron?: boolean }>(
   ({ className, children, hideChevron, ...props }, ref) => (
     <BaseAccordion.Header className={header()}>
       <BaseAccordion.Trigger ref={ref} className={trigger({ className })} {...props}>

@@ -1,11 +1,31 @@
 import * as React from 'react';
-import { cn } from '@lib/utils/cn';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { cn } from '@/lib/utils/cn';
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+const cardVariants = tv({
+  base: 'rounded-xl border border-border bg-card text-card-foreground shadow-sm',
+  variants: {
+    padding: {
+      none: '',
+      sm: 'p-4',
+      md: 'p-6',
+    },
+  },
+  defaultVariants: {
+    padding: 'none',
+  },
+});
+
+/** Props for the Card component */
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, padding, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('rounded-xl border border-border bg-card text-card-foreground shadow-sm', className)}
+      className={cardVariants({ padding, className })}
       {...props}
     />
   )
@@ -23,7 +43,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardHeader.displayName = 'CardHeader';
 
-const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
@@ -63,4 +83,4 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, cardVariants };

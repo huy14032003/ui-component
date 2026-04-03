@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ComboBox } from '../combobox/ComboBox';
-import { flattenSearchableRoutes } from '../../../../routes';
+import { flattenSearchableRoutes, type RouteConfig } from '../../../../routes';
 
-import * as Icon from "@components/ui/icons";
-import { cn } from '@lib/utils/cn';
+import * as Icon from "@/components/ui/icons";
+import { cn } from '@/lib/utils/cn';
 import { ThemeToggle } from '../ThemeToggle';
 import { Tooltip } from '../tooltip/Tooltip';
 import {
@@ -33,7 +33,7 @@ import { ROUTES } from '../../../../routes';
 // ─── SidebarNavItem ──────────────────────────────────────────────────────────
 
 interface SidebarNavItemProps {
-  route: any;
+  route: RouteConfig;
   parentPath?: string;
   isCollapsed: boolean;
 }
@@ -52,7 +52,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({ route, parentPath = '',
   // Kiểm tra xem có node con nào đang active không (để tự động mở group)
   const isAnyChildActive = React.useMemo(() => {
     if (!hasChildren) return false;
-    const checkActive = (items: any[]): boolean => {
+    const checkActive = (items: RouteConfig[]): boolean => {
       return items.some(item => {
         const itemAbsPath = [absolutePath, item.prefix, item.path]
           .filter(Boolean)
@@ -63,7 +63,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({ route, parentPath = '',
         return false;
       });
     };
-    return checkActive(route.children);
+    return checkActive(route.children ?? []);
   }, [hasChildren, route.children, absolutePath, location.pathname]);
 
   if (hasChildren) {
@@ -75,7 +75,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({ route, parentPath = '',
           label={route.label}
           isChildActive={isAnyChildActive}
         >
-          {route.children.map((child: any, index: number) => (
+          {route.children!.map((child, index) => (
             <SidebarNavItem 
               key={index} 
               route={child} 

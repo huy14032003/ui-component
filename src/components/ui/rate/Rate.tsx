@@ -24,17 +24,29 @@ const rateVariants = tv({
   },
 });
 
+/** Props for the Rate component */
 export interface RateProps extends VariantProps<typeof rateVariants> {
+  /** Controlled rating value */
   value?: number;
+  /** Default rating value (uncontrolled) */
   defaultValue?: number;
+  /** Callback fired when the rating changes */
   onChange?: (value: number) => void;
+  /** Total number of stars */
   count?: number;
+  /** Allow half-star precision */
   allowHalf?: boolean;
+  /** Allow clicking the current value to reset to 0 */
   allowClear?: boolean;
+  /** Display as read-only (no interaction) */
   readonly?: boolean;
+  /** Disable the rating component */
   disabled?: boolean;
+  /** Custom element to render instead of the default star icon */
   character?: React.ReactNode;
+  /** Tailwind text color class for filled stars */
   activeColor?: string;
+  /** Tailwind text color class for empty stars */
   inactiveColor?: string;
   className?: string;
   'aria-label'?: string;
@@ -85,7 +97,7 @@ const Rate = React.forwardRef<HTMLDivElement, RateProps>(({
       ref={ref}
       className={slots.root({ className })}
       role="radiogroup"
-      aria-label={ariaLabel || 'Đánh giá'}
+      aria-label={ariaLabel || 'Rating'}
     >
       {Array.from({ length: count }, (_, i) => {
         const fraction = getStarFraction(i, display);

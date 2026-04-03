@@ -37,11 +37,15 @@ const buttonVariants = tv({
   },
 });
 
+/** Props for the Button component */
 export interface ButtonProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'className'>,
   VariantProps<typeof buttonVariants> {
+  /** Icon rendered before the button label */
   leftIcon?: React.ReactNode;
+  /** Icon rendered after the button label */
   rightIcon?: React.ReactNode;
+  /** Shows a loading spinner and disables interaction */
   isLoading?: boolean;
   className?: string;
   children?: React.ReactNode;

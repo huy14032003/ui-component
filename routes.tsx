@@ -32,6 +32,14 @@ import RatePage from './src/pages/RatePage';
 import TogglePage from './src/pages/TogglePage';
 import SidebarPage from './src/pages/SidebarPage';
 import TextareaPage from './src/pages/TextareaPage';
+import SeparatorPage from './src/pages/SeparatorPage';
+import ScrollAreaPage from './src/pages/ScrollAreaPage';
+import BreadcrumbPage from './src/pages/BreadcrumbPage';
+import PaginationPage from './src/pages/PaginationPage';
+import DropdownMenuPage from './src/pages/DropdownMenuPage';
+import ContextMenuPage from './src/pages/ContextMenuPage';
+import AspectRatioPage from './src/pages/AspectRatioPage';
+import SheetPage from './src/pages/SheetPage';
 import { VsCodeIDE } from './src/components/ui/vs-code/VsCodeIDE';
 
 export interface RouteConfig {
@@ -94,6 +102,24 @@ export const ROUTES: RouteConfig[] = [
         label: 'Spinner',
         icon: <Icon.Loader2 className="w-4 h-4" />,
         element: <SpinnerPage />,
+      },
+      {
+        path: '/separator',
+        label: 'Separator',
+        icon: <Icon.Minus className="w-4 h-4" />,
+        element: <SeparatorPage />,
+      },
+      {
+        path: '/breadcrumb',
+        label: 'Breadcrumb',
+        icon: <Icon.Navigation className="w-4 h-4" />,
+        element: <BreadcrumbPage />,
+      },
+      {
+        path: '/aspect-ratio',
+        label: 'Aspect Ratio',
+        icon: <Icon.Square className="w-4 h-4" />,
+        element: <AspectRatioPage />,
       },
     ]
   },
@@ -160,6 +186,22 @@ export const ROUTES: RouteConfig[] = [
         element: <TextareaPage />,
       },
     ]
+  },
+
+  // Navigation & Layout
+  {
+    path: '/components/pagination',
+    label: 'Pagination',
+    icon: <Icon.Hash className="w-4 h-4" />,
+    element: <PaginationPage />,
+    category: 'complex',
+  },
+  {
+    path: '/components/scroll-area',
+    label: 'Scroll Area',
+    icon: <Icon.ScrollText className="w-4 h-4" />,
+    element: <ScrollAreaPage />,
+    category: 'complex',
   },
 
   // Complex
@@ -233,6 +275,27 @@ export const ROUTES: RouteConfig[] = [
     label: 'Drawer',
     icon: <Icon.PanelLeft className="w-4 h-4" />,
     element: <DrawerPage />,
+    category: 'overlays',
+  },
+  {
+    path: '/components/dropdown-menu',
+    label: 'Dropdown Menu',
+    icon: <Icon.ChevronDown className="w-4 h-4" />,
+    element: <DropdownMenuPage />,
+    category: 'overlays',
+  },
+  {
+    path: '/components/context-menu',
+    label: 'Context Menu',
+    icon: <Icon.Menu className="w-4 h-4" />,
+    element: <ContextMenuPage />,
+    category: 'overlays',
+  },
+  {
+    path: '/components/sheet',
+    label: 'Sheet',
+    icon: <Icon.PanelLeft className="w-4 h-4" />,
+    element: <SheetPage />,
     category: 'overlays',
   },
 

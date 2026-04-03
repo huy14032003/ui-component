@@ -1,23 +1,22 @@
 import * as React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ROUTES } from '../routes';
+import { ROUTES, type RouteConfig } from '../routes';
 import { DashboardLayout } from './components/ui/layout/DashboardLayout';
 
-/**
- * Hàm flattenRoutes: Biến cấu trúc cây thành mảng phẳng để dùng với React Router.
- * Đồng thời xử lý việc ghép nối path với prefix.
- */
-const flattenRoutes = (routes: any[], parentPath = ''): any[] => {
-  let flat: any[] = [];
+interface FlatRoute extends RouteConfig {
+  path: string;
+}
+
+const flattenRoutes = (routes: RouteConfig[], parentPath = ''): FlatRoute[] => {
+  let flat: FlatRoute[] = [];
 
   routes.forEach((route) => {
-    // Kết hợp đường dẫn từ cha và prefix nếu có
     const combinedPath = [parentPath, route.prefix, route.path]
       .filter(Boolean)
       .join('/')
-      .replace(/\/+/g, '/'); // Clean up double slashes
+      .replace(/\/+/g, '/');
 
-    const processedRoute = {
+    const processedRoute: FlatRoute = {
       ...route,
       path: combinedPath === '' ? '/' : combinedPath,
     };
@@ -36,27 +35,24 @@ const flattenRoutes = (routes: any[], parentPath = ''): any[] => {
 
 const App = () => {
   const allRoutes = React.useMemo(() => flattenRoutes(ROUTES), []);
-  
-  // Tách biệt route có layout và không có layout (standalone)
+
   const layoutRoutes = allRoutes.filter(r => !r.standalone);
   const standaloneRoutes = allRoutes.filter(r => r.standalone);
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Render standalone routes first */}
         {standaloneRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element} />
         ))}
 
-        {/* Dashboard Layout Routes */}
         <Route path="/" element={<DashboardLayout />}>
           {layoutRoutes.map((route) => (
-            <Route 
-              key={route.path} 
-              index={route.path === '/'} 
-              path={route.path === '/' ? undefined : route.path.replace(/^\//, '')} 
-              element={route.element} 
+            <Route
+              key={route.path}
+              index={route.path === '/'}
+              path={route.path === '/' ? undefined : route.path.replace(/^\//, '')}
+              element={route.element}
             />
           ))}
 

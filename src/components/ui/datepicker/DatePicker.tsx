@@ -21,24 +21,38 @@ interface TimeParts {
     s: string;
 }
 
+/** Props for the DatePicker component */
 export interface DatePickerProps {
+    /** Picker mode: single date, date range, or time-only */
     mode?: DatePickerMode;
-    /** single → Date | range → DateRange | time-only → dùng timeValue */
+    /** Selected date (Date for single, DateRange for range) */
     date?: Date | DateRange;
+    /** Callback fired when the date changes */
     onDateChange?: (date: Date | DateRange | undefined) => void;
+    /** Alternative callback (alias for onDateChange) */
     onChange?: (date: Date | DateRange | undefined) => void;
-    /** Chỉ dùng khi mode='time-only' */
+    /** Current time string, only used when mode is 'time-only' */
     timeValue?: string;
+    /** Callback fired when the time value changes (time-only mode) */
     onTimeChange?: (time: string) => void;
+    /** Label text displayed above the picker */
     label?: string;
+    /** Placeholder text when no date is selected */
     placeholder?: string;
+    /** Disable all dates before today */
     disablePastDates?: boolean;
+    /** Show time picker alongside the calendar */
     showTime?: boolean;
+    /** Time format: hours only, hours:minutes, or hours:minutes:seconds */
     timeFormat?: TimeFormat;
+    /** Time picker UI style: native input or dropdown selects */
     timePickerStyle?: TimePickerStyle;
+    /** Disable the entire picker */
     disabled?: boolean;
     className?: string;
+    /** Helper text displayed below the picker */
     description?: string;
+    /** Error message displayed below the picker (replaces description) */
     error?: string;
 }
 
@@ -160,7 +174,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ parts, onChange, timeFormat, ti
         <div className="flex items-center gap-1.5">
             <div className="flex-1">
                 <NativeScrollSelect
-                    aria-label="Giờ"
+                    aria-label="Hours"
                     value={parts.h}
                     options={hoursOptions}
                     onChange={(val) => onChange({ ...parts, h: val })}
@@ -171,7 +185,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ parts, onChange, timeFormat, ti
                     <span className="text-sm font-bold text-muted-foreground">:</span>
                     <div className="flex-1">
                         <NativeScrollSelect
-                            aria-label="Phút"
+                            aria-label="Minutes"
                             value={parts.m}
                             options={minutesOptions}
                             onChange={(val) => onChange({ ...parts, m: val })}
@@ -184,7 +198,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ parts, onChange, timeFormat, ti
                     <span className="text-sm font-bold text-muted-foreground">:</span>
                     <div className="flex-1">
                         <NativeScrollSelect
-                            aria-label="Giây"
+                            aria-label="Seconds"
                             value={parts.s}
                             options={secondsOptions}
                             onChange={(val) => onChange({ ...parts, s: val })}
@@ -206,7 +220,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(({
     timeValue,
     onTimeChange,
     label,
-    placeholder = 'Chọn ngày...',
+    placeholder = 'Select date...',
     disablePastDates = false,
     showTime = false,
     timeFormat = 'HH:mm:ss',
@@ -273,7 +287,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(({
         if (mode === 'time-only') {
             const val = timeValue ?? buildTimeString(timeParts, timeFormat);
             if (!val || val === '00' || val === '00:00' || val === '00:00:00')
-                return <span className="text-muted-foreground">{placeholder || 'Chọn giờ...'}</span>;
+                return <span className="text-muted-foreground">{placeholder || 'Select time...'}</span>;
             return <span>{val}</span>;
         }
 
@@ -370,7 +384,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(({
                                     <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                                         <Clock className="w-3.5 h-3.5" />
                                         <span>
-                                            {timeFormat === 'HH' ? 'Chọn giờ' : timeFormat === 'HH:mm' ? 'Giờ : Phút' : 'Giờ : Phút : Giây'}
+                                            {timeFormat === 'HH' ? 'Select hour' : timeFormat === 'HH:mm' ? 'Hour : Minute' : 'Hour : Minute : Second'}
                                         </span>
                                     </div>
                                     <TimePicker
@@ -396,10 +410,10 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(({
                                     }}
                                     className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-2 hover:underline"
                                 >
-                                    Xóa
+                                    Clear
                                 </button>
                                 <Button size="sm" onClick={() => setOpen(false)}>
-                                    Xác nhận
+                                    Confirm
                                 </Button>
                             </div>
                         </BasePopover.Popup>

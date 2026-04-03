@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Combobox as BaseCombobox } from '@base-ui/react';
 import { Check, ChevronDown, X, Loader2 } from 'lucide-react';
 import { tv } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const comboboxVariants = tv({
   slots: {
@@ -19,30 +19,46 @@ const comboboxVariants = tv({
   }
 });
 
+/** A single option in the ComboBox dropdown */
 export interface ComboBoxOption {
+  /** Display text for the option */
   label: string;
+  /** Unique value identifying the option */
   value: string;
 }
 
+/** Props for the ComboBox component */
 export interface ComboBoxProps {
+  /** Array of selectable options */
   options: ComboBoxOption[];
+  /** Label text displayed above the combobox */
   label?: string;
   placeholder?: string;
+  /** Controlled selected value (string for single, string[] for multiple) */
   value?: string | string[];
+  /** Initial value for uncontrolled usage */
   defaultValue?: string | string[];
+  /** Callback fired when the selected value changes */
   onValueChange?: (value: string | string[]) => void;
+  /** Enable multi-select mode with chip display */
   multiple?: boolean;
+  /** Shows a loading spinner on the dropdown trigger */
   isLoading?: boolean;
   className?: string;
+  /** Enable type-ahead filtering of options (default: true) */
   autocomplete?: boolean;
+  /** Text shown when no options match the filter */
   emptyText?: string;
+  /** Label for the "select all" action in multi-select mode */
   selectAllText?: string;
+  /** Label for the "clear all" action in multi-select mode */
   clearAllText?: string;
+  /** Icon rendered at the start (left side) of the input */
   leftIcon?: React.ReactNode;
 }
 
 const ComboBox = React.forwardRef<HTMLInputElement, ComboBoxProps>(
-  ({ options, label, placeholder, value, defaultValue, onValueChange, multiple, isLoading, className, autocomplete = true, emptyText = 'Không tìm thấy kết quả.', selectAllText = 'Chọn tất cả', clearAllText = 'Xóa tất cả', leftIcon }, ref) => {
+  ({ options, label, placeholder, value, defaultValue, onValueChange, multiple, isLoading, className, autocomplete = true, emptyText = 'No results found.', selectAllText = 'Select all', clearAllText = 'Clear all', leftIcon }, ref) => {
     const [inputValue, setInputValue] = React.useState('');
     const [internalValue, setInternalValue] = React.useState<string | string[] | null>(defaultValue || (multiple ? [] : null));
 
@@ -135,6 +151,7 @@ const ComboBox = React.forwardRef<HTMLInputElement, ComboBoxProps>(
               {hasValue && (
                 <button
                   type="button"
+                  aria-label="Clear selection"
                   onClick={handleClear}
                   className="p-1 hover:bg-muted rounded-full text-muted-foreground transition-colors mr-1"
                 >

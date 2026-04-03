@@ -11,10 +11,14 @@ const tooltipVariants = tv({
 
 const { popup, arrow } = tooltipVariants();
 
+/** Props for the Tooltip component */
 export interface TooltipProps extends React.ComponentPropsWithoutRef<typeof BaseTooltip.Root> {
+  /** Content displayed inside the tooltip popup */
   content: React.ReactNode;
   children: React.ReactNode;
+  /** Which side of the trigger to render the tooltip */
   side?: 'top' | 'right' | 'bottom' | 'left';
+  /** Alignment relative to the trigger */
   align?: 'start' | 'center' | 'end';
 }
 
@@ -22,10 +26,10 @@ const Tooltip = React.forwardRef<React.ElementRef<typeof BaseTooltip.Root>, Tool
   ({ children, content, side = 'top', align = 'center', ...props }, ref) => {
     return (
       <BaseTooltip.Root {...props}>
-        <BaseTooltip.Trigger render={children as React.ReactElement} />
+        <BaseTooltip.Trigger render={React.isValidElement(children) ? children : <span>{children}</span>} />
         <BaseTooltip.Portal>
           <BaseTooltip.Positioner side={side} align={align} sideOffset={4}>
-            <BaseTooltip.Popup className={popup()}>
+            <BaseTooltip.Popup className={popup()} role="tooltip">
               <BaseTooltip.Arrow className={arrow()} />
               {content}
             </BaseTooltip.Popup>

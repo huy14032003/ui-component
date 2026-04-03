@@ -1,17 +1,34 @@
 import * as React from 'react';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react';
-import { cn } from '@lib/utils/cn';
+import { tv, type VariantProps } from 'tailwind-variants';
 
-export interface RadioGroupProps extends React.ComponentPropsWithoutRef<typeof BaseRadioGroup> {
+const radioGroupVariants = tv({
+  base: 'grid gap-2',
+  variants: {
+    orientation: {
+      vertical: 'grid-flow-row',
+      horizontal: 'grid-flow-col auto-cols-auto',
+    },
+  },
+  defaultVariants: {
+    orientation: 'vertical',
+  },
+});
+
+/** Props for the RadioGroup component */
+export interface RadioGroupProps
+  extends React.ComponentPropsWithoutRef<typeof BaseRadioGroup>,
+    VariantProps<typeof radioGroupVariants> {
   className?: string;
 }
 
 const RadioGroup = React.forwardRef<React.ElementRef<typeof BaseRadioGroup>, RadioGroupProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, orientation, ...props }, ref) => {
     return (
       <BaseRadioGroup
         ref={ref}
-        className={cn('grid gap-2', className)}
+        className={radioGroupVariants({ orientation, className })}
+        aria-orientation={orientation ?? 'vertical'}
         {...props}
       />
     );
@@ -20,4 +37,4 @@ const RadioGroup = React.forwardRef<React.ElementRef<typeof BaseRadioGroup>, Rad
 
 RadioGroup.displayName = 'RadioGroup';
 
-export { RadioGroup };
+export { RadioGroup, radioGroupVariants };

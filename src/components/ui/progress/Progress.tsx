@@ -40,13 +40,18 @@ const progressVariants = tv({
   }
 });
 
-export interface ProgressProps 
-  extends Omit<React.ComponentPropsWithoutRef<typeof BaseProgress.Root>, 'value'>, 
+/** Props for the Progress component */
+export interface ProgressProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseProgress.Root>, 'value'>,
     VariantProps<typeof progressVariants> {
     className?: string;
+    /** Progress value from 0 to 100 */
     value?: number | null;
+    /** @deprecated Use `labelPosition` instead */
     showLabel?: boolean;
+    /** Where to display the percentage label */
     labelPosition?: 'inside' | 'outside' | 'none';
+    /** Descriptive text label shown above the progress bar */
     label?: string;
 }
 
@@ -72,6 +77,10 @@ const Progress = React.forwardRef<React.ElementRef<typeof BaseProgress.Root>, Pr
           ref={ref}
           className={root()}
           value={value ?? null}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={displayValue}
+          aria-label={label ?? 'Progress'}
           {...props}
         >
           <BaseProgress.Indicator 

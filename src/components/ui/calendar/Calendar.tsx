@@ -25,17 +25,28 @@ const wrapperVariants = tv({
 
 export type CalendarMode = 'single' | 'range' | 'multiple';
 
+/** Props for the Calendar component */
 export interface CalendarProps extends VariantProps<typeof calendarVariants> {
+  /** Selection mode: single date, date range, or multiple dates */
   mode?: CalendarMode;
+  /** Currently selected value (Date, DateRange, or Date[] depending on mode) */
   selected?: Date | DateRange | Date[];
+  /** Callback fired when the selection changes */
   onSelect?: (value: Date | DateRange | Date[] | undefined) => void;
+  /** Disable all dates before today */
   disablePastDates?: boolean;
+  /** Disable all dates after today */
   disableFutureDates?: boolean;
+  /** Disable the entire calendar */
   disabled?: boolean;
+  /** Locale key from react-day-picker/locale (defaults to 'vi') */
   locale?: keyof typeof locales;
   className?: string;
+  /** Additional class name for the outer wrapper */
   wrapperClassName?: string;
+  /** Number of months to display side by side */
   numberOfMonths?: number;
+  /** Show days from adjacent months */
   showOutsideDays?: boolean;
 }
 
@@ -61,42 +72,36 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(({
     return undefined;
   };
 
+  const commonProps = {
+    locale: locales[locale as keyof typeof locales],
+    disabled: getDisabled(),
+    numberOfMonths,
+    showOutsideDays,
+    className: calendarVariants({ size, className }),
+  };
+
   return (
     <div ref={ref} className={wrapperVariants({ className: wrapperClassName })}>
-      {mode === 'single' && (
+      {mode === 'range' ? (
         <DayPicker
-          locale={locales[locale as keyof typeof locales]}
-          mode="single"
-          selected={selected as Date | undefined}
-          onSelect={(d) => onSelect?.(d)}
-          disabled={getDisabled()}
-          numberOfMonths={numberOfMonths}
-          showOutsideDays={showOutsideDays}
-          className={calendarVariants({ size, className })}
-        />
-      )}
-      {mode === 'range' && (
-        <DayPicker
-          locale={locales[locale as keyof typeof locales]}
+          {...commonProps}
           mode="range"
           selected={selected as DateRange | undefined}
           onSelect={(d) => onSelect?.(d)}
-          disabled={getDisabled()}
-          numberOfMonths={numberOfMonths}
-          showOutsideDays={showOutsideDays}
-          className={calendarVariants({ size, className })}
         />
-      )}
-      {mode === 'multiple' && (
+      ) : mode === 'multiple' ? (
         <DayPicker
-          locale={locales[locale as keyof typeof locales]}
+          {...commonProps}
           mode="multiple"
           selected={selected as Date[] | undefined}
           onSelect={(d) => onSelect?.(d)}
-          disabled={getDisabled()}
-          numberOfMonths={numberOfMonths}
-          showOutsideDays={showOutsideDays}
-          className={calendarVariants({ size, className })}
+        />
+      ) : (
+        <DayPicker
+          {...commonProps}
+          mode="single"
+          selected={selected as Date | undefined}
+          onSelect={(d) => onSelect?.(d)}
         />
       )}
     </div>

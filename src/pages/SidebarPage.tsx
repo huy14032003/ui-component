@@ -29,10 +29,10 @@ const SidebarPage = () => {
             label: 'Components',
             defaultOpen: true,
             items: [
-                { to: '#', icon: <Icons.AlertCircle className="w-4 h-4" />, label: 'Alert' },
-                { to: '#', icon: <Icons.BadgeCheck className="w-4 h-4" />, label: 'Badge' },
-                { to: '#', icon: <Icons.CheckCircle2 className="w-4 h-4" />, label: 'Button' },
-                { to: '#', icon: <Icons.Bell className="w-4 h-4" />, label: 'Bell' },
+                { to: '/1', icon: <Icons.AlertCircle className="w-4 h-4" />, label: 'Alert' },
+                { to: '/2', icon: <Icons.BadgeCheck className="w-4 h-4" />, label: 'Badge' },
+                { to: '/3', icon: <Icons.CheckCircle2 className="w-4 h-4" />, label: 'Button' },
+                { to: '/4', icon: <Icons.Bell className="w-4 h-4" />, label: 'Bell' },
 
             ],
         },

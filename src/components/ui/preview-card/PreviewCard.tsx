@@ -26,19 +26,32 @@ const previewCardVariants = tv({
 export type PreviewCardSide = 'top' | 'right' | 'bottom' | 'left';
 export type PreviewCardAlign = 'start' | 'center' | 'end';
 
+/** Props for the PreviewCard component */
 export interface PreviewCardProps {
+  /** Element that triggers the preview card */
   trigger: React.ReactNode;
+  /** Title text displayed in the card body */
   title?: string;
+  /** Description text displayed below the title */
   description?: string;
+  /** URL for the cover image at the top of the card */
   coverImage?: string;
+  /** Alt text for the cover image */
   coverAlt?: string;
+  /** Height in px of the cover image area */
   coverHeight?: number;
   children?: React.ReactNode;
+  /** Content rendered in the card footer section */
   footerContent?: React.ReactNode;
+  /** Which side of the trigger to render the card */
   side?: PreviewCardSide;
+  /** Alignment relative to the trigger */
   align?: PreviewCardAlign;
+  /** Distance in px between the trigger and the card */
   sideOffset?: number;
+  /** Open the card on hover instead of click */
   openOnHover?: boolean;
+  /** Width of the card in px */
   width?: number;
   className?: string;
 }

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { Dialog as BaseDialog } from '@base-ui/react';
 import { X } from 'lucide-react';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const drawerVariants = tv({
   slots: {
@@ -65,14 +65,22 @@ const drawerVariants = tv({
   },
 });
 
+/** Props for the Drawer component */
 export interface DrawerProps extends VariantProps<typeof drawerVariants> {
+  /** Controlled open state */
   open?: boolean;
+  /** Callback fired when the drawer opens or closes */
   onOpenChange?: (open: boolean) => void;
+  /** Element that opens the drawer when clicked */
   trigger?: React.ReactNode;
+  /** Title text displayed in the drawer header */
   title?: string;
+  /** Description text displayed below the title */
   description?: string;
   children?: React.ReactNode;
+  /** Content rendered in the drawer footer area */
   footerContent?: React.ReactNode;
+  /** Hides the close button in the header */
   hideClose?: boolean;
   className?: string;
 }
@@ -122,7 +130,7 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(({
               {!hideClose && (
                 <BaseDialog.Close
                   className={slots.close()}
-                  aria-label="Đóng"
+                  aria-label="Close"
                 >
                   <X className="h-4 w-4" />
                 </BaseDialog.Close>

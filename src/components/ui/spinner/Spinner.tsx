@@ -24,6 +24,7 @@ const spinnerVariants = tv({
   }
 });
 
+/** Props for the Spinner component */
 export interface SpinnerProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof spinnerVariants> {}

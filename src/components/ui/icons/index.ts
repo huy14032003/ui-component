@@ -53,4 +53,10 @@ export {
   ShieldCheck,
   CreditCard as BillingIcon,
   Bell as BellIcon,
+  Minus,
+  ScrollText,
+  Navigation,
+  Hash,
+  ChevronDown,
+  MoreHorizontal,
 } from 'lucide-react';

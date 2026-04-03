@@ -36,9 +36,11 @@ const badgeVariants = tv({
   }
 });
 
+/** Props for the Badge component */
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>,
   VariantProps<typeof badgeVariants> {
+  /** Show a pulsing dot indicator before the badge content */
   pulse?: boolean;
 }
 

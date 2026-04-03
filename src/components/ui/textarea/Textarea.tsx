@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Field as BaseField } from '@base-ui/react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const textareaVariants = tv({
   base: 'flex min-h-[80px] w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:ring-0  placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-shadow',
@@ -16,11 +16,15 @@ const textareaVariants = tv({
   }
 });
 
-export interface TextareaProps 
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement>, 
+/** Props for the Textarea component */
+export interface TextareaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   VariantProps<typeof textareaVariants> {
+  /** Label text displayed above the textarea */
   label?: string;
+  /** Error message displayed below the textarea (replaces description) */
   error?: string;
+  /** Helper text displayed below the textarea */
   description?: string;
 }
 

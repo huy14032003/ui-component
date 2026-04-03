@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { AlertCircle, CheckCircle2, ChevronRight, Info, XCircle } from 'lucide-react';
+// Icons can be passed as children by the consumer
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const alertVariants = tv({
   base: 'relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground',
@@ -19,7 +19,10 @@ const alertVariants = tv({
   }
 });
 
-const Alert = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>>(
+/** Props for the Alert component */
+type AlertProps = React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>;
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ className, variant, ...props }, ref) => (
     <div
       ref={ref}

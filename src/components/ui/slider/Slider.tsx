@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Slider as BaseSlider } from '@base-ui/react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const sliderVariants = tv({
   slots: {
@@ -15,6 +15,7 @@ const sliderVariants = tv({
 
 const { root, control, track, indicator, thumb } = sliderVariants();
 
+/** Props for the Slider component */
 export interface SliderProps extends React.ComponentPropsWithoutRef<typeof BaseSlider.Root> {
     className?: string;
 }
@@ -24,6 +25,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof BaseSlider.Root>, Slider
     <BaseSlider.Root
       ref={ref}
       className={root({ className })}
+      aria-label={props['aria-label'] ?? 'Slider'}
       {...props}
     >
       {/* 1. Thêm BaseSlider.Control bọc ngoài */}

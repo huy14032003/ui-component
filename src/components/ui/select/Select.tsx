@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Select as BaseSelect } from '@base-ui/react';
 import { tv } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 import { ChevronDown, Check, X } from 'lucide-react';
 
 const selectVariants = tv({
@@ -16,24 +16,36 @@ const selectVariants = tv({
 
 const { trigger, content, viewport, item, icon } = selectVariants();
 
+/** Props for the Select component */
 export interface SelectProps extends Omit<React.ComponentPropsWithoutRef<typeof BaseSelect.Root>, 'value' | 'defaultValue'> {
+    /** Label text displayed above the select trigger */
     label?: string;
+    /** Helper text displayed below the select (hidden when error is present) */
     description?: string;
+    /** Error message displayed below the select; also applies danger styling */
     error?: string;
+    /** Placeholder shown when no option is selected */
     placeholder?: string;
+    /** Array of selectable options */
     options: { label: string; value: string }[];
     id?: string;
     className?: string;
+    /** Controlled selected value */
     value?: string;
+    /** Initial selected value for uncontrolled usage */
     defaultValue?: string;
+    /** Whether a clear button is shown when a value is selected */
     clearable?: boolean;
+    /** Callback fired when the selected value changes */
     onChange?: (value: string) => void;
+    /** Text shown when the options array is empty */
     emptyText?: string;
+    /** Accessible label for the clear button */
     clearLabel?: string;
 }
 
 const Select = React.forwardRef<React.ElementRef<typeof BaseSelect.Trigger>, SelectProps>(
-    ({ label, description, error, placeholder = 'Chọn...', options, id, className, clearable = true, onChange, onValueChange, value, defaultValue, emptyText = 'Không tìm thấy kết quả.', clearLabel = 'Xóa lựa chọn', ...props }, ref) => {
+    ({ label, description, error, placeholder = 'Select...', options, id, className, clearable = true, onChange, value, defaultValue, emptyText = 'No results found.', clearLabel = 'Clear selection', ...props }, ref) => {
         const triggerRef = React.useRef<HTMLButtonElement>(null);
 
         const [selectedValue, setSelectedValue] = React.useState<string>(value ?? defaultValue ?? '');
@@ -42,14 +54,9 @@ const Select = React.forwardRef<React.ElementRef<typeof BaseSelect.Trigger>, Sel
             if (value !== undefined) setSelectedValue(value);
         }, [value]);
 
-        const handleValueChange = (val: unknown) => {
-            const strVal = val as string;
-            setSelectedValue(strVal);
-            onChange?.(strVal);
-            // @ts-expect-error Base UI type mapping for onValueChange expects strict context which is internal
-            onValueChange?.(strVal, {
-                event: new Event('change')
-            });
+        const handleValueChange = (val: string) => {
+            setSelectedValue(val);
+            onChange?.(val);
         };
 
         const handleClear = (e: React.MouseEvent) => {
@@ -57,10 +64,6 @@ const Select = React.forwardRef<React.ElementRef<typeof BaseSelect.Trigger>, Sel
             e.stopPropagation();
             setSelectedValue('');
             onChange?.('');
-            // @ts-expect-error Base UI type mapping for onValueChange expects strict context which is internal
-            onValueChange?.('', {
-                event: new Event('change')
-            });
         };
 
         const selectedLabel = options.find((o) => o.value === selectedValue)?.label;
@@ -81,7 +84,7 @@ const Select = React.forwardRef<React.ElementRef<typeof BaseSelect.Trigger>, Sel
                     <BaseSelect.Root
                         value={value}
                         defaultValue={defaultValue}
-                        onValueChange={handleValueChange}
+                        onValueChange={handleValueChange as (value: unknown) => void}
                         {...props}
                     >
                         <BaseSelect.Trigger

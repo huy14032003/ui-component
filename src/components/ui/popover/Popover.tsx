@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Popover as BasePopover } from '@base-ui/react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const popoverVariants = tv({
   slots: {
@@ -12,7 +12,9 @@ const popoverVariants = tv({
 
 const { popup, arrow } = popoverVariants();
 
+/** Props for the Popover component */
 export interface PopoverProps extends React.ComponentPropsWithoutRef<typeof BasePopover.Root> {
+    /** Element that triggers the popover on click */
     trigger: React.ReactNode;
     children: React.ReactNode;
     className?: string;

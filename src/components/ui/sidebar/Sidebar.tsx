@@ -4,7 +4,7 @@ import { PanelLeft, ChevronRight, ChevronsUpDown } from 'lucide-react';
 import { tv } from 'tailwind-variants';
 import { Popover as BasePopover } from '@base-ui/react';
 import { Tooltip } from '../tooltip/Tooltip';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -40,10 +40,14 @@ export function useSidebar() {
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
+/** Props for the SidebarProvider that manages sidebar state (open/collapsed, mobile, width) */
 export interface SidebarProviderProps {
   children: React.ReactNode;
+  /** Initial open state for uncontrolled usage (default: true) */
   defaultOpen?: boolean;
+  /** Controlled open state */
   open?: boolean;
+  /** Callback fired when the sidebar opens or closes */
   onOpenChange?: (open: boolean) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -145,9 +149,13 @@ SidebarTrigger.displayName = 'SidebarTrigger';
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
+/** Props for the Sidebar panel */
 export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
+  /** Which side of the viewport the sidebar attaches to */
   side?: 'left' | 'right';
+  /** Visual variant: default border, floating card, or inset with background */
   variant?: 'sidebar' | 'floating' | 'inset';
+  /** Collapse behavior: slide offcanvas, shrink to icons, or non-collapsible */
   collapsible?: 'offcanvas' | 'icon' | 'none';
 }
 
@@ -459,10 +467,15 @@ const menuButtonVariants = tv({
   defaultVariants: { size: 'md', collapsed: false },
 });
 
+/** Props for a sidebar menu button */
 export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Render as child element instead of a button */
   asChild?: boolean;
+  /** Marks the button as the currently active item */
   isActive?: boolean;
+  /** Tooltip text shown when the sidebar is collapsed */
   tooltip?: string;
+  /** Button size variant */
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -502,12 +515,19 @@ SidebarMenuButton.displayName = 'SidebarMenuButton';
 
 // ─── SidebarNavLink — wraps React Router NavLink ─────────────────────────────
 
+/** Props for a sidebar navigation link (wraps React Router NavLink) */
 export interface SidebarNavLinkProps {
+  /** Route path for the link */
   to: string;
+  /** Icon rendered before the label */
   icon?: React.ReactNode;
+  /** Display text for the link; also used as tooltip when collapsed */
   label: string;
+  /** Match route exactly (React Router `end` prop) */
   end?: boolean;
+  /** Badge element rendered after the label */
   badge?: React.ReactNode;
+  /** Link size variant */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -561,12 +581,18 @@ SidebarNavLink.displayName = 'SidebarNavLink';
 
 // ─── SidebarMenuCollapsible — nhóm có sub-items ───────────────────────────────
 
+/** Props for a collapsible sidebar menu group with sub-items */
 export interface SidebarMenuCollapsibleProps {
+  /** Unique identifier for the group */
   id: string;
+  /** Icon displayed next to the group label */
   icon: React.ReactNode;
+  /** Display text for the collapsible group header */
   label: string;
   children: React.ReactNode;
+  /** Whether the group is initially expanded */
   defaultOpen?: boolean;
+  /** When true, the group auto-expands and shows an active indicator */
   isChildActive?: boolean;
 }
 

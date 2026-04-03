@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
-import * as Icon from "@components/ui/icons";
-import { cn } from '@lib/utils/cn';
+import * as Icon from "@/components/ui/icons";
+import { cn } from '@/lib/utils/cn';
 import { ThemeToggle } from '../ThemeToggle';
 import { Tooltip } from '../tooltip/Tooltip';
 import {

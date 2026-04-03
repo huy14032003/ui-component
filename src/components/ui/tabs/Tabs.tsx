@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Tabs as BaseTabs } from '@base-ui/react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const tabsVariants = tv({
   slots: {
@@ -15,6 +15,7 @@ const tabsVariants = tv({
 
 const { rootSlots, list, indicator, trigger, panel } = tabsVariants();
 
+/** Props for the root Tabs container */
 export interface TabsProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Root> {
 }
 
@@ -31,6 +32,7 @@ const Tabs = React.forwardRef<React.ElementRef<typeof BaseTabs.Root>, TabsProps>
 );
 Tabs.displayName = 'Tabs';
 
+/** Props for the tab list container that holds tab triggers */
 export interface TabsListProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.List> {
 }
 
@@ -46,6 +48,7 @@ const TabsList = React.forwardRef<React.ElementRef<typeof BaseTabs.List>, TabsLi
 );
 TabsList.displayName = 'TabsList';
 
+/** Props for an individual tab trigger button */
 export interface TabsTriggerProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Tab> {
 }
 
@@ -58,6 +61,7 @@ const TabsTrigger = React.forwardRef<React.ElementRef<typeof BaseTabs.Tab>, Tabs
 );
 TabsTrigger.displayName = 'TabsTrigger';
 
+/** Props for a tab content panel */
 export interface TabsContentProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Panel> {
 }
 

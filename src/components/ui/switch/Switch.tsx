@@ -27,9 +27,11 @@ const switchVariants = tv({
 
 
 
+/** Props for the Switch component */
 export interface SwitchProps
   extends Omit<BaseSwitch.Root.Props, 'className'>,
   VariantProps<typeof switchVariants> {
+  /** Text label displayed next to the switch */
   label?: string;
   className?: string;
 }

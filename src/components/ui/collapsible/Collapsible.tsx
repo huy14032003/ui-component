@@ -12,13 +12,19 @@ const collapsibleVariants = tv({
   }
 });
 
+/** Props for the Collapsible component */
 export interface CollapsibleProps {
+  /** Content rendered inside the trigger button */
   trigger: React.ReactNode;
   children: React.ReactNode;
+  /** Whether the panel is open by default (uncontrolled) */
   defaultOpen?: boolean;
+  /** Controlled open state */
   open?: boolean;
+  /** Callback fired when the open state changes */
   onOpenChange?: (open: boolean) => void;
   className?: string;
+  /** Additional class name applied to the trigger button */
   triggerClassName?: string;
 }
 

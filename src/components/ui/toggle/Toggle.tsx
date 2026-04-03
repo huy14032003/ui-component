@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const toggleVariants = tv({
   base: [
@@ -46,11 +46,15 @@ const toggleVariants = tv({
   },
 });
 
+/** Props for the Toggle component */
 export interface ToggleProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'>,
     VariantProps<typeof toggleVariants> {
+  /** Controlled pressed state */
   pressed?: boolean;
+  /** Default pressed state (uncontrolled) */
   defaultPressed?: boolean;
+  /** Callback fired when the pressed state changes */
   onPressedChange?: (pressed: boolean) => void;
 }
 
@@ -109,15 +113,23 @@ interface ToggleGroupContextValue {
 
 const ToggleGroupContext = React.createContext<ToggleGroupContextValue | null>(null);
 
+/** Props for the ToggleGroup component */
 export interface ToggleGroupProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /** Whether only one or multiple items can be active at a time */
   type?: 'single' | 'multiple';
+  /** Controlled array of active item values */
   value?: string[];
+  /** Default active values (uncontrolled) */
   defaultValue?: string[];
+  /** Callback fired when the active values change */
   onValueChange?: (value: string[]) => void;
+  /** Variant applied to all child ToggleGroupItems (can be overridden per item) */
   variant?: VariantProps<typeof toggleVariants>['variant'];
+  /** Size applied to all child ToggleGroupItems (can be overridden per item) */
   size?: VariantProps<typeof toggleVariants>['size'];
   children: React.ReactNode;
+  /** Disable the entire group */
   disabled?: boolean;
 }
 
@@ -164,8 +176,10 @@ const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
 
 ToggleGroup.displayName = 'ToggleGroup';
 
+/** Props for the ToggleGroupItem component */
 export interface ToggleGroupItemProps
   extends Omit<ToggleProps, 'pressed' | 'onPressedChange'> {
+  /** Unique value identifying this item within the group */
   value: string;
 }
 

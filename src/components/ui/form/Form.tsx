@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { cn } from '@lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 import {
     Controller,
     FormProvider,
@@ -22,6 +22,7 @@ type FormFieldContextValue<
 
 const FormFieldContext = React.createContext<FormFieldContextValue | null>(null);
 
+/** Connects a form field to react-hook-form via Controller and provides field context */
 const FormField = <
     TFieldValues extends FieldValues = FieldValues,
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
@@ -68,6 +69,7 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue | null>(null);
 
+/** Container for a single form field; provides a unique ID via context */
 const FormItem = React.forwardRef<
     HTMLDivElement,
     React.HTMLAttributes<HTMLDivElement>
@@ -82,6 +84,7 @@ const FormItem = React.forwardRef<
 });
 FormItem.displayName = 'FormItem';
 
+/** Label that auto-associates with its parent FormItem's control via htmlFor */
 const FormLabel = React.forwardRef<
     HTMLLabelElement,
     React.LabelHTMLAttributes<HTMLLabelElement>
@@ -99,6 +102,7 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = 'FormLabel';
 
+/** Wrapper for the form input; applies aria-describedby and aria-invalid attributes */
 const FormControl = React.forwardRef<
     React.ElementRef<'div'>,
     React.HTMLAttributes<HTMLDivElement>
@@ -121,6 +125,7 @@ const FormControl = React.forwardRef<
 });
 FormControl.displayName = 'FormControl';
 
+/** Helper text displayed below a form control */
 const FormDescription = React.forwardRef<
     HTMLParagraphElement,
     React.HTMLAttributes<HTMLParagraphElement>
@@ -138,6 +143,7 @@ const FormDescription = React.forwardRef<
 });
 FormDescription.displayName = 'FormDescription';
 
+/** Displays the field's validation error message, or custom children as fallback */
 const FormMessage = React.forwardRef<
     HTMLParagraphElement,
     React.HTMLAttributes<HTMLParagraphElement>

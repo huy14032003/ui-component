@@ -15,11 +15,17 @@ const alertDialogVariants = tv({
 
 const { overlay, content, header, footer, title, description } = alertDialogVariants();
 
+/** Props for the AlertDialog component */
 export interface AlertDialogProps extends React.ComponentPropsWithoutRef<typeof BaseAlertDialog.Root> {
+  /** Element rendered as the dialog trigger button */
   trigger?: React.ReactNode;
+  /** Title displayed in the dialog header */
   headerTitle?: string;
+  /** Description text displayed below the title */
   headerDescription?: string;
+  /** Element rendered as the cancel/close action */
   cancelContent?: React.ReactNode;
+  /** Element rendered as the confirm/destructive action */
   actionContent?: React.ReactNode;
 }
 
