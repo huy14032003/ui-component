@@ -12,7 +12,9 @@
       "Bash(node:*)",
       "Bash(npm install:*)",
       "Bash(find:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(mv .storybook document/.storybook)",
+      "Bash(rm -rf src/stories)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "basuicn",
   "private": false,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "bin": {
     "basuicn": "./dist/ui-cli.cjs"
@@ -23,7 +23,9 @@
     "test:coverage": "vitest run --coverage",
     "registry:build": "npx -y tsx scripts/build-registry.ts",
     "theme:sync": "npx -y tsx scripts/generate-theme-css.ts",
-    "ui:add": "npx -y tsx scripts/ui-cli.ts add"
+    "ui:add": "npx -y tsx scripts/ui-cli.ts add",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -81,7 +83,18 @@
     "unified": "^11.0.5",
     "vite": "^8.0.1",
     "vitest": "^4.1.2",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "storybook": "^10.3.4",
+    "@storybook/react-vite": "^10.3.4",
+    "@chromatic-com/storybook": "^5.1.1",
+    "@storybook/addon-vitest": "^10.3.4",
+    "@storybook/addon-a11y": "^10.3.4",
+    "@storybook/addon-docs": "^10.3.4",
+    "@storybook/addon-onboarding": "^10.3.4",
+    "eslint-plugin-storybook": "^10.3.4",
+    "playwright": "^1.59.1",
+    "@vitest/browser-playwright": "^4.1.2",
+    "@vitest/coverage-v8": "^4.1.2"
   },
   "dependencies": {
     "keen-slider": "^6.8.6"

@@ -276,6 +276,21 @@
     }
 }
 
+/* ─── Reduced Motion ─────────────────────────────────────────────────────────
+   Respect prefers-reduced-motion for a11y.
+   Disables all animations and transitions globally when the user's OS
+   requests reduced motion. Individual components can opt-out via
+   motion-reduce:* utilities if an animation is essential.
+*/
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 /* Ensure data-state="checked" always works for background */
 [data-state="checked"] {
     &.bg-primary {

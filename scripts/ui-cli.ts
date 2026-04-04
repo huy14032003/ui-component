@@ -2,17 +2,56 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import readline from 'readline';
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const VERSION = '0.1.4';
 const REGISTRY_LOCAL = './registry.json';
 const REGISTRY_REMOTE = 'https://raw.githubusercontent.com/huy14032003/ui-component/main/registry.json';
 
-const log  = (msg: string) => console.log(`[basuicn] ${msg}`);
-const warn = (msg: string) => console.warn(`[basuicn] WARN: ${msg}`);
-const error = (msg: string) => console.error(`[basuicn] ERROR: ${msg}`);
+// ─── Colors (ANSI) ───────────────────────────────────────────────────────────
+
+const c = {
+    reset: '\x1b[0m',
+    bold: '\x1b[1m',
+    dim: '\x1b[2m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    red: '\x1b[31m',
+    cyan: '\x1b[36m',
+    magenta: '\x1b[35m',
+    blue: '\x1b[34m',
+    gray: '\x1b[90m',
+};
+
+const log   = (msg: string) => console.log(`${c.cyan}▸${c.reset} ${msg}`);
+const ok    = (msg: string) => console.log(`${c.green}✔${c.reset} ${msg}`);
+const warn  = (msg: string) => console.warn(`${c.yellow}⚠${c.reset} ${msg}`);
+const error = (msg: string) => console.error(`${c.red}✖${c.reset} ${msg}`);
 
 const getTargetProjectDir = () => process.cwd();
 
-// ─── Registry ──────────────────────���─────────────────────────────���────────────
+// ─── Interactive prompt ──────────────────────────────────────────────────────
+
+const ask = (question: string): Promise<string> => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    return new Promise((resolve) => {
+        rl.question(`${c.cyan}?${c.reset} ${question} `, (answer) => {
+            rl.close();
+            resolve(answer.trim());
+        });
+    });
+};
+
+const confirm = async (question: string, defaultYes = true): Promise<boolean> => {
+    const hint = defaultYes ? 'Y/n' : 'y/N';
+    const answer = await ask(`${question} ${c.dim}(${hint})${c.reset}`);
+    if (!answer) return defaultYes;
+    return answer.toLowerCase().startsWith('y');
+};
+
+// ─── Registry ─────────────────────────────────────────────────────────────────
 
 interface RegistryFile { path: string; content: string }
 interface RegistryComponent {
@@ -80,7 +119,7 @@ const installNpmPackages = (packages: string[], cwd: string, dev = false) => {
 
     if (toInstall.length === 0) return;
 
-    log(`Installing: ${toInstall.join(', ')}...`);
+    log(`Installing: ${c.bold}${toInstall.join(', ')}${c.reset}...`);
     const flag = dev ? '--save-dev' : '--save';
     try {
         execSync(`npm install ${toInstall.join(' ')} ${flag}`, { stdio: 'inherit', cwd });
@@ -89,9 +128,8 @@ const installNpmPackages = (packages: string[], cwd: string, dev = false) => {
     }
 };
 
-// ─── Packages ───────────────────────��─────────────────────────────��───────────
+// ─── Packages ─────────────────────────────────────────────────────────────────
 
-/** Build/dev tooling installed as devDependencies */
 const VITE_DEV_PACKAGES = [
     'tailwindcss',
     '@tailwindcss/vite',
@@ -99,10 +137,6 @@ const VITE_DEV_PACKAGES = [
     '@types/node',
 ];
 
-/**
- * Runtime packages every project using these components needs.
- * Installed as regular dependencies.
- */
 const RUNTIME_PACKAGES = [
     '@base-ui/react',
     'tailwind-variants',
@@ -112,7 +146,7 @@ const RUNTIME_PACKAGES = [
     'lucide-react',
 ];
 
-// ─── Vite config ────────────────────────────���──────────────────────────��──────
+// ─── Vite config ──────────────────────────────────────────────────────────────
 
 const VITE_CONFIG_TEMPLATE = `import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
@@ -151,7 +185,7 @@ const setupViteConfig = (cwd: string) => {
 
     if (!fs.existsSync(configTs) && !fs.existsSync(configJs)) {
         fs.writeFileSync(configTs, VITE_CONFIG_TEMPLATE);
-        log('Created vite.config.ts.');
+        ok('Created vite.config.ts.');
         return;
     }
 
@@ -170,7 +204,7 @@ const setupViteConfig = (cwd: string) => {
     const hasAlias = content.includes('alias:') || content.includes("'@'") || content.includes('"@"');
 
     if (missingImports.length === 0 && missingPlugins.length === 0 && hasAlias) {
-        log('vite.config already configured — skipping.');
+        ok('vite.config already configured — skipping.');
         return;
     }
 
@@ -229,10 +263,10 @@ const setupViteConfig = (cwd: string) => {
     }
 
     fs.writeFileSync(existingPath, content);
-    log(`Updated ${path.basename(existingPath)} with Tailwind + path aliases.`);
+    ok(`Updated ${path.basename(existingPath)} with Tailwind + path aliases.`);
 };
 
-// ─── tsconfig ────────────────────────��────────────────────────────────���───────
+// ─── tsconfig ─────────────────────────────────────────────────────────────────
 
 const setupTsConfig = (cwd: string) => {
     const candidates = ['tsconfig.app.json', 'tsconfig.json'];
@@ -244,7 +278,7 @@ const setupTsConfig = (cwd: string) => {
         const raw = fs.readFileSync(configPath, 'utf-8');
 
         if (raw.includes('"@/*"') || raw.includes("'@/*'")) {
-            log(`${candidate} already has path aliases — skipping.`);
+            ok(`${candidate} already has path aliases — skipping.`);
             return;
         }
 
@@ -257,7 +291,7 @@ const setupTsConfig = (cwd: string) => {
             parsed.compilerOptions.baseUrl = '.';
             parsed.compilerOptions.paths = TSCONFIG_PATHS;
             fs.writeFileSync(configPath, JSON.stringify(parsed, null, 2));
-            log(`Added path aliases to ${candidate}.`);
+            ok(`Added path aliases to ${candidate}.`);
         } catch (err) {
             warn(`Could not auto-patch ${candidate}: ${err instanceof Error ? err.message : err}`);
             warn('Add these to compilerOptions manually:');
@@ -274,15 +308,11 @@ const setupTsConfig = (cwd: string) => {
 
     const newConfig = { compilerOptions: { baseUrl: '.', paths: TSCONFIG_PATHS } };
     fs.writeFileSync(path.join(cwd, 'tsconfig.json'), JSON.stringify(newConfig, null, 2));
-    log('Created tsconfig.json with path aliases.');
+    ok('Created tsconfig.json with path aliases.');
 };
 
-// ─── Core files ────────────────────────────���─────────────────────────────��────
+// ─── Core files ───────────────────────────────────────────────────────────────
 
-/**
- * Copy core files (cn.ts, index.css, ThemeProvider, themes.ts) from registry.
- * Pass force=true on `init` to always overwrite — keeps core up to date.
- */
 const ensureCore = (
     registry: { core?: { dependencies: string[]; files: RegistryFile[] } },
     cwd: string,
@@ -300,21 +330,17 @@ const ensureCore = (
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
 
         if (fs.existsSync(targetPath) && !options.force) {
-            log(`Core file exists (skipping): ${file.path}`);
+            log(`Core file exists (skipping): ${c.dim}${file.path}${c.reset}`);
             continue;
         }
 
         fs.writeFileSync(targetPath, file.content);
-        log(`${fs.existsSync(targetPath) ? 'Updated' : 'Created'} core file: ${file.path}`);
+        ok(`${fs.existsSync(targetPath) ? 'Updated' : 'Created'} core file: ${file.path}`);
     }
 };
 
 // ─── main.tsx patching ────────────────────────────────────────────────────────
 
-/**
- * Components that need additional setup in the main entry file.
- * Key = component name in registry, value = import + JSX to inject.
- */
 const MAIN_PATCH_COMPONENTS: Record<string, { import: string; jsx: string }> = {
     toast: {
         import: "import { Toaster } from '@/components/ui/toast/Toaster';",
@@ -333,7 +359,6 @@ const findMainFile = (cwd: string): string | null => {
 };
 
 const insertImport = (content: string, importLine: string): string => {
-    // Don't add duplicate
     if (content.includes(importLine)) return content;
     const allImports = [...content.matchAll(/^import\s.+$/gm)];
     if (allImports.length > 0) {
@@ -344,14 +369,6 @@ const insertImport = (content: string, importLine: string): string => {
     return importLine + '\n' + content;
 };
 
-/**
- * Patches the main entry file to:
- *  1. Import src/styles/index.css (theme variables + Tailwind)
- *  2. Import ThemeProvider
- *  3. Wrap <App /> with <ThemeProvider>
- *
- * Safe to call multiple times — skips sections that are already set up.
- */
 const patchMainTsx = (cwd: string) => {
     const mainPath = findMainFile(cwd);
     if (!mainPath) {
@@ -362,11 +379,9 @@ const patchMainTsx = (cwd: string) => {
     let content = fs.readFileSync(mainPath, 'utf-8');
     let changed = false;
 
-    // 1. Ensure styles/index.css is imported
     const cssImportLine = "import './styles/index.css';";
     const hasCssImport = content.includes('styles/index.css') || content.includes('index.css');
     if (!hasCssImport) {
-        // Insert at top before other imports
         const firstImport = content.match(/^import\s/m);
         if (firstImport?.index !== undefined) {
             content = content.slice(0, firstImport.index) + cssImportLine + '\n' + content.slice(firstImport.index);
@@ -375,12 +390,10 @@ const patchMainTsx = (cwd: string) => {
         }
         changed = true;
     } else if (!content.includes('styles/index.css')) {
-        // Has some CSS import but not our theme CSS — add it alongside
         content = insertImport(content, cssImportLine);
         changed = true;
     }
 
-    // 2. ThemeProvider
     if (!content.includes('ThemeProvider')) {
         content = insertImport(content, "import { ThemeProvider } from '@/lib/theme/ThemeProvider';");
 
@@ -395,16 +408,12 @@ const patchMainTsx = (cwd: string) => {
 
     if (changed) {
         fs.writeFileSync(mainPath, content);
-        log(`Patched ${path.relative(cwd, mainPath)}.`);
+        ok(`Patched ${path.relative(cwd, mainPath)}.`);
     } else {
-        log(`${path.relative(cwd, mainPath)} already configured — skipping.`);
+        ok(`${path.relative(cwd, mainPath)} already configured — skipping.`);
     }
 };
 
-/**
- * Injects a component's bootstrap JSX (e.g. <Toaster />) into the main entry file.
- * Places it inside <ThemeProvider> after <App />, falls back to right after <App />.
- */
 const patchMainTsxComponent = (cwd: string, componentName: string) => {
     const patch = MAIN_PATCH_COMPONENTS[componentName];
     if (!patch) return;
@@ -413,7 +422,6 @@ const patchMainTsxComponent = (cwd: string, componentName: string) => {
     if (!mainPath) return;
 
     let content = fs.readFileSync(mainPath, 'utf-8');
-    // Check by component tag name (e.g. "Toaster")
     const tagName = patch.jsx.match(/<(\w+)/)?.[1];
     if (tagName && content.includes(`<${tagName}`)) return;
 
@@ -431,10 +439,10 @@ const patchMainTsxComponent = (cwd: string, componentName: string) => {
         if (fallback !== content) fs.writeFileSync(mainPath, fallback);
     }
 
-    log(`Added <${tagName}> to ${path.relative(cwd, mainPath)}.`);
+    ok(`Added <${tagName}> to ${path.relative(cwd, mainPath)}.`);
 };
 
-// ─── Component add/remove ──────────────────────────��──────────────────────────
+// ─── Component add/remove ─────────────────────────────────────────────────────
 
 const addComponent = (
     name: string,
@@ -448,11 +456,11 @@ const addComponent = (
 
     const component = registry.components[name];
     if (!component) {
-        error(`Component "${name}" not found. Run 'list' to see available components.`);
+        error(`Component "${name}" not found. Run '${c.cyan}basuicn list${c.reset}' to see available components.`);
         return;
     }
 
-    log(`Adding: ${name}...`);
+    log(`Adding: ${c.bold}${name}${c.reset}...`);
 
     ensureCore(registry as Parameters<typeof ensureCore>[0], cwd);
     installNpmPackages(component.dependencies, cwd);
@@ -472,12 +480,12 @@ const addComponent = (
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
 
         if (fs.existsSync(targetPath) && !options.force) {
-            warn(`Skipped (exists): ${file.path} — use --force to overwrite`);
+            warn(`Skipped (exists): ${file.path} — use ${c.cyan}--force${c.reset} to overwrite`);
             continue;
         }
 
         fs.writeFileSync(targetPath, file.content);
-        log(`Created: ${file.path}`);
+        ok(`Created: ${file.path}`);
     }
 };
 
@@ -492,13 +500,13 @@ const removeComponent = (
         return;
     }
 
-    log(`Removing: ${name}...`);
+    log(`Removing: ${c.bold}${name}${c.reset}...`);
 
     for (const file of component.files) {
         const targetPath = path.join(cwd, file.path);
         if (fs.existsSync(targetPath)) {
             fs.unlinkSync(targetPath);
-            log(`Deleted: ${file.path}`);
+            ok(`Deleted: ${file.path}`);
         }
     }
 
@@ -507,7 +515,7 @@ const removeComponent = (
         try {
             if (fs.existsSync(targetDir) && fs.readdirSync(targetDir).length === 0) {
                 fs.rmdirSync(targetDir);
-                log(`Removed empty dir: ${path.relative(cwd, targetDir)}`);
+                ok(`Removed empty dir: ${path.relative(cwd, targetDir)}`);
             }
         } catch (err) {
             warn(`Could not remove directory: ${err instanceof Error ? err.message : err}`);
@@ -515,15 +523,168 @@ const removeComponent = (
     }
 };
 
+// ─── Help texts ───────────────────────────────────────────────────────────────
+
+const HELP_MAIN = `
+${c.bold}${c.cyan}basuicn${c.reset} ${c.dim}v${VERSION}${c.reset} — Modern React UI Component CLI
+
+${c.bold}USAGE${c.reset}
+  ${c.cyan}npx basuicn${c.reset} ${c.green}<command>${c.reset} ${c.dim}[options]${c.reset}
+
+${c.bold}COMMANDS${c.reset}
+  ${c.green}init${c.reset}                       Initialize project: install deps, copy core files, patch entry
+  ${c.green}add${c.reset} ${c.dim}<name...>${c.reset}             Add component(s) to your project
+  ${c.green}update${c.reset} ${c.dim}<name...>${c.reset}          Update component(s) to latest registry version
+  ${c.green}diff${c.reset} ${c.dim}<name...>${c.reset}            Show diff between local and registry version
+  ${c.green}remove${c.reset} ${c.dim}<name...>${c.reset}          Remove component(s) from your project
+  ${c.green}list${c.reset}                       List all available components
+  ${c.green}doctor${c.reset}                     Check project health and configuration
+
+${c.bold}OPTIONS${c.reset}
+  ${c.cyan}--force${c.reset}                    Overwrite existing files when adding/updating
+  ${c.cyan}--local${c.reset}                    Use local registry.json instead of remote
+  ${c.cyan}--help, -h${c.reset}                 Show help (use with a command for detailed help)
+  ${c.cyan}--version, -v${c.reset}              Show version
+
+${c.bold}QUICK START${c.reset}
+  ${c.dim}$${c.reset} npx basuicn init
+  ${c.dim}$${c.reset} npx basuicn add button input card
+  ${c.dim}$${c.reset} npx basuicn add toast
+
+${c.bold}EXAMPLES${c.reset}
+  ${c.dim}$${c.reset} npx basuicn add dialog --force   ${c.dim}# Overwrite existing dialog${c.reset}
+  ${c.dim}$${c.reset} npx basuicn diff button           ${c.dim}# See what changed since last update${c.reset}
+  ${c.dim}$${c.reset} npx basuicn doctor                ${c.dim}# Diagnose missing deps/config${c.reset}
+
+${c.dim}Documentation: https://github.com/huy14032003/ui-component${c.reset}
+`;
+
+const HELP_COMMANDS: Record<string, string> = {
+    init: `
+${c.bold}basuicn init${c.reset}
+
+  Initialize your project for basuicn components.
+
+  ${c.bold}What it does:${c.reset}
+    1. Installs runtime dependencies (@base-ui/react, tailwind-variants, etc.)
+    2. Sets up vite.config.ts with Tailwind CSS + path aliases
+    3. Patches tsconfig.json with path aliases (@/*, @lib/*, etc.)
+    4. Copies core files (cn.ts, themes.ts, ThemeProvider.tsx, index.css)
+    5. Wraps your <App /> with <ThemeProvider> in the main entry
+
+  ${c.bold}Usage:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn init
+    ${c.dim}$${c.reset} npx basuicn init --local   ${c.dim}# Use local registry${c.reset}
+`,
+    add: `
+${c.bold}basuicn add${c.reset} ${c.dim}<name...>${c.reset}
+
+  Add one or more components to your project.
+
+  ${c.bold}Options:${c.reset}
+    ${c.cyan}--force${c.reset}    Overwrite existing component files
+
+  ${c.bold}Features:${c.reset}
+    • Auto-runs init if project hasn't been set up
+    • Resolves internal dependencies (e.g., dialog depends on button)
+    • Installs required npm packages automatically
+    • Patches main entry for components that need it (e.g., toast)
+
+  ${c.bold}Usage:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn add button
+    ${c.dim}$${c.reset} npx basuicn add button input card dialog
+    ${c.dim}$${c.reset} npx basuicn add toast --force
+
+  ${c.bold}Interactive:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn add           ${c.dim}# Prompts to select components${c.reset}
+`,
+    update: `
+${c.bold}basuicn update${c.reset} ${c.dim}<name...>${c.reset}
+
+  Update component(s) to the latest registry version.
+  Equivalent to ${c.cyan}add --force${c.reset}.
+
+  ${c.bold}Usage:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn update button
+    ${c.dim}$${c.reset} npx basuicn update button card dialog
+`,
+    remove: `
+${c.bold}basuicn remove${c.reset} ${c.dim}<name...>${c.reset}
+
+  Remove component(s) from your project.
+  Deletes component files and cleans up empty directories.
+
+  ${c.bold}Usage:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn remove button
+    ${c.dim}$${c.reset} npx basuicn remove dialog drawer sheet
+`,
+    diff: `
+${c.bold}basuicn diff${c.reset} ${c.dim}<name...>${c.reset}
+
+  Show differences between your local component files and the registry version.
+  Useful to see what has changed before running update.
+
+  ${c.bold}Usage:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn diff button
+    ${c.dim}$${c.reset} npx basuicn diff button card
+`,
+    list: `
+${c.bold}basuicn list${c.reset}
+
+  Show all available components in the registry.
+  Displays internal dependencies for each component.
+
+  ${c.bold}Usage:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn list
+`,
+    doctor: `
+${c.bold}basuicn doctor${c.reset}
+
+  Run a health check on your project configuration.
+
+  ${c.bold}Checks:${c.reset}
+    • Core files exist (cn.ts, themes.ts, ThemeProvider.tsx, index.css)
+    • ThemeProvider + CSS import in main entry
+    • Runtime packages installed
+    • Dev packages installed
+    • Tailwind CSS configured
+    • TypeScript path aliases
+    • Vite config present
+
+  ${c.bold}Usage:${c.reset}
+    ${c.dim}$${c.reset} npx basuicn doctor
+`,
+};
+
 // ─── Commands ─────────────────────────────────────────────────────────────────
 
 const main = async () => {
     const args = process.argv.slice(2);
+
+    // Version flag
+    if (args.includes('--version') || args.includes('-v')) {
+        console.log(`basuicn v${VERSION}`);
+        return;
+    }
+
     const isLocal = args.includes('--local');
     const isForce = args.includes('--force');
-    const filteredArgs = args.filter((a) => !a.startsWith('--'));
+    const isHelp = args.includes('--help') || args.includes('-h');
+    const filteredArgs = args.filter((a) => !a.startsWith('--') && a !== '-h' && a !== '-v');
     const command = filteredArgs[0];
     const componentNames = filteredArgs.slice(1);
+
+    // Help for specific command
+    if (isHelp && command && HELP_COMMANDS[command]) {
+        console.log(HELP_COMMANDS[command]);
+        return;
+    }
+
+    // General help
+    if (isHelp || !command) {
+        console.log(HELP_MAIN);
+        return;
+    }
 
     const cwd = getTargetProjectDir();
     const registry = await getRegistry(isLocal);
@@ -535,17 +696,43 @@ const main = async () => {
             setupViteConfig(cwd);
             setupTsConfig(cwd);
             installNpmPackages(RUNTIME_PACKAGES, cwd);
-            // force=true so init always refreshes core files to latest version
             ensureCore(registry, cwd, { force: true });
             patchMainTsx(cwd);
-            log('Initialization complete.');
+            console.log('');
+            ok(`${c.bold}Initialization complete!${c.reset} Run ${c.cyan}npx basuicn add <component>${c.reset} to get started.`);
             break;
         }
 
         case 'add': {
-            if (componentNames.length === 0) {
-                error('Usage: npx basuicn add <component-name> [--force]');
-                return;
+            let names = componentNames;
+
+            // Interactive mode: no component names provided
+            if (names.length === 0) {
+                const all = Object.keys(registry.components).sort();
+                console.log(`\n${c.bold}Available components (${all.length}):${c.reset}`);
+
+                // Group by category
+                const categories: Record<string, string[]> = {};
+                for (const name of all) {
+                    const prefix = name.includes('-') ? name.split('-')[0] : 'general';
+                    if (!categories[prefix]) categories[prefix] = [];
+                    categories[prefix].push(name);
+                }
+
+                // Print in columns
+                const cols = 4;
+                for (let i = 0; i < all.length; i += cols) {
+                    const row = all.slice(i, i + cols).map(n => n.padEnd(20)).join('');
+                    console.log(`  ${c.dim}${row}${c.reset}`);
+                }
+
+                console.log('');
+                const answer = await ask(`Which components to add? ${c.dim}(space-separated, or "all")${c.reset}`);
+                if (!answer) {
+                    log('No components selected.');
+                    return;
+                }
+                names = answer === 'all' ? all : answer.split(/[\s,]+/).filter(Boolean);
             }
 
             // Auto-init if project hasn't been initialized yet
@@ -557,108 +744,147 @@ const main = async () => {
                 installNpmPackages(RUNTIME_PACKAGES, cwd);
                 ensureCore(registry, cwd, { force: true });
                 patchMainTsx(cwd);
+                console.log('');
             }
 
-            for (const name of componentNames) {
+            for (const name of names) {
                 addComponent(name, registry, cwd, { force: isForce });
                 patchMainTsxComponent(cwd, name);
             }
-            log('Done!');
+            console.log('');
+            ok(`${c.bold}Done!${c.reset} Added ${names.length} component(s).`);
             break;
         }
 
         case 'update': {
             if (componentNames.length === 0) {
-                error('Usage: npx basuicn update <component-name> [...]');
+                error(`Usage: ${c.cyan}npx basuicn update <component-name> [...]${c.reset}`);
+                console.log(`  Run ${c.cyan}npx basuicn update --help${c.reset} for details.`);
                 return;
             }
             for (const name of componentNames) {
-                log(`Updating: ${name}...`);
+                log(`Updating: ${c.bold}${name}${c.reset}...`);
                 addComponent(name, registry, cwd, { force: true });
             }
-            log('Update complete.');
+            console.log('');
+            ok(`${c.bold}Update complete.${c.reset}`);
             break;
         }
 
         case 'remove': {
             if (componentNames.length === 0) {
-                error('Usage: npx basuicn remove <component-name>');
+                error(`Usage: ${c.cyan}npx basuicn remove <component-name>${c.reset}`);
                 return;
             }
+
+            if (!isForce) {
+                const yes = await confirm(`Remove ${componentNames.join(', ')}?`);
+                if (!yes) {
+                    log('Cancelled.');
+                    return;
+                }
+            }
+
             for (const name of componentNames) {
                 removeComponent(name, registry, cwd);
             }
-            log('Done!');
+            console.log('');
+            ok(`${c.bold}Done!${c.reset}`);
             break;
         }
 
         case 'list': {
             const components = Object.keys(registry.components).sort();
-            log(`Available components (${components.length}):`);
+            console.log(`\n${c.bold}Available components (${components.length}):${c.reset}\n`);
+
+            const installed: string[] = [];
+            const available: string[] = [];
+
             for (const k of components) {
                 const comp = registry.components[k];
-                const deps = comp.internalDependencies?.filter(Boolean);
-                const depStr = deps?.length ? ` (requires: ${deps.join(', ')})` : '';
-                console.log(`  - ${k}${depStr}`);
+                const firstFile = comp.files[0];
+                const isInstalled = firstFile && fs.existsSync(path.join(cwd, firstFile.path));
+                if (isInstalled) installed.push(k);
+                else available.push(k);
             }
+
+            if (installed.length > 0) {
+                console.log(`  ${c.green}Installed (${installed.length}):${c.reset}`);
+                for (const k of installed) {
+                    const deps = registry.components[k].internalDependencies?.filter(Boolean);
+                    const depStr = deps?.length ? ` ${c.dim}→ ${deps.join(', ')}${c.reset}` : '';
+                    console.log(`    ${c.green}●${c.reset} ${k}${depStr}`);
+                }
+                console.log('');
+            }
+
+            if (available.length > 0) {
+                console.log(`  ${c.dim}Available (${available.length}):${c.reset}`);
+                for (const k of available) {
+                    const deps = registry.components[k].internalDependencies?.filter(Boolean);
+                    const depStr = deps?.length ? ` ${c.dim}→ ${deps.join(', ')}${c.reset}` : '';
+                    console.log(`    ${c.dim}○${c.reset} ${k}${depStr}`);
+                }
+            }
+            console.log('');
             break;
         }
 
         case 'diff': {
             if (componentNames.length === 0) {
-                error('Usage: npx basuicn diff <component-name>');
+                error(`Usage: ${c.cyan}npx basuicn diff <component-name>${c.reset}`);
                 return;
             }
             for (const name of componentNames) {
                 const component = registry.components[name];
                 if (!component) {
-                    error(`Component "${name}" not found. Run 'list' to see available components.`);
+                    error(`Component "${name}" not found.`);
                     continue;
                 }
                 let hasDiff = false;
-                console.log(`\n[diff] ${name}`);
+                console.log(`\n${c.bold}[diff] ${name}${c.reset}`);
                 for (const file of component.files) {
                     const targetPath = path.join(cwd, file.path);
                     if (!fs.existsSync(targetPath)) {
-                        console.log(`  + [new file] ${file.path}`);
+                        console.log(`  ${c.green}+ [new file]${c.reset} ${file.path}`);
                         hasDiff = true;
                         continue;
                     }
                     const localContent = fs.readFileSync(targetPath, 'utf-8');
                     if (localContent === file.content) continue;
                     hasDiff = true;
-                    console.log(`\n  ~ ${file.path}`);
+                    console.log(`\n  ${c.yellow}~${c.reset} ${file.path}`);
                     const localLines = localContent.split('\n');
                     const remoteLines = file.content.split('\n');
                     const maxLen = Math.max(localLines.length, remoteLines.length);
                     let shownLines = 0;
                     for (let i = 0; i < maxLen; i++) {
                         if (localLines[i] !== remoteLines[i]) {
-                            if (localLines[i] !== undefined) console.log(`    - ${localLines[i]}`);
-                            if (remoteLines[i] !== undefined) console.log(`    + ${remoteLines[i]}`);
+                            if (localLines[i] !== undefined) console.log(`    ${c.red}- ${localLines[i]}${c.reset}`);
+                            if (remoteLines[i] !== undefined) console.log(`    ${c.green}+ ${remoteLines[i]}${c.reset}`);
                             shownLines++;
                             if (shownLines >= 20) {
                                 const remaining = maxLen - i - 1;
-                                if (remaining > 0) console.log(`    ... and ${remaining} more lines`);
+                                if (remaining > 0) console.log(`    ${c.dim}... and ${remaining} more lines${c.reset}`);
                                 break;
                             }
                         }
                     }
                 }
-                if (!hasDiff) log(`${name}: already up to date.`);
+                if (!hasDiff) ok(`${name}: already up to date.`);
             }
             break;
         }
 
         case 'doctor': {
-            log('Running project health check...\n');
+            console.log(`\n${c.bold}Project Health Check${c.reset}\n`);
             let issues = 0;
-            const check = (ok: boolean, msg: string, fix?: string) => {
-                console.log(`${ok ? '  ✓' : '  ✗'} ${msg}`);
-                if (!ok) { if (fix) console.log(`      → ${fix}`); issues++; }
+            const check = (passed: boolean, msg: string, fix?: string) => {
+                console.log(`  ${passed ? `${c.green}✔${c.reset}` : `${c.red}✖${c.reset}`} ${msg}`);
+                if (!passed) { if (fix) console.log(`    ${c.dim}→ ${fix}${c.reset}`); issues++; }
             };
 
-            // ── Core files ──────────────────────────────────────────────────
+            // Core files
             check(fs.existsSync(path.join(cwd, 'src/lib/utils/cn.ts')),
                 'src/lib/utils/cn.ts', 'run: npx basuicn init');
             check(fs.existsSync(path.join(cwd, 'src/lib/theme/themes.ts')),
@@ -668,7 +894,7 @@ const main = async () => {
             check(fs.existsSync(path.join(cwd, 'src/styles/index.css')),
                 'src/styles/index.css (theme variables)', 'run: npx basuicn init');
 
-            // ── main entry ────────────────���──────────────────────────��──────
+            // Main entry
             const mainPath = findMainFile(cwd);
             if (mainPath) {
                 const mainContent = fs.readFileSync(mainPath, 'utf-8');
@@ -680,7 +906,7 @@ const main = async () => {
                 check(false, 'main entry file (src/main.tsx)', 'create src/main.tsx');
             }
 
-            // ── Runtime packages ─────────────────────────��──────────────────
+            // Runtime packages
             const pkgPath = path.join(cwd, 'package.json');
             if (fs.existsSync(pkgPath)) {
                 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
@@ -688,7 +914,6 @@ const main = async () => {
                 for (const dep of RUNTIME_PACKAGES) {
                     check(!!allDeps[dep], `package: ${dep}`, `run: npm install ${dep}`);
                 }
-                // Dev packages
                 for (const dep of VITE_DEV_PACKAGES) {
                     check(!!allDeps[dep], `package (dev): ${dep}`, `run: npm install -D ${dep}`);
                 }
@@ -696,14 +921,14 @@ const main = async () => {
                 check(false, 'package.json found', 'run: npm init -y');
             }
 
-            // ── Config files ────────────────────���───────────────────────────
+            // Config files
             const hasTailwindInCss = (() => {
                 const candidates = ['src/styles/index.css', 'src/index.css', 'src/App.css'];
                 return candidates.some(f => {
                     const p = path.join(cwd, f);
                     if (!fs.existsSync(p)) return false;
-                    const c = fs.readFileSync(p, 'utf-8');
-                    return c.includes('@import "tailwindcss"') || c.includes("@import 'tailwindcss'");
+                    const content = fs.readFileSync(p, 'utf-8');
+                    return content.includes('@import "tailwindcss"') || content.includes("@import 'tailwindcss'");
                 });
             })();
             check(hasTailwindInCss, '@import "tailwindcss" in CSS', 'run: npx basuicn init');
@@ -712,8 +937,8 @@ const main = async () => {
             const hasAlias = tsCandidates.some(f => {
                 const p = path.join(cwd, f);
                 if (!fs.existsSync(p)) return false;
-                const c = fs.readFileSync(p, 'utf-8');
-                return c.includes('"@/*"') || c.includes("'@/*'");
+                const content = fs.readFileSync(p, 'utf-8');
+                return content.includes('"@/*"') || content.includes("'@/*'");
             });
             check(hasAlias, 'TypeScript path aliases (@/*)', 'run: npx basuicn init');
 
@@ -724,35 +949,16 @@ const main = async () => {
 
             console.log('');
             if (issues === 0) {
-                log('All checks passed! Project is healthy.');
+                ok(`${c.bold}All checks passed!${c.reset} Project is healthy.`);
             } else {
-                warn(`${issues} issue(s) found. Run "npx basuicn init" to fix most issues.`);
+                warn(`${c.bold}${issues} issue(s) found.${c.reset} Run ${c.cyan}npx basuicn init${c.reset} to fix most issues.`);
             }
             break;
         }
 
         default: {
-            console.log(`
-  basuicn — UI Component CLI
-
-  Commands:
-    init                     Set up project: install deps, copy core files, patch main entry
-    add <name> [--force]     Add component(s) to your project
-    update <name>            Update component(s) to latest registry version
-    diff <name>              Show diff between local and registry version
-    remove <name>            Remove component(s) from your project
-    list                     List all available components
-    doctor                   Check project health and configuration
-
-  Options:
-    --local                  Use local registry.json instead of remote
-    --force                  Overwrite existing files when adding
-
-  Quick start:
-    npx basuicn init
-    npx basuicn add button
-    npx basuicn add toast
-`);
+            error(`Unknown command: "${command}"`);
+            console.log(`  Run ${c.cyan}npx basuicn --help${c.reset} to see available commands.\n`);
         }
     }
 };
